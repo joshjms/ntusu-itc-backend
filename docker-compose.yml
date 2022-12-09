@@ -1,0 +1,32 @@
+version: '3.9'
+services:
+  db:
+    container_name: SUITC_Database
+    image: postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+  web:
+    build:
+      context: .
+      dockerfile: docker/dev/Dockerfile
+    container_name: SUITC_Backend
+    image: suitc_image
+    command: >
+      bash -c "python manage.py migrate
+      && python manage.py runserver 0.0.0.0:8888"
+    volumes:
+      - .:/project
+    ports:
+      - "8888:8888"
+    environment:
+      - POSTGRES_NAME=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    depends_on:
+      - db
+volumes:
+  data:

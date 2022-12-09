@@ -87,13 +87,33 @@ WSGI_APPLICATION = "SUITC_Backend.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+"""
+    Github Action CI currently does not use Docker.
+    PostgreSQL database is only used in Docker Volumes
+    in development and deployment (to be setup later).
+    The testing done through Github Action will be
+    defaulted to use the original sqlite3 file.
+"""
+import os
+NAME = os.environ.get('POSTGRES_NAME')
+if NAME:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ.get('POSTGRES_NAME'),
+            'USER': os.environ.get('POSTGRES_USER'),
+            'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+            'HOST': 'db',
+            'PORT': 5432,
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        },
+    }
 
 
 # Password validation

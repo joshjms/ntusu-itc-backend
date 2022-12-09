@@ -14,3 +14,9 @@ django-cors-headers==3.13.0
 # DRF JWT; dependent to DRF
 djangorestframework-simplejwt==5.2.2
 PyJWT==2.6.0
+
+# Database
+psycopg2-binary==2.9.3
+
+# Unittest library
+mock==4.0.3

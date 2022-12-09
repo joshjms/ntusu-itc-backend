@@ -4,3 +4,13 @@ Django==4.1.2
 sqlparse==0.4.3
 tzdata==2022.5
 pytz==2022.5
+
+# Django REST Framework; dependent to Django
+djangorestframework==3.14.0
+
+# Django Cors Headers; dependent to Django
+django-cors-headers==3.13.0
+
+# DRF JWT; dependent to DRF
+djangorestframework-simplejwt==5.2.2
+PyJWT==2.6.0

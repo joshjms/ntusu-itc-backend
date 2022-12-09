@@ -37,11 +37,23 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'corsheaders',
+    
+    'portal',
+    'sso',
+    'ufacility',
+    'inventory',
+    'event',
+    'starswar',
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    'corsheaders.middleware.CorsMiddleware',
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -50,6 +62,9 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "SUITC_Backend.urls"
+
+# DJANGO CORS HEADERS SETTINGS
+CORS_ORIGIN_ALLOW_ALL = True
 
 TEMPLATES = [
     {

@@ -14,14 +14,24 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.http import HttpResponse
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path('', include('portal.urls')),
+    path('summernote/', include('django_summernote.urls')),
+
+    path('', lambda _: HttpResponse("NTUSU ITC BACKEND")),
+    path('portal/', include('portal.urls')),
     path('sso/', include('sso.urls')),
     path('ufacility/', include('ufacility.urls')),
     path('inventory/', include('inventory.urls')),
     path('event/', include('event.urls')),
     path('starswar/', include('starswar.urls')),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL,
+                          document_root=settings.MEDIA_ROOT)

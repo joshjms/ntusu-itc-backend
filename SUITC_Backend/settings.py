@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
+    'drf_yasg',
     
     'portal',
     'sso',
@@ -163,3 +164,13 @@ ses_client = boto3.client(
     aws_access_key_id='AKIASDA4XJS4KLMM4RV7',
     aws_secret_access_key='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',
 )
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        "Auth Token eg [Bearer {JWT}]": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}

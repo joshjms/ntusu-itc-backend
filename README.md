@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is NTUSU ITC Backend repository created on November 2022. It is built using mainly Django REST Framework and a few other dependencies. The old 5 years old repository [here](https://github.com/michac789/NTUSU-Backend) is about to be deprecated, as there are multiple compatibility issues and we want to shift to Single Page Application format where we separate the backend and frontend.
+This is NTUSU ITC Backend repository created on December 2022. It is built using mainly Django REST Framework and a few other dependencies. The old 5 years old repository [here](https://github.com/michac789/NTUSU-Backend) is about to be deprecated, as there are multiple compatibility issues and we want to shift to Single Page Application format where we separate the backend and frontend.
 
 ### Table of Contents
 
@@ -53,6 +53,10 @@ Automatic CI testing is enforced everytime a pull request or a push is done to t
 Sample data are created using Django Fixtures.
 
 TODO - create fixtures and update
+
+### API Documentation
+
+TODO
 
 ## Production Environment
 

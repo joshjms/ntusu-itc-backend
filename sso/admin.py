@@ -2,5 +2,9 @@ from django.contrib import admin
 from sso.models import User
 
 
-# Register your models here.
-admin.site.register(User)
+class CustomUserAdmin(admin.ModelAdmin):
+    list_display = ('username', 'display_name', 'email',
+                    'is_active', 'is_staff')
+
+
+admin.site.register(User, CustomUserAdmin)

@@ -1,12 +1,15 @@
 from rest_framework import serializers
-from django.contrib.auth import password_validation
+from rest_framework.generics import get_object_or_404
+from django.contrib.auth import password_validation, hashers
 from django.utils.crypto import get_random_string
 from sso.models import User
 from sso.utils import send_activation_token
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
+    password = serializers.CharField(
+        write_only=True, style={'input_type': 'password'}
+    )
     class Meta:
         model = User
         fields = ['display_name', 'email', 'password',]
@@ -18,13 +21,14 @@ class UserCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('No duplicate email')
         return value
 
-    def validate(self, data):
-        user = User(**data)
-        password_validation.validate_password(data['password'], user)
-        return super().validate(data)
+    def validate(self, attrs):
+        user = User(**attrs)
+        password_validation.validate_password(attrs['password'], user)
+        return super().validate(attrs)
     
     def create(self, validated_data):
-        email = validated_data['email']
+        email, pw = validated_data['email'], validated_data['password']
+        validated_data['password'] = hashers.make_password(pw)
         validated_data['is_active'] = False
         validated_data['username'] = email[:email.find('@')].lower()
         validated_data['custom_token'] = get_random_string(20)
@@ -38,3 +42,23 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['username', 'email', 'display_name', 'description',]
+
+
+class TokenSerializer(serializers.Serializer):
+    token = serializers.CharField(max_length=20)
+
+
+class EmailSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+
+class PasswordResetSerializer(serializers.Serializer):
+    token = serializers.CharField(max_length=20)
+    password = serializers.CharField(
+        write_only=True, style={'input_type': 'password'}
+    )
+    
+    def validate(self, attrs):
+        user = get_object_or_404(User, custom_token=attrs['token'])
+        password_validation.validate_password(attrs['password'], user)
+        return super().validate(attrs)

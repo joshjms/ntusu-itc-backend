@@ -2,6 +2,7 @@ from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
 from django.contrib.auth import password_validation, hashers
 from django.utils.crypto import get_random_string
+from django.utils import timezone as tz
 from sso.models import User
 from sso.utils import send_activation_token
 
@@ -60,5 +61,7 @@ class PasswordResetSerializer(serializers.Serializer):
     
     def validate(self, attrs):
         user = get_object_or_404(User, custom_token=attrs['token'])
+        if tz.now() > user.token_expiry_date:
+            raise serializers.ValidationError('token already used')
         password_validation.validate_password(attrs['password'], user)
         return super().validate(attrs)

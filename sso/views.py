@@ -45,7 +45,7 @@ class UserVerifyView(APIView):
         return Response({ 'status': 'account activated',})
 
 
-class UserChangePasswordView(APIView):
+class ChangePasswordView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     

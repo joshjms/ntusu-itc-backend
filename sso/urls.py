@@ -15,6 +15,8 @@ urlpatterns = [
 
     path('register/', views.UserRegisterView.as_view()),
     path('user/<str:username>/', views.UserProfileView.as_view()),
+    path('verify/<str:token>/', views.UserVerifyView.as_view()),
+    path('change_password/', views.UserChangePasswordView.as_view()),
 ]
 
 # TODO

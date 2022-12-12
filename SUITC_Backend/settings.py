@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'corsheaders',
     'drf_yasg',
+    'django_summernote',
     
     'portal',
     'sso',
@@ -174,3 +175,7 @@ SWAGGER_SETTINGS = {
         }
     }
 }
+
+# TODO - change this during deployment env
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')

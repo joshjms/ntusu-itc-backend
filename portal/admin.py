@@ -1,5 +1,11 @@
 from django.contrib import admin
-from . import models
+from django_summernote.admin import SummernoteModelAdmin
+from portal.models import UpdateNote
 
-# Register your models here.
-admin.site.register(models.SampleModel)
+
+class UpdateSummernote(SummernoteModelAdmin):
+    summernote_fields = ('content',)
+    list_display = ('id', 'title', 'added',)
+
+
+admin.site.register(UpdateNote, UpdateSummernote)

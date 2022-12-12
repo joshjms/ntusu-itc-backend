@@ -9,8 +9,8 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone as tz
 from django.utils.crypto import get_random_string
 from datetime import timedelta as td
+from portal.permissions import IsSelfOrReadOnly
 from sso.models import User
-from sso.permissions import IsSelfOrReadOnly
 from sso.serializers import (
     UserCreateSerializer,
     UserProfileSerializer,

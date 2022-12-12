@@ -1,4 +1,3 @@
-import boto3
 from SUITC_Backend.settings import ses_client
 
 

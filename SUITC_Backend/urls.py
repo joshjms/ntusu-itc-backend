@@ -23,7 +23,7 @@ from drf_yasg.views import get_schema_view
 
 schema_view = get_schema_view(
     openapi.Info(
-        title='NTUSU BACKEND API',
+        title='NTUSU ITC BACKEND API',
         default_version='1.0.0',
         description='Auto generated API documentation :)',
     ), public=True
@@ -31,10 +31,11 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path('swagger/', schema_view.with_ui('swagger')),
+    path('swagger/', schema_view.with_ui('swagger'), name='swagger'),
     path('summernote/', include('django_summernote.urls')),
 
-    path('', include('portal.urls')),
+    path('', include('docs.urls')),
+    path('portal/', include('portal.urls')),
     path('sso/', include('sso.urls')),
     path('ufacility/', include('ufacility.urls')),
     path('inventory/', include('inventory.urls')),

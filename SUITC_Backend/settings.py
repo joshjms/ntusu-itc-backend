@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'django_summernote',
     
+    'docs',
     'portal',
     'sso',
     'ufacility',

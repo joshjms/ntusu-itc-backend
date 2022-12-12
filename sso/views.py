@@ -56,6 +56,7 @@ class ChangePasswordView(APIView):
         except ValidationError as errors:
             return Response({ 'errors': errors,}, status=400)
         user.set_password(new_password)
+        user.save()
         return Response({ 'status': 'password changed',})
 
 

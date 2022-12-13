@@ -7,3 +7,7 @@ class UpdateNoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = UpdateNote
         fields = ('id', 'title', 'description', 'content', 'added')
+
+
+class UpdateNoteSerializerGeneral(UpdateNoteSerializer):
+    content = serializers.CharField(write_only=True)

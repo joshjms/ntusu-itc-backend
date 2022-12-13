@@ -2,7 +2,10 @@ from rest_framework import generics
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from portal.models import UpdateNote
 from portal.permissions import IsSuperUserOrReadOnly
-from portal.serializers import UpdateNoteSerializer
+from portal.serializers import (
+    UpdateNoteSerializer,
+    UpdateNoteSerializerGeneral
+)
 
 
 class UpdateNoteMixin:
@@ -14,7 +17,7 @@ class UpdateNoteMixin:
 
 class UpdateNoteView(UpdateNoteMixin,
 		generics.ListCreateAPIView):
-    pass
+    serializer_class = UpdateNoteSerializerGeneral
 
 
 class UpdateNoteDetailView(UpdateNoteMixin,

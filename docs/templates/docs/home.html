@@ -1,0 +1,14 @@
+{% extends "docs/base.html" %}
+
+{% block body %}
+    <a href="{% url 'docs:index' %}">
+        <h3>
+            Manual Documentation
+        </h3>
+    </a>
+    <a href="{% url 'swagger' %}">
+        <h3>
+            Swagger Automatic Documentation
+        </h3>
+    </a>
+{% endblock body %}

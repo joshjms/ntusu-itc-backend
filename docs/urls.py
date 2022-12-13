@@ -1,9 +1,12 @@
 from django.urls import path
-from django.shortcuts import render
+from . import views
 
 
 app_name = 'docs'
 urlpatterns = [
-    path('', lambda req: render(req, 'index.html'), name='index'),
-    path('docs/', lambda req: render(req, 'docs.html'), name='main'),
+    path('', views.HomePageView.as_view(), name='home'),
+    path('docs/', views.ListView.as_view(), name='index'),
+    path('docs/new/', views.CreateView.as_view(), name='create'),
+    path('docs/<str:title>/', views.DetailView.as_view(), name='detail'),
+    path('docs/<str:title>/edit/', views.EditView.as_view(), name='edit'),
 ]

@@ -1,0 +1,23 @@
+{% extends "docs/base.html" %}
+
+{% block body %}
+    <h1>
+        Create/Edit Page
+    </h1>
+    <a href="{% url 'docs:index' %}">
+        <h4>
+            Back to Documentation List
+        </h4>
+    </a>
+    <form action="{% url 'docs:create' %}" method="POST">
+        {% csrf_token %}
+        {{ form.title.label }}: {{ form.title }} <br>
+        Content: <br>
+        {{ form.content }}
+        {% if form.errors %}
+            <h3>Error!</h3>
+            {{ form.errors }}
+        {% endif %}
+        <button type="submit">Save Changes</button>
+    </form>
+{% endblock body %}

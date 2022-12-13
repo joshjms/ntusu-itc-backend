@@ -1,0 +1,22 @@
+{% extends "docs/base.html" %}
+
+{% block body %}
+    <hr>
+    <h3>
+        {{ title }}
+    </h3>
+    <hr>
+    <div style="padding:5%;">
+        {{ content|safe }}
+    </div>
+    <a href="{% url 'docs:edit' title %}">
+        <h4>
+            Edit Documentation
+        </h4>
+    </a>
+    <a href="{% url 'docs:index' %}">
+        <h4>
+            Back to Documentation List
+        </h4>
+    </a>
+{% endblock body %}

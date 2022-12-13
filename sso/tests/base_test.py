@@ -6,13 +6,13 @@ from sso.models import User
 
 class BaseAPITestCase(APITestCase):
     '''
-        Inherits from rest_framework APITestCase,
-        provides setUpTestData class method that has 3 users
-        (user1 as superuser, user2 & user3 as regular users),
-        3 different clients for testing purpose as follows:
-        Client 1 -> superuser (logged in as user1)
-        Client 2 -> regular user (logged in as user2)
-        Client 3 -> unauthorized / anonymous user (not logged in)
+    Inherits from rest_framework APITestCase,
+    provides setUpTestData class method that has 3 users
+    (user1 as superuser, user2 & user3 as regular users),
+    3 different clients for testing purpose as follows:
+    Client 1 -> superuser (logged in as user1)
+    Client 2 -> regular user (logged in as user2)
+    Client 3 -> unauthorized / anonymous user (not logged in)
     '''
     @classmethod
     def setUpTestData(self):

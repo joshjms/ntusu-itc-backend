@@ -178,5 +178,7 @@ SWAGGER_SETTINGS = {
 }
 
 # TODO - change this during deployment env
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+MEDIA_URL_SUMMERNOTE = '/media/'
+MEDIA_ROOT_SUMMERNOTE = os.path.join(BASE_DIR, 'media/')
+MEDIA_URL_DOCS = '/api-guide/'
+MEDIA_ROOT_DOCS = os.path.join(BASE_DIR, 'docs/api-guide/')

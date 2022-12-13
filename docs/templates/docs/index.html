@@ -1,0 +1,32 @@
+{% extends "docs/base.html" %}
+
+{% block body %}
+    <h2>
+        Documentation List
+    </h2>
+    <ul>
+    {% for entry in entries %}
+        <a href="{% url 'docs:detail' entry.title %}">
+            <h3>            
+                <li>
+                    {{ entry|capfirst }} <br>
+                </li>
+            </h3>
+        </a>
+    {% empty %}
+        <div>
+            No entries found!
+        </div>
+    {% endfor %}
+    </ul>
+    <a href="{% url 'docs:create' %}">
+        <h4>
+            Create New Documentation Entry
+        </h4>
+    </a>
+    <a href="{% url 'docs:home' %}">
+        <h4>
+            Back to Home Page
+        </h4>
+    </a>
+{% endblock body %}

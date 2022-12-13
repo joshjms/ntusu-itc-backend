@@ -15,9 +15,7 @@ services:
       dockerfile: docker/dev/Dockerfile
     container_name: SUITC_Backend
     image: suitc_image
-    command: >
-      bash -c 'python manage.py migrate
-      && python manage.py runserver 0.0.0.0:8888'
+    command: python manage.py runserver 0.0.0.0:8888
     volumes:
       - .:/project
     ports:

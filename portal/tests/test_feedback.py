@@ -97,5 +97,33 @@ class PortalUpdate(BaseAPITestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp_json['title'], 'Make Index Swapper')
     
-    def test_feedback_admin_post(self):
-        pass # TODO - create admin test case
+    def test_feedback_admin_post_unauthorized(self):
+        # only admin can send feedback
+        resp = self.client2.put(
+            reverse('portal:feedback_detail', args=(1,)), {
+                'response': 'some response'
+            }
+        )
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_feedback_admin_post_valid(self):
+        # valid response by admin
+        resp1 = self.client1.put(
+            reverse('portal:feedback_detail', args=(1,)), {
+                'response': 'some response'
+            }
+        )
+        self.assertEqual(resp1.status_code, status.HTTP_200_OK)
+        feedback = FeedbackForm.objects.get(id=1)
+        self.assertTrue(feedback.resolved)
+        self.assertEqual(feedback.response, 'some response')
+
+        # cannot send response if issue already resolved
+        resp2 = self.client1.put(
+            reverse('portal:feedback_detail', args=(1,)), {
+                'response': 'some response 2'
+            }
+        )
+        resp_json = loads(resp2.content.decode('utf-8'))
+        self.assertEqual(resp2.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIsInstance(resp_json[0], str)

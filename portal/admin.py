@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django_summernote.admin import SummernoteModelAdmin
-from portal.models import UpdateNote
+from portal.models import UpdateNote, FeedbackForm
 
 
 class UpdateSummernote(SummernoteModelAdmin):
@@ -9,3 +9,4 @@ class UpdateSummernote(SummernoteModelAdmin):
 
 
 admin.site.register(UpdateNote, UpdateSummernote)
+admin.site.register(FeedbackForm)

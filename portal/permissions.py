@@ -16,3 +16,11 @@ class IsSuperUserOrReadOnly(BasePermission):
             request.user and
             request.user.is_superuser
         )
+
+
+class IsSuperUser(BasePermission):
+    def has_permission(self, request, _):
+        return bool(
+            request.user and
+            request.user.is_superuser
+        )

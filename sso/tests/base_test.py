@@ -37,7 +37,7 @@ class BaseAPITestCase(APITestCase):
         self.client1 = APIClient()
         self.client2 = APIClient()
         self.client3 = APIClient()
-        resp1 = self.client2.post(
+        resp1 = self.client1.post(
             reverse('sso:token_obtain_pair'),
             {
                 'username': 'user1',

@@ -1,6 +1,16 @@
 from SUITC_Backend.settings import ses_client
 
 
+DO_NOT_REPLY_MESSAGE = f'''
+    <p style="color: red;">        
+        This is a system generated email, please do <b>not</b> reply
+        directly to this email. If you have any other enquiries regarding
+        our IT services, please contact the mail su-itc@e.ntu.edu.sg
+        (Student Union Information Technology Committee).
+    </p>
+'''
+
+
 def send_email(subject, body, recipients: list, sender='do-not-reply'):
     email_from = sender + '@ntusu.org'
     return ses_client.send_email(
@@ -37,6 +47,7 @@ def send_activation_token(email, token):
         <p>
             If you never registered to NTUSU Portal, please ignore this email.
         </p>
+        {DO_NOT_REPLY_MESSAGE}
     '''
     send_email(ACTIVATION_EMAIL_SUBJECT, ACTIVATION_EMAIL_CONTENT, [email])
 
@@ -63,5 +74,6 @@ def send_reset_token(email, token, username):
             Please do NOT share the link with anyone else.
             If you never made this request, please ignore this email.
         </p>
+        {DO_NOT_REPLY_MESSAGE}
     '''
     send_email(RESET_EMAIL_SUBJECT, RESET_EMAIL_CONTENT, [email])

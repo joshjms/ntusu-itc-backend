@@ -69,7 +69,14 @@ MIDDLEWARE = [
 ROOT_URLCONF = "SUITC_Backend.urls"
 
 # DJANGO CORS HEADERS SETTINGS
-CORS_ORIGIN_ALLOW_ALL = True
+# CORS_ORIGIN_ALLOW_ALL = True # TODO - change this later
+# CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_HEADERS = [
+    "Content-Type", "Authorization"
+]
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+]
 
 TEMPLATES = [
     {

@@ -14,7 +14,7 @@ This is NTUSU ITC Backend repository created on December 2022. It is built using
 
 ### How To Run Development Server
 
-- Note: For Macbook M1/M2, you must run before doing all required steps below:
+- Note: For Macbook M1/M2, you must run this before doing all required steps below:
 
   ```powershell
       softwareupdate --install-rosetta

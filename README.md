@@ -14,30 +14,38 @@ This is NTUSU ITC Backend repository created on December 2022. It is built using
 
 ### How To Run Development Server
 
+- Note: For Macbook M1/M2, you must run before doing all required steps below:
+
+  ```powershell
+      softwareupdate --install-rosetta
+      export DOCKER_DEFAULT_PLATFORM=linux/amd64
+  ```
+
 1. Install Docker Desktop based on your operating system ([MAC](https://docs.docker.com/desktop/install/mac-install/) / [Windows](https://docs.docker.com/desktop/install/windows-install/) / [Linux](https://docs.docker.com/desktop/install/linux-install/)) and launch the application
 
 2. Clone this repository and move into the project directory where `docker-compose.yml` file is located
 
 3. Install the server using Docker
 
-    ```powershell
-        docker-compose up --build
-    ```
+   ```powershell
+       docker-compose up --build
+   ```
 
-    Stop using `Ctrl+C`. Re-run this command when you want to start the server again in your local development environment.
+   Stop using `Ctrl+C`. Re-run this command when you want to start the server again in your local development environment.
 
-    Your server should be up at `localhost:8888`. If this is your first time running the development environment, please do step 4 as shown below. The application will not run properly if you do not perform database migration.
+   Your server should be up at `localhost:8888`. If this is your first time running the development environment, please do step 4 as shown below. The application will not run properly if you do not perform database migration.
 
 4. Initialize database migration
 
-    Using another terminal, execute the following command:
+   Using another terminal, execute the following command:
 
-    ```powershell
-        docker exec -ti SUITC_Backend python manage.py migrate
-    ```
-    Note: you might need to add `sudo` if you're using MAC
+   ```powershell
+       docker exec -ti SUITC_Backend python manage.py migrate
+   ```
 
-    You should do this when it is your first time running the development environment, and anytime there are new database migrations.
+   Note: you might need to add `sudo` if you're using MAC
+
+   You should do this when it is your first time running the development environment, and anytime there are new database migrations.
 
 ### Executing Utility Commands
 

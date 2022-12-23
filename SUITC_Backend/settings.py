@@ -196,3 +196,9 @@ MEDIA_URL_SUMMERNOTE = '/media/'
 MEDIA_ROOT_SUMMERNOTE = os.path.join(BASE_DIR, 'media/')
 MEDIA_URL_DOCS = '/api-guide/'
 MEDIA_ROOT_DOCS = os.path.join(BASE_DIR, 'docs/api-guide/')
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ]
+}

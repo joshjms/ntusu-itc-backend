@@ -163,3 +163,53 @@ class SSOResetPassword(APITestCase):
         self.assertEqual(resp2.get('Content-Type'), 'application/json')
         user = User.objects.get(username='user1')
         self.assertLessEqual(tz.now() + td(days=0.9), user.token_expiry_date)
+
+
+class SSOVerifyTokenTest(APITestCase):
+    @classmethod
+    def setUpTestData(self):
+        # create user
+        self.user1 = User.objects.create_user(
+            display_name='User1',
+            email='user1@e.ntu.edu.sg',
+            username='user1',
+            password='1048576#',
+        )
+        self.client = APIClient()
+        # get custom token
+        self.client.post(
+            reverse('sso:forgot_password'),
+            {
+                'email': 'user1@e.ntu.edu.sg',
+            },
+        )
+        self.token = User.objects.get(username='user1').custom_token
+    
+    def test_token_invalid(self):
+        # token is not valid (no user has this token), must return 404
+        resp = self.client.get(
+            reverse('sso:verify_token', args=(12345678901234567890,))
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+    
+    # TODO - using mock or freezegun library to simulate time
+    # def test_token_expired(self):
+    #     # pretend that token has already expired, must return 401
+    #     user = User.objects.get(username='user1')
+    #     print(user.token_expiry_date)
+    #     user.token_expiry_date = tz.now() + td(days=2)
+    #     print(user.token_expiry_date)
+    #     user.save()
+    #     a = User.objects.get(username='user1')
+    #     print(a.token_expiry_date)
+    #     resp = self.client.get(
+    #         reverse('sso:verify_token', args=(self.token,))
+    #     )
+    #     self.assertEqual(resp.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_token_valid(self):
+        # token is valid
+        resp = self.client.get(
+            reverse('sso:verify_token', args=(self.token,))
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)

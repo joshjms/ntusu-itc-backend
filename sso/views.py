@@ -1,4 +1,4 @@
-from rest_framework import generics
+from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
@@ -87,3 +87,16 @@ class ResetPasswordView(APIView):
         user.token_expiry_date = tz.now()
         user.save()
         return Response({ 'status': 'ok',})
+
+
+class TokenCheckView(APIView):
+    def get(self, _, token):
+        user = get_object_or_404(User, custom_token=token)
+        print("TEST")
+        print(user.token_expiry_date)
+        print(tz.now())
+        if tz.now() > user.token_expiry_date:
+            return Response({ 'status': 'token expired', },
+                status=status.HTTP_401_UNAUTHORIZED)
+        return Response({ 'status': 'token valid', },
+            status=status.HTTP_200_OK)

@@ -14,6 +14,7 @@ class SSOChangePasswordTest(BaseAPITestCase):
         resp = self.client2.put(
             reverse('sso:change_password'),
             {
+                'current_password': '2097152#',
                 'new_password': 'somenewvalidpw',
             },
         )
@@ -27,6 +28,7 @@ class SSOChangePasswordTest(BaseAPITestCase):
         resp = self.client2.put(
             reverse('sso:change_password'),
             {
+                'current_password': '2097152#',
                 'new_password': 'user2',
             },
         )
@@ -39,6 +41,7 @@ class SSOChangePasswordTest(BaseAPITestCase):
         resp = self.client2.put(
             reverse('sso:change_password'),
             {
+                'current_password': '2097152#',
                 'new_password': '12345678',
             },
         )
@@ -46,6 +49,18 @@ class SSOChangePasswordTest(BaseAPITestCase):
         resp_json = loads(resp.content.decode('utf-8'))
         self.assertIsNotNone(resp_json, 'errors')
 
+    # do not allow password to be changed if old password is different
+    def test_new_password_invalid_3(self):
+        resp = self.client2.put(
+            reverse('sso:change_password'),
+            {
+                'current_password': 'idklol',
+                'new_password': '12345678',
+            },
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        resp_json = loads(resp.content.decode('utf-8'))
+        self.assertIsNotNone(resp_json, 'errors')
 
 class SSOForgotPassword(BaseAPITestCase):
     # email is unregistered

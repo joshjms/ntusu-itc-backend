@@ -30,7 +30,8 @@ def send_email(subject, body, recipients: list, sender='do-not-reply'):
 
 
 def send_activation_token(email, token):
-    ACTIVATION_LINK = 'https://app.ntusu.org/sso/verify/'
+    # ACTIVATION_LINK = 'https://app.ntusu.org/sso/verify/'
+    ACTIVATION_LINK = 'http://localhost:3000/sso/verify/'
     ACTIVATION_EMAIL_SUBJECT = 'NTUSU Portal Activation Link'
     ACTIVATION_EMAIL_CONTENT = f'''
         Hi,
@@ -53,7 +54,8 @@ def send_activation_token(email, token):
 
 
 def send_reset_token(email, token, username):
-    RESET_LINK = 'https://app.ntusu.org/sso/reset_password/'
+    # RESET_LINK = 'https://app.ntusu.org/sso/reset_password/'
+    RESET_LINK = 'http://localhost:3000/sso/change_password/'
     RESET_EMAIL_SUBJECT = 'NTUSU Portal Reset Password Token'
     RESET_EMAIL_CONTENT = f'''
         Hi,

@@ -6,21 +6,22 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from ufacility.models import Verification, Booking, Venue, UFacilityUser
 from ufacility.serializers import VerificationSerializer, BookingSerializer, VenueSerializer, UFacilityUserSerializer
 from sso.models import User
+from rest_framework import status
 
 
 # POST /users
 class UserView(APIView):
     def post(self, request):
-        user = request.user
-        ufacilityuser = UFacilityUser.objects.get(user=user)
+        requesting_user = request.user
+        requesting_ufacilityuser = UFacilityUser.objects.get(user=requesting_user)
 
-        # Check if user exists
-        if ufacilityuser == None:
-            return Response({"status": "ufacilityuser does not exist"})
+        # Check if requesting_user exists
+        if requesting_ufacilityuser == None:
+            return Response({"status": status.HTTP_401_UNAUTHORIZED, "message": "User does not have a UFacility account."})
         
-        # Only admins can create users
-        if ufacilityuser.is_admin == False:
-            return Response({"status": "unauthorized"})
+        # Only admins can create ufacility users
+        if requesting_ufacilityuser.is_admin == False:
+            return Response({"status": status.HTTP_403_FORBIDDEN, "message": "User is not a UFacility admin."})
 
         data = request.data
         serializer = UFacilityUserSerializer(data=data)
@@ -28,22 +29,24 @@ class UserView(APIView):
             serializer.save()
             return Response(serializer.data)
 
-        return Response(serializer.errors)
+        return Response({"status": status.HTTP_400_BAD_REQUEST, "message": "Invalid data."})
 
 
 # GET /users/<user_id>
 class UserDetailView(APIView):
     def get(self, request, user_id):
         ufacilityuser = UFacilityUser.objects.get(id=user_id)
-        # Check if user exists
+
+        # Check if ufacilityuser exists
         if ufacilityuser == None:
-            return Response({"status": "ufacilityuser does not exist"})
+            return Response({"status": status.HTTP_404_NOT_FOUND, "message": "UFacility user does not exist."})
 
         requesting_user = request.user
         requesting_ufacilityuser = UFacilityUser.objects.get(user=requesting_user)
-        # Only admins or the user itself can view the user details
+
+        # Only admins or the ufacility user itself can view the user details
         if requesting_ufacilityuser != ufacilityuser and requesting_ufacilityuser.is_admin == False:
-            return Response({"status": "unauthorized"})
+            return Response({"status": status.HTTP_403_FORBIDDEN, "message": "User is neither a UFacility admin nor the user itself."})
 
         serializer = UFacilityUserSerializer(ufacilityuser)
         return Response(serializer.data)
@@ -52,76 +55,82 @@ class UserDetailView(APIView):
 # GET, POST /verifications
 class VerificationView(APIView):
     def get(self, request):
-        user = request.user
-        ufacilityuser = UFacilityUser.objects.get(user=user)
+        requesting_user = request.user
+        requesting_ufacilityuser = UFacilityUser.objects.get(user=requesting_user)
 
         # Only admins can view all verifications
-        if ufacilityuser.is_admin == False:
-            return Response({"status": "unauthorized"})
+        if requesting_ufacilityuser.is_admin == False:
+            return Response({"status": status.HTTP_403_FORBIDDEN, "message": "User is not a UFacility admin."})
 
         verifications = Verification.objects.all()
         serializer = VerificationSerializer(verifications, many=True)
         return Response(serializer.data)
 
     def post(self, request):
-        user = request.user
+        requesting_user = request.user
+        requesting_ufacilityuser = UFacilityUser.objects.get(user=requesting_user)
+        verification = Verification.objects.get(user=requesting_user)
+
+        # Check if requesting_user already has a verification or a ufacility account
+        if verification != None or requesting_ufacilityuser != None:
+            return Response({"status": status.HTTP_409_CONFLICT, "message": "User already has a verification or a UFacility account."})
 
         data = request.data
-        data["user"] = user.id
+        data["user"] = requesting_user.id
         serializer = VerificationSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         
-        return Response(serializer.errors)
+        return Response({"status": status.HTTP_400_BAD_REQUEST, "message": "Invalid data."})
 
 
 # GET, DELETE /verifications/<verification_id>
 class VerificationDetailView(APIView):
     def get(self, request, verification_id):
-        user = request.user
-        ufacilityuser = UFacilityUser.objects.get(user=user)
+        requesting_user = request.user
+        requesting_ufacilityuser = UFacilityUser.objects.get(user=requesting_user)
         verification = Verification.objects.get(id=verification_id)
 
         # Check if verification exists
         if verification == None:
-            return Response({"status": "verification does not exist"})
+            return Response({"status": status.HTTP_404_NOT_FOUND, "message": "Verification does not exist."})
 
         # Only admins or the user itself can view the verification details
-        if verification.user != user and ufacilityuser.is_admin == False:
-            return Response({"status": "unauthorized"})
+        if requesting_user != verification.user and requesting_ufacilityuser.is_admin == False:
+            return Response({"status": status.HTTP_403_FORBIDDEN, "message": "User is neither a UFacility admin nor the owner of the verification."})
 
         serializer = VerificationSerializer(verification)
         return Response(serializer.data)
 
     def delete(self, request, verification_id):
-        user = request.user
-        ufacilityuser = UFacilityUser.objects.get(user=user)
+        requesting_user = request.user
+        requesting_ufacilityuser = UFacilityUser.objects.get(user=requesting_user)
         verification = Verification.objects.get(id=verification_id)
 
         # Check if verification exists
         if verification == None:
-            return Response({"status": "verification does not exist"})
+            return Response({"status": status.HTTP_404_NOT_FOUND, "message": "Verification does not exist."})
 
         # Only admins or the user itself can delete the verification
-        if verification.user != ufacilityuser and ufacilityuser.is_admin == False:
-            return Response({"status": "unauthorized"})
+        if requesting_user != verification.user and requesting_ufacilityuser.is_admin == False:
+            return Response({"status": status.HTTP_403_FORBIDDEN, "message": "User is neither a UFacility admin nor the owner of the verification."})
 
         verification.delete()
-        return Response({"status": "deleted"})
+        return Response({"status": status.HTTP_204_NO_CONTENT, "message": "Verification deleted."})
 
     def put(self, request, verification_id):
-        user = request.user
-        ufacilityuser = UFacilityUser.objects.get(user=user)
+        requesting_user = request.user
+        requesting_ufacilityuser = UFacilityUser.objects.get(user=requesting_user)
         verification = Verification.objects.get(id=verification_id)
 
         # Check if verification exists
         if verification == None:
-            return Response({"status": "verification does not exist"})
+            return Response({"status": status.HTTP_404_NOT_FOUND, "message": "Verification does not exist."})
 
-        # Only admins or the user itself can update the verification
-        if verification.user != ufacilityuser and ufacilityuser.is_admin == False:
-            return Response({"status": "unauthorized"})
+        # Only admins or the user itself can delete the verification
+        if requesting_user != verification.user and requesting_ufacilityuser.is_admin == False:
+            return Response({"status": status.HTTP_403_FORBIDDEN, "message": "User is neither a UFacility admin nor the owner of the verification."})
 
         data = request.data
         data["user"] = verification.user.id
@@ -130,15 +139,17 @@ class VerificationDetailView(APIView):
             serializer.save()
             return Response(serializer.data)
         
-        return Response(serializer.errors)
+        return Response({"status": status.HTTP_400_BAD_REQUEST, "message": "Invalid data."})
 
 
 # GET, POST /bookings
 class BookingView(APIView):
     def get(self, request):
-        user = request.user
-        ufacilityuser = UFacilityUser.objects.get(user=user)
-        if ufacilityuser.is_admin == True:
+        requesting_user = request.user
+        requesting_ufacilityuser = UFacilityUser.objects.get(user=requesting_user)
+
+        # Admins can view all bookings whereas users can only view their own bookings
+        if requesting_ufacilityuser.is_admin == True:
             bookings = Booking.objects.all()
             serializer = BookingSerializer(bookings, many=True)
             return Response(serializer.data)
@@ -148,9 +159,9 @@ class BookingView(APIView):
             return Response(serializer.data)
 
     def post(self, request):
-        user = request.user
+        requesting_user = request.user
+        requesting_ufacilityuser = UFacilityUser.objects.get(user=reqeusting_user)
         data = request.data
-        ufacilityuser = UFacilityUser.objects.get(user=user)
         data["user"] = ufacilityuser.id
         venue = Venue.objects.get(name=data["venue"])
         data["venue"] = venue.id
@@ -160,31 +171,39 @@ class BookingView(APIView):
             serializer.save()
             return Response(serializer.data)
         
-        return Response(serializer.errors)
+        return Response({"status": status.HTTP_400_BAD_REQUEST, "message": "Invalid data."})
 
 
 # GET, PUT, DELETE /bookings/<booking_id>
 class BookingDetailView(APIView):
     def get(self, request, booking_id):
+        requesting_user = request.user
+        requesting_ufacilityuser = UFacilityUser.objects.get(user=requesting_user)
         booking = Booking.objects.get(id=booking_id)
+
+        # Check if booking exists
         if booking == None:
-            return Response({"status": "booking does not exist"})
+            return Response({"status": status.HTTP_404_NOT_FOUND, "message": "Booking does not exist."})
+
+        # Viewing specific bookings is only allowed for admins and the user who created the booking
+        if requesting_ufacilityuser.is_admin == False and requesting_ufacilityuser != booking.user:
+            return Response({"status": status.HTTP_403_FORBIDDEN, "message": "User is neither a UFacility admin nor the owner of the booking."})
 
         serializer = BookingSerializer(booking)
         return Response(serializer.data)
 
     def put(self, request, booking_id):
-        user = request.user
-        ufacilityuser = UFacilityUser.objects.get(user=user)
+        requesting_user = request.user
+        requesting_ufacilityuser = UFacilityUser.objects.get(user=requesting_user)
         booking = Booking.objects.get(id=booking_id)
 
         # Check if booking exists
         if booking == None:
-            return Response({"status": "booking does not exist"})
+            return Response({"status": status.HTTP_404_NOT_FOUND, "message": "Booking does not exist."})
 
         # Update is only allowed for admins and the user who created the booking
-        if ufacilityuser.is_admin == False and booking.user != ufacilityuser:
-            return Response({"status": "unauthorized"})
+        if requesting_ufacilityuser.is_admin == False and requesting_ufacilityuser != booking.user:
+            return Response({"status": status.HTTP_403_FORBIDDEN, "message": "User is neither a UFacility admin nor the owner of the booking."})
 
         data = request.data
         venue = Venue.objects.get(name=data["venue"])
@@ -196,19 +215,23 @@ class BookingDetailView(APIView):
             serializer.save()
             return Response(serializer.data)
 
-        return Response(serializer.errors)
+        return Response({"status": status.HTTP_400_BAD_REQUEST, "message": "Invalid data."})
 
     def delete(self, request, booking_id):
-        user = request.user
-        ufacilityuser = UFacilityUser.objects.get(user=user)
+        requesting_user = request.user
+        requesting_ufacilityuser = UFacilityUser.objects.get(user=requesting_user)
         booking = Booking.objects.get(id=booking_id)
 
+        # Check if booking exists
+        if booking == None:
+            return Response({"status": status.HTTP_404_NOT_FOUND, "message": "Booking does not exist."})
+
         # Delete is only allowed for admins and the user who created the booking
-        if ufacilityuser.is_admin == False and booking.user != ufacilityuser:
-            return Response({"status": "unauthorized"})
+        if requesting_ufacilityuser.is_admin == False and requesting_ufacilityuser != booking.user:
+            return Response({"status": status.HTTP_403_FORBIDDEN, "message": "User is neither a UFacility admin nor the owner of the booking."})
 
         booking.delete()
-        return Response({"status": "booking deleted"})
+        return Response({"status": status.HTTP_204_NO_CONTENT, "message": "Booking deleted."})
 
 
 # GET, POST /venues
@@ -219,12 +242,12 @@ class VenueView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        user = request.user
-        ufacilityUser = UFacilityUser.objects.get(user=user)
+        requesting_user = request.user
+        reqeusting_ufacilityUser = UFacilityUser.objects.get(user=requesting_user)
 
         # POST is only allowed for admins
-        if ufacilityUser.is_admin == False:
-            return Response({"status": "unauthorized"})
+        if requesting_ufacilityUser.is_admin == False:
+            return Response({"status": status.HTTP_403_FORBIDDEN, "message": "User is not a UFacility admin."})
 
         data = request.data
         serializer = VenueSerializer(data=data)
@@ -232,4 +255,4 @@ class VenueView(APIView):
             serializer.save()
             return Response(serializer.data)
         
-        return Response(serializer.errors)
+        return Response({"status": status.HTTP_400_BAD_REQUEST, "message": "Invalid data."})

@@ -52,6 +52,27 @@ class UserDetailView(APIView):
         return Response(serializer.data)
 
 
+# GET /users/<user_id>/bookings
+class UserBookingsView(APIView):
+    def get(self, request, user_id):
+        ufacilityuser = UFacilityUser.objects.get(id=user_id)
+
+        # Check if ufacilityuser exists
+        if ufacilityuser == None:
+            return Response({"status": status.HTTP_404_NOT_FOUND, "message": "UFacility user does not exist."})
+
+        requesting_user = request.user
+        requesting_ufacilityuser = UFacilityUser.objects.get(user=requesting_user)
+
+        # Only admins or the ufacility user itself can view the user bookings
+        if requesting_ufacilityuser != ufacilityuser and requesting_ufacilityuser.is_admin == False:
+            return Response({"status": status.HTTP_403_FORBIDDEN, "message": "User is neither a UFacility admin nor the user itself."})
+
+        bookings = Booking.objects.filter(user=ufacilityuser)
+        serializer = BookingSerializer(bookings, many=True)
+        return Response(serializer.data)
+
+
 # GET, POST /verifications
 class VerificationView(APIView):
     def get(self, request):
@@ -256,3 +277,4 @@ class VenueView(APIView):
             return Response(serializer.data)
         
         return Response({"status": status.HTTP_400_BAD_REQUEST, "message": "Invalid data."})
+

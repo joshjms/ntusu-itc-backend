@@ -50,9 +50,15 @@ class ChangePasswordView(APIView):
     permission_classes = [IsAuthenticated]
     
     def put(self, request):
+        current_password = request.data.get('current_password', '')
+        print(current_password)
         new_password = request.data.get('new_password', '')
         user = User.objects.get(username=request.user.username)
-        try: password_validation.validate_password(new_password, user)
+        try:
+            valid = user.check_password(current_password)
+            if not valid:
+                raise ValidationError('password does not match current')
+            password_validation.validate_password(new_password, user)
         except ValidationError as errors:
             return Response({ 'errors': errors,}, status=400)
         user.set_password(new_password)

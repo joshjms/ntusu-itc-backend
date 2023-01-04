@@ -1,8 +1,18 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 from sso.models import User
 
 
-# TODO - create user session
+# TODO - create user session ???
+# save contact details as session, cancelled request count, ban cooldown?
+
+# class IndexSwapperConfig(models.Model):
+#     web_scraper_link = models.CharField(max_length=200)
+
+#     def save(self, *args, **kwargs):
+#         if IndexSwapperConfig.objects.exists():
+#             raise ValidationError('There can only be 1 IndexSwapperConfig instance!')
+#         return super().save(*args, **kwargs)
 
 
 class CourseIndex(models.Model):
@@ -43,6 +53,10 @@ class SwapRequest(models.Model):
         related_name='available_swap'
     )
     wanted_indexes = models.CharField(max_length=100)
+
+    @property
+    def get_wanted_indexes(self):
+        pass # TODO
 
     class Meta:
         verbose_name_plural = 'Swap Requests'

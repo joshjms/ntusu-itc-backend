@@ -1,3 +1,10 @@
-from django.shortcuts import render
+from rest_framework import viewsets
+from rest_framework.decorators import action
 
-# Create your views here.
+
+class CourseIndexViewSet(viewsets.Viewset):
+    pass
+
+
+class SwapRequestViewSet(viewsets.ViewSet):
+    pass

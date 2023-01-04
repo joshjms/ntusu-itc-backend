@@ -7,6 +7,7 @@ from starswar.serializers import (
     CourseIndexPartialSerializer,
     CourseIndexCompleteSerializer,
 )
+from starswar.utils import util_algo, util_email, util_scraper
 from portal.permissions import IsSuperUser
 
 
@@ -35,16 +36,18 @@ class CourseIndexViewSet(ModelViewSet):
     
     @action(methods=['get'], detail=False, url_name='get_indexes',
         url_path='get_indexes/(?P<course_code>[^/.]+)')
-    def get_indexes_from_course(self, *_, **kwargs):
+    def get_indexes_from_course(self, *args, **kwargs):
         instances = CourseIndex.objects.filter(code=kwargs['course_code'])
         return Response([{
             'index': x.index, 'pending_count': x.pending_count,
             'information': x.get_information
         } for x in instances])
-
-    # web scraper automatic data insertion TODO
-    def populate_database(self):
-        pass
+    
+    @action(methods=['post'], detail=False, url_name='populate_db',
+        url_path='populate_db', serializer_class=None)
+    def populate_database(self, *args, **kwargs):
+        util_scraper.populate_modules()
+        return Response('Process ongoing, it may take a few minutes!')
 
 
 class SwapRequestViewSet(ViewSet):

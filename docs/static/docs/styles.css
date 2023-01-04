@@ -33,4 +33,6 @@ pre {
 
 p {
     margin: 0 0 10px;
+    text-align: justify;
+    text-justify: inter-word;
 }

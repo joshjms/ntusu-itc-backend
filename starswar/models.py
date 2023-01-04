@@ -23,6 +23,18 @@ class CourseIndex(models.Model):
     information = models.TextField()
     pending_count = models.IntegerField(default=0)
 
+    @property
+    def get_information(self):
+        def serialize(msg):
+            a = msg.split('\\')
+            return {
+                'type': a[0], 'group': a[1],
+                'day': a[2], 'time': a[3],
+                'venue': a[4], 'remark': a[5]
+            }
+        return [serialize(x) for x in self.information.split(';')]
+
+
     class Meta:
         verbose_name_plural = 'Course Indexes'
     

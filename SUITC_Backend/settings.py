@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'drf_yasg',
     'django_summernote',
+    'django_filters',
     
     'docs',
     'portal',
@@ -206,5 +207,8 @@ MEDIA_ROOT_DOCS = os.path.join(BASE_DIR, 'docs/api-guide/')
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ]
+    ],
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend'
+    ],
 }

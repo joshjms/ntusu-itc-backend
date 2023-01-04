@@ -5,11 +5,6 @@ from .models import IndexSwapperConfig, CourseIndex, SwapRequest
 class IndexSwapperConfigAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
         return not IndexSwapperConfig.objects.exists()
-        # retVal = super().has_add_permission(request)
-        # # set add permission to False, if object already exists
-        # if retVal and IndexSwapperConfig.objects.exists():
-        #     retVal = False
-        # return retVald
 
 
 class SwapRequestAdmin(admin.ModelAdmin):

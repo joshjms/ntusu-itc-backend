@@ -7,8 +7,7 @@ from starswar.models import CourseIndex, IndexSwapperConfig
 
     Insert all modules to the database using the required format
 '''
-async def populate_modules(max_indexes=99999,
-        url=IndexSwapperConfig.objects.get().web_scraper_link):
+async def populate_modules(max_indexes=99999, url='some_url'):
     # TODO
     # CourseIndex.objects.create(
     #     code='MH1101',

@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from starswar.models import CourseIndex, SwapRequest
 from collections import defaultdict
+from starswar.models import CourseIndex, SwapRequest
 
 
 class CourseIndexPartialSerializer(serializers.ModelSerializer):
@@ -35,3 +35,9 @@ class CourseIndexCompleteSerializer(serializers.ModelSerializer):
                 if obj.index == index:
                     resp_dict[curr_index] += 1
         return resp_dict
+
+
+class SwapRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SwapRequest
+        fields = ('contact_info', 'current_index', 'get_wanted_indexes',)

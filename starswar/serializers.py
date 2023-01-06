@@ -38,6 +38,27 @@ class CourseIndexCompleteSerializer(serializers.ModelSerializer):
 
 
 class SwapRequestSerializer(serializers.ModelSerializer):
+    current_index = serializers.CharField(max_length=5)
+
     class Meta:
         model = SwapRequest
         fields = ('contact_info', 'current_index', 'get_wanted_indexes',)
+    
+    def create(self, validated_data):
+        from django.shortcuts import get_object_or_404
+        validated_data['current_index'] = get_object_or_404(CourseIndex,
+            index=validated_data['current_index'])
+        return super().create(validated_data)
+    
+    # def validate_current_index(self, value):
+    #     return False
+    #     return bool(CourseIndex.objects.filter(index=value).count)
+    
+    # def validate(self, attrs):
+    #     return False
+    #     return CourseIndex.objects.filter(index=attrs['current_index']).count() == 1
+    
+    # def create(self, validated_data):
+    #     curr_index = validated_data['current_index']
+    #     validated_data['current_index'] = CourseIndex.objects.get(index=curr_index)
+    #     return super().create(self, validated_data)

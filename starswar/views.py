@@ -9,6 +9,7 @@ from starswar.serializers import (
     SwapRequestSerializer,
 )
 from starswar.utils import util_algo, util_email, util_scraper
+from starswar.utils.decorator import verify_cooldown, get_swap_request_with_id_verify
 from portal.permissions import IsSuperUser
 
 
@@ -51,7 +52,7 @@ class CourseIndexViewSet(ModelViewSet):
 
 class SwapRequestViewSet(ViewSet):
     '''
-        Create new swap request, by default has 'SEARCHING' status.
+        Create new swap request (need contact_info, current_index, wanted_indexes), by default has 'SEARCHING' status.
         Perform pairing algorithm for every swap request created.
         Email the user for confirmation that swap request has been created.
         If any pair is found, email both users that pair has been found.
@@ -59,18 +60,21 @@ class SwapRequestViewSet(ViewSet):
     def create(self, request):
         serializer = SwapRequestSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            serializer.save(user=request.user)
+            serializer.save(user=request.user.id)
+            util_email.send_swap_request_creation()
+            util_algo.pairing_algorithm()
             return Response(serializer.data)
-            # TODO
 
     '''
         Gets all of this user's swap request instances.
         If query parameter of status is given, filter based on status.
         For example, ?status=W for waiting status only.
-        Valid query parameters are: ?status=W, ?status=S, ?status=C
+        Valid query parameters are: ?status=W, ?status=S, ?status=C.
+        For SuperUser, get all swap request instances created by all users.
     '''
     def list(self, request):
-        filter_kw = {'user': request.user.id}
+        filter_kw = {}
+        if not request.user.is_superuser: filter_kw['user'] = request.user.id
         status = request.GET.get('status')
         if status: filter_kw['status'] = status
         qs = SwapRequest.objects.filter(**filter_kw)
@@ -78,14 +82,17 @@ class SwapRequestViewSet(ViewSet):
         return Response(serializer.data)
 
     '''
-        Applicable for swap request with status of 'WAITING', only allow user's own swap request.
-        Change both user and its pair (if not completed) status to 'SEARCHING' and reinitiate pairing algorithm.
-        Email the user for reinitiate search confirmation.
-        Email pair (if not completed) researching pair because current pair decided to reinitiate search.
+        Applicable for swap request with status of 'WAITING', only allow user's own swap request and after some cooldown time.
+        Change the user status to 'SEARCHING' and reinitiate pairing algorithm.
+        Email the user for reinitiating search confirmation.
     '''
     @action(methods=['patch'], detail=True)
+    @get_swap_request_with_id_verify(SwapRequest.Status.WAITING)
+    @verify_cooldown()
     def search_another(self, *args, **kwargs):
-        pass # TODO
+        util_algo.pairing_algorithm()
+        util_email.send_swap_search_another()
+        return Response('ok')
     
     '''
         Applicable for swap request with status of 'WAITING', only allow user's own swap request.
@@ -93,15 +100,27 @@ class SwapRequestViewSet(ViewSet):
         Email the user for completed swap confirmation.
     '''
     @action(methods=['patch'], detail=True)
+    @get_swap_request_with_id_verify(SwapRequest.Status.WAITING)
     def mark_complete(self, *args, **kwargs):
-        pass # TODO
+        kwargs['sr'].status = SwapRequest.Status.COMPLETED
+        kwargs['sr'].save()
+        util_email.send_swap_completed()
+        return Response('ok')
     
     '''
         Applicable for swap request with status of 'SEACHING' or 'WAITING', only allow user's own swap request.
         If status is 'SEARCHING', simply delete this swap request instance.
         If status is 'WAITING', delete this swap request instance, change pair's swap request instance status to 'WATING' and reinitiate pairing algorithm.
         Email the user for deletion confirmation, warn user not to do it again.
+        If status is 'WAITING', email its pair that their pair has decided to cancel swap and they will be soon paired with another people.
     '''
     @action(methods=['patch'], detail=True)
+    @get_swap_request_with_id_verify(SwapRequest.Status.WAITING, SwapRequest.Status.SEARCHING)
     def cancel(self, *args, **kwargs):
-        pass # TODO
+        if kwargs['sr'].status == SwapRequest.Status.COMPLETED:
+            kwargs['sr'].delete()
+        elif kwargs['sr'].status == SwapRequest.Status.WAITING:
+            util_algo.pairing_algorithm()
+            util_email.send_swap_cancel_pair()
+        util_email.send_swap_cancel_self()
+        return Response('ok')

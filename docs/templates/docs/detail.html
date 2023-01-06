@@ -1,15 +1,12 @@
 {% extends "docs/base.html" %}
-{% load static %}
 
 {% block body %}
-    <link href="{% static 'docs/styles.css' %}" rel="stylesheet">
-    <code>TEST</code>
     <hr>
     <h3>
         {{ title }}
     </h3>
     <hr>
-    <div style="padding:5%; border:1px solid grey;">
+    <div style="padding:5%;">
         {{ content|safe }}
     </div>
     <a href="{% url 'docs:edit' title %}">

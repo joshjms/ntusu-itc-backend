@@ -1,10 +1,7 @@
 {% extends "docs/base.html" %}
 
 {% block body %}
-    <hr>
-    <h3>
-        {{ title }}
-    </h3>
+    <link href="{% static 'docs/styles.css' %}" rel="stylesheet">
     <hr>
     <div style="padding:5%;">
         {{ content|safe }}

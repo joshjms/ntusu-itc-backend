@@ -4,8 +4,16 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from sso.models import User
 
 
-# TODO - create user session ???
+# TODO - create user session ??? yes
+# TODO - add ICC courses, ask for faculty when asking for swapping icc mod
 # save contact details as session, cancelled request count, ban cooldown?
+# class UserSession(models.Model):
+#     user = models.OneToOneField(
+#         User, on_delete=models.CASCADE,
+#         related_name='index_swapper_session'
+#     )
+#     contact_info = models.CharField(max_length=100)
+#     cancelled_request = models.IntegerField()
 
 class IndexSwapperConfig(models.Model):
     web_scraper_link = models.CharField(max_length=200)
@@ -67,15 +75,15 @@ class SwapRequest(models.Model):
     datetime_added = models.DateTimeField(auto_now_add=True)
     datetime_found = models.DateTimeField(blank=True, null=True)
     current_index = models.ForeignKey(
-        CourseIndex, on_delete=models.CASCADE,
-        related_name='available_swap'
+        CourseIndex, on_delete=models.SET_NULL,
+        related_name='available_swap', null=True
     )
     wanted_indexes = models.CharField(max_length=100)
 
     @property
     def get_wanted_indexes(self):
-        pass # TODO
-
+        return self.wanted_indexes.split(';')
+    
     class Meta:
         verbose_name_plural = 'Swap Requests'
     

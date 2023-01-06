@@ -8,6 +8,6 @@ from starswar.views import (
 app_name = 'starswar'
 router = routers.DefaultRouter()
 router.register('modules', CourseIndexViewSet, basename='modules')
+router.register('swaprequest', SwapRequestViewSet, basename='swaprequest')
 
 urlpatterns = [] + router.urls
-# print(urlpatterns) DEBUG TODO

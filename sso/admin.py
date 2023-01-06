@@ -3,7 +3,7 @@ from sso.models import User
 
 
 class CustomUserAdmin(admin.ModelAdmin):
-    list_display = ('username', 'display_name', 'email',
+    list_display = ('id', 'username', 'display_name', 'email',
                     'is_active', 'is_staff')
 
 

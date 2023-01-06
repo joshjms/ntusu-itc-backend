@@ -74,8 +74,8 @@ class SwapRequest(models.Model):
 
     @property
     def get_wanted_indexes(self):
-        pass # TODO
-
+        return self.wanted_indexes.split(';')
+    
     class Meta:
         verbose_name_plural = 'Swap Requests'
     

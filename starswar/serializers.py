@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from starswar.models import CourseIndex, SwapRequest
+from collections import defaultdict
 
 
 class CourseIndexPartialSerializer(serializers.ModelSerializer):
@@ -10,7 +11,27 @@ class CourseIndexPartialSerializer(serializers.ModelSerializer):
 
 class CourseIndexCompleteSerializer(serializers.ModelSerializer):
     datetime_added = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', read_only=True)
+    information = serializers.CharField(write_only=True)
+    information_data = serializers.SerializerMethodField(read_only=True)
+    pending_data = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = CourseIndex
-        fields = ('id', 'code', 'name', 'index', 'datetime_added', 'pending_count', 'information',)
+        fields = ('id', 'code', 'name', 'index', 'datetime_added',
+            'pending_count', 'information', 'information_data', 'pending_data')
         read_only_fields = ('id', 'datetime_added', 'pending_count',)
+    
+    def get_information_data(self, obj):
+        try:
+            return obj.get_information
+        except IndexError or Exception:
+            return 'invalid data format'
+    
+    def get_pending_data(self, obj):
+        resp_dict = defaultdict(int)
+        for sr in SwapRequest.objects.all():
+            curr_index = sr.current_index.index
+            for index in sr.get_wanted_indexes:
+                if obj.index == index:
+                    resp_dict[curr_index] += 1
+        return resp_dict

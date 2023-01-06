@@ -6,11 +6,11 @@ The Swagger's automatic documentation can be used to try some of the features be
 
 Fields:
 
-- **code** (max length 6): course code (for example: MH1101)
-- **name** (max length 100): course name (for example: CALCULUS II)
-- **index** (max length 5, unique): course index (for example: 70145), all indexes are considered unique including those from different modules
-- **datetime_added** (auto now): used for internal purpose to know when the course index is created to the database (so we can differentiate the outdated indexes and updated ones)
-- **information** (text field): stores collections of (type, group, day, time, venue, remark) details for a course index using '^' as column delimiter and ';' as row delimiter (for example: LEC/STUDIO^LE^THU^0930-1120^LT19A^;LEC/STUDIO^LE^TUE^1330-1420^LT23^;TUT^T1^WED^0830-09.20^SPMS-TR+3^Teaching Wk2-13)
+- **code** (max length 6, required): course code (for example: MH1101)
+- **name** (max length 100, required): course name (for example: CALCULUS II)
+- **index** (max length 5, required, unique): course index (for example: 70145), all indexes are considered unique including those from different modules
+- **datetime_added** (datetime, auto now): used for internal purpose to know when the course index is created to the database (so we can differentiate the outdated indexes and updated ones)
+- **information** (text field, required): stores collections of (type, group, day, time, venue, remark) details for a course index using '^' as column delimiter and ';' as row delimiter (for example: LEC/STUDIO^LE^THU^0930-1120^LT19A^;LEC/STUDIO^LE^TUE^1330-1420^LT23^;TUT^T1^WED^0830-09.20^SPMS-TR+3^Teaching Wk2-13)
 - **pending_count** (integer, default 0): the number of swap requests that has this course index as a foreign key in *current index* field, not to be updated manually; iterating through the related models takes too long, so it is instead stored here and updated for every swap request created/deleted/finished
 
 ### `[GET] /starswar/modules/`
@@ -53,7 +53,43 @@ Expected to be used in 'all modules' page. Returns all modules through a partial
 
 Expected to be used in 'all modules' or 'my swap requests' page if the user wishes to view more details about an index. Compared to the API above, this API works for specific course index, and additionally send datetime_added, information (list of type-group-day-time-venue-remark), pending count details (indexes of people who want to swap with this index). Sample output:
 
-    TODO
+    {
+      "id": 2,
+      "code": "MH1101",
+      "name": "CALCULUS II",
+      "index": "70146",
+      "datetime_added": "2023-01-04 14:26:42",
+      "pending_count": 0,
+      "information_data": [
+        {
+          "type": "LEC/STUDIO",
+          "group": "LE",
+          "day": "THU",
+          "time": "0930-1120",
+          "venue": "LT19A",
+          "remark": ""
+        },
+        {
+          "type": "LEC/STUDIO",
+          "group": "LE",
+          "day": "TUE",
+          "time": "1330-1420",
+          "venue": "LT23",
+          "remark": ""
+        },
+        {
+          "type": "TUT",
+          "group": "T2",
+          "day": "WED",
+          "time": "0830-0920",
+          "venue": "SPMS-TR+4",
+          "remark": "Teaching Wk2-13"
+        }
+      ],
+      "pending_data": {
+        "70145": 1
+      }
+    }
 
 ### `[GET] /starswar/modules/get_courses/`
 
@@ -122,20 +158,52 @@ Uses web scraper to automatically populate database using an async function. Req
 
 ## Swap Request
 
-TODO
+Fields:
 
-### TODO
+- **user** (FK sso.User): foreign key to the User model, automatically set this field to the user who created the swap request
+- **contact_info** (max length 100, required): contact information of people who created the swap request
+- **pair\_contact\_info** (max length 100, default null): contact information of pair; it is filled once a pair is found (waiting status)
+- **status** (max length 1, choices=[S (searching), W (waiting), C (completed)], default S): status of the swap request; S: default value, still searching for matching pair; W: matching pair found, waiting for confirmation from both sides to perform the swap; C: swap completed
+- **datetime_added** (datetime, auto now): datetime when the swap request is created
+- **datetime_found** (datetime): latest datetime when the status changes to W, used for cooldown feature (not allowing user to search for another pair until a specific duration is reached)
+- **current_index** (FK CourseIndex, required): foreign key to CourseIndex model, stores the current index (and course) that the user has and wants to be swapped
+- **wanted_indexes** (max length 100, required): stores collections of wanted indexes using ';' as delimeter (for example: 70146;70147 means the user wants either index 70146 or 70147)
 
-TODO - description
+### `[POST] /starswar/swaprequest/`
 
-### TODO
+Create new swap request (need contact_info, current_index, wanted_indexes), by default has 'SEARCHING' status.
+Perform pairing algorithm for every swap request created.
+Email the user for confirmation that swap request has been created.
+If any pair is found, email both users that pair has been found.
 
-TODO - description
+### `[GET] /starswar/swaprequest/`
 
-### TODO
+Gets all of this user's swap request instances.
+If query parameter of status is given, filter based on status.
+For example, ?status=W for waiting status only.
+Valid query parameters are: ?status=W, ?status=S, ?status=C.
+For SuperUser, get all swap request instances created by all users.
 
-TODO - description
+### `[PATCH] /starswar/swaprequest/<int:id>/search_another/`
 
-### TODO
+Applicable for swap request with status of 'WAITING', only allow user's own swap request and after some cooldown time.
+Change the user status to 'SEARCHING' and reinitiate pairing algorithm.
+Email the user for reinitiating search confirmation.
 
-TODO - description
+### `[PATCH] /starswar/swaprequest/<int:id>/mark_complete/`
+
+Applicable for swap request with status of 'WAITING', only allow user's own swap request.
+Change the user status to 'COMPLETED'.
+Email the user for completed swap confirmation.
+
+### `[DELETE] /starswar/swaprequest/<int:id>/cancel/`
+
+Applicable for swap request with status of 'SEACHING' or 'WAITING', only allow user's own swap request.
+If status is 'SEARCHING', simply delete this swap request instance.
+If status is 'WAITING', delete this swap request instance, change pair's swap request instance status to 'WAITING' and reinitiate pairing algorithm.
+Email the user for deletion confirmation, warn user not to do it again.
+If status is 'WAITING', email its pair that their pair has decided to cancel swap and they will be soon paired with another people.
+
+##  User Session
+
+Tentatively another model to store user's information in index swapper app. For example, store contact information so they do not have to reenter that many times, store number of request cancelled (ban users who repeatedly create a swap request but cancel or do not perform the swap properly).

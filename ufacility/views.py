@@ -7,6 +7,19 @@ from ufacility.models import Verification, Booking, Venue, UFacilityUser
 from ufacility.serializers import VerificationSerializer, BookingSerializer, VenueSerializer, UFacilityUserSerializer
 from sso.models import User
 from rest_framework import status
+from sso.utils import send_email
+
+
+exco_email = ""
+
+
+# Clash check
+def clash_exists(venue, day, start_time, end_time):
+    bookings = Booking.objects.filter(venue=venue, date=day)
+    for booking in bookings:
+        if start_time < booking.end_time and end_time > booking.start_time:
+            return True
+    return False
 
 
 # POST /users
@@ -155,7 +168,7 @@ class VerificationDetailView(APIView):
 
         data = request.data
         data["user"] = verification.user.id
-        serializer = VerificationSerializer(verification, data=data)
+        serializer = VerificationSerializer(verification, data=data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -168,16 +181,9 @@ class BookingView(APIView):
     def get(self, request):
         requesting_user = request.user
         requesting_ufacilityuser = UFacilityUser.objects.get(user=requesting_user)
-
-        # Admins can view all bookings whereas users can only view their own bookings
-        if requesting_ufacilityuser.is_admin == True:
-            bookings = Booking.objects.all()
-            serializer = BookingSerializer(bookings, many=True)
-            return Response(serializer.data)
-        else:
-            bookings = Booking.objects.filter(status="accepted")
-            serializer = BookingSerializer(bookings, many=True)
-            return Response(serializer.data)
+        bookings = Booking.objects.all()
+        serializer = BookingSerializer(bookings, many=True)
+        return Response(serializer.data)
 
     def post(self, request):
         requesting_user = request.user
@@ -187,6 +193,10 @@ class BookingView(APIView):
         venue = Venue.objects.get(name=data["venue"])
         data["venue"] = venue.id
         data["status"] = "pending"
+
+        if clash_exists(venue.id, data["date"], data["start_time"], data["end_time"]):
+            return Response({"status": status.HTTP_409_CONFLICT, "message": "Booking clashes with another booking."})
+
         serializer = BookingSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
@@ -222,7 +232,7 @@ class BookingDetailView(APIView):
         if booking == None:
             return Response({"status": status.HTTP_404_NOT_FOUND, "message": "Booking does not exist."})
 
-        # Update is only allowed for admins and the user who created the booking
+        # Updating bookings is only allowed for admins and the user who created the booking
         if requesting_ufacilityuser.is_admin == False and requesting_ufacilityuser != booking.user:
             return Response({"status": status.HTTP_403_FORBIDDEN, "message": "User is neither a UFacility admin nor the owner of the booking."})
 
@@ -231,8 +241,15 @@ class BookingDetailView(APIView):
         data["venue"] = venue.id
         data["user"] = ufacilityuser.id
         data["status"] = booking.status
-        serializer = BookingSerializer(booking, data=data)
+        serializer = BookingSerializer(booking, data=data, partial=True)
         if serializer.is_valid():
+            if requesting_ufacilityuser.is_admin:
+                email_subject = f"Booking request for {data['venue']} on {data['date']} from {data['start_time']} to {data['end_time']}"
+                email_body = """\
+                        This is an auto-generated email to inform you that a booking has been placed for {venue} on {date} from {start_time} to {end_time}.
+                        Please contact {exco_email} should you have any enquiries.
+                        """.format(venue=data["venue"], date=data["date"], start_time=data["start_time"], end_time=data["end_time"], exco_email=exco_email)
+                send_email(email_subject, email_body, recipients=[venue.security_email])
             serializer.save()
             return Response(serializer.data)
 

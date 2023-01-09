@@ -52,7 +52,7 @@ class BookingSerializer(serializers.ModelSerializer):
 class VenueSerializer(serializers.ModelSerializer):
     class Meta:
         model = Venue
-        fields = ["id", "name"]
+        fields = ["id", "name", "security_email"]
 
     def create(self, validated_data):
         venue = Venue.objects.create(**validated_data)

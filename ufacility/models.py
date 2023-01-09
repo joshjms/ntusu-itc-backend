@@ -22,6 +22,7 @@ class UFacilityUser(models.Model):
 
 class Venue(models.Model):
     name = models.CharField(max_length=100, unique=True)
+    security_email = models.CharField(max_length=100)
 
     def __str__(self) -> str:
         return self.name

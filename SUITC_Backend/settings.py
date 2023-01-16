@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 import boto3
 import datetime
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,8 +27,6 @@ SECRET_KEY = "django-insecure-nd*^s9auc*ybc#!t%bxnwv!*ps+m#)&-3910+1ruo#sdc7!6jg
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
-ALLOWED_HOSTS = ['0.0.0.0', 'localhost']
 
 # Application definition
 
@@ -113,8 +112,18 @@ WSGI_APPLICATION = "SUITC_Backend.wsgi.application"
     The testing done through Github Action will be
     defaulted to use the original sqlite3 file.
 """
-import os
+
 NAME = os.environ.get('POSTGRES_NAME')
+PROD = bool(os.environ.get('PROD', 0))
+
+ALLOWED_HOSTS = []
+if PROD:
+    ALLOWED_HOSTS += ['ntusu-itc-backend.ap-southeast-1.elasticbeanstalk.com']
+    ALLOWED_HOSTS += ['172.31.19.15']
+else:
+    ALLOWED_HOSTS += ['0.0.0.0', 'localhost', '127.0.0.1']
+
+
 if NAME:
     DATABASES = {
         'default': {
@@ -124,6 +133,17 @@ if NAME:
             'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
             'HOST': 'db',
             'PORT': 5432,
+        }
+    }
+elif PROD:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ.get('DB_NAME'),
+            'USER': 'admin',
+            'PASSWORD': os.environ.get('DB_PASSWORD'),
+            'HOST': 'ntusu-itc-database.cluster-cubkol3kj008.ap-southeast-1.rds.amazonaws.com',
+            'PORT': '3306',
         }
     }
 else:
@@ -179,7 +199,7 @@ ses_client = boto3.client(
     'ses',
     region_name='ap-southeast-1',
     aws_access_key_id='AKIASDA4XJS4KLMM4RV7',
-    aws_secret_access_key='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',
+    aws_secret_access_key=os.environ.get('SES_SECRET_ACCESS_KEY', 'Gr02PTgGt3OTCg5J2YgVX4M+7j4GpN36hWm46n3O'),
 )
 
 SWAGGER_SETTINGS = {
@@ -198,7 +218,6 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": datetime.timedelta(days=1),
 }
 
-# TODO - change this during deployment env
 MEDIA_URL_SUMMERNOTE = '/media/'
 MEDIA_ROOT_SUMMERNOTE = os.path.join(BASE_DIR, 'media/')
 MEDIA_URL_DOCS = '/api-guide/'
@@ -212,3 +231,6 @@ REST_FRAMEWORK = {
         'django_filters.rest_framework.DjangoFilterBackend'
     ],
 }
+
+# DEPLOYMENT SETTINGS
+STATIC_ROOT = 'static'

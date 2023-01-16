@@ -28,6 +28,8 @@ SECRET_KEY = "django-insecure-nd*^s9auc*ybc#!t%bxnwv!*ps+m#)&-3910+1ruo#sdc7!6jg
 DEBUG = True
 
 ALLOWED_HOSTS = ['0.0.0.0', 'localhost']
+ALLOWED_HOSTS += ['127.0.0.1']
+ALLOWED_HOSTS += ['ntusu-itc-backend.ap-southeast-1.elasticbeanstalk.com']
 
 # Application definition
 

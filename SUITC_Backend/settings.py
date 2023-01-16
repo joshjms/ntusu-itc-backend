@@ -214,3 +214,6 @@ REST_FRAMEWORK = {
         'django_filters.rest_framework.DjangoFilterBackend'
     ],
 }
+
+# DEPLOYMENT SETTINGS
+STATIC_ROOT = 'static'

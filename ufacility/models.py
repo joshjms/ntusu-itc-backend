@@ -34,7 +34,7 @@ class Booking(models.Model):
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     purpose = models.CharField(max_length=200)
-    pax = models.IntegerField()
+    pax = models.PositiveIntegerField()
     status = models.CharField(max_length=10, choices=STATUSES)
 
     def __str__(self) -> str:

@@ -1,11 +1,7 @@
-from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from rest_framework_simplejwt.authentication import JWTAuthentication
 from ufacility.models import Verification, Booking, Venue, UFacilityUser
 from ufacility.serializers import VerificationSerializer, BookingSerializer, VenueSerializer, UFacilityUserSerializer
-from sso.models import User
 from rest_framework import status
 from sso.utils import send_email
 
@@ -26,9 +22,9 @@ def clash_exists(venue, day, start_time, end_time):
 class UserView(APIView):
     def post(self, request):
         requesting_user = request.user
-        requesting_ufacilityuser = UFacilityUser.objects.get(user=requesting_user)
+        requesting_ufacilityuser = UFacilityUser.objects.filter(user=requesting_user).first()
 
-        # Check if requesting_user exists
+        # Check if requesting_user has a ufacility account
         if requesting_ufacilityuser == None:
             return Response({"status": status.HTTP_401_UNAUTHORIZED, "message": "User does not have a UFacility account."})
         
@@ -48,18 +44,23 @@ class UserView(APIView):
 # GET /users/<user_id>
 class UserDetailView(APIView):
     def get(self, request, user_id):
-        ufacilityuser = UFacilityUser.objects.get(id=user_id)
+        requesting_user = request.user
+        requesting_ufacilityuser = UFacilityUser.objects.filter(user=requesting_user).first()
+
+        # Check if requesting_user has a ufacility account
+        if requesting_ufacilityuser == None:
+            return Response({"status": status.HTTP_401_UNAUTHORIZED, "message": "User does not have a UFacility account."})
+
+        ufacilityuser = UFacilityUser.objects.filter(id=user_id).first()
+
+        # Only admins or the ufacility user itself can view the user details
+        if requesting_ufacilityuser != ufacilityuser and requesting_ufacilityuser.is_admin == False:
+            return Response({"status": status.HTTP_403_FORBIDDEN, "message": "User is neither a UFacility admin nor the user itself."})
 
         # Check if ufacilityuser exists
         if ufacilityuser == None:
             return Response({"status": status.HTTP_404_NOT_FOUND, "message": "UFacility user does not exist."})
 
-        requesting_user = request.user
-        requesting_ufacilityuser = UFacilityUser.objects.get(user=requesting_user)
-
-        # Only admins or the ufacility user itself can view the user details
-        if requesting_ufacilityuser != ufacilityuser and requesting_ufacilityuser.is_admin == False:
-            return Response({"status": status.HTTP_403_FORBIDDEN, "message": "User is neither a UFacility admin nor the user itself."})
 
         serializer = UFacilityUserSerializer(ufacilityuser)
         return Response(serializer.data)
@@ -68,18 +69,23 @@ class UserDetailView(APIView):
 # GET /users/<user_id>/bookings
 class UserBookingsView(APIView):
     def get(self, request, user_id):
-        ufacilityuser = UFacilityUser.objects.get(id=user_id)
-
-        # Check if ufacilityuser exists
-        if ufacilityuser == None:
-            return Response({"status": status.HTTP_404_NOT_FOUND, "message": "UFacility user does not exist."})
 
         requesting_user = request.user
-        requesting_ufacilityuser = UFacilityUser.objects.get(user=requesting_user)
+        requesting_ufacilityuser = UFacilityUser.objects.filter(user=requesting_user).first()
+
+        # Check if requesting_user has a ufacility account
+        if requesting_ufacilityuser == None:
+            return Response({"status": status.HTTP_401_UNAUTHORIZED, "message": "User does not have a UFacility account."})
+
+        ufacilityuser = UFacilityUser.objects.filter(id=user_id).first()
 
         # Only admins or the ufacility user itself can view the user bookings
         if requesting_ufacilityuser != ufacilityuser and requesting_ufacilityuser.is_admin == False:
             return Response({"status": status.HTTP_403_FORBIDDEN, "message": "User is neither a UFacility admin nor the user itself."})
+
+        # Check if ufacilityuser exists
+        if ufacilityuser == None:
+            return Response({"status": status.HTTP_404_NOT_FOUND, "message": "UFacility user does not exist."})
 
         bookings = Booking.objects.filter(user=ufacilityuser)
         serializer = BookingSerializer(bookings, many=True)
@@ -90,7 +96,11 @@ class UserBookingsView(APIView):
 class VerificationView(APIView):
     def get(self, request):
         requesting_user = request.user
-        requesting_ufacilityuser = UFacilityUser.objects.get(user=requesting_user)
+        requesting_ufacilityuser = UFacilityUser.objects.filter(user=requesting_user).first()
+
+        # Check if requesting_user has a ufacility account
+        if requesting_ufacilityuser == None:
+            return Response({"status": status.HTTP_401_UNAUTHORIZED, "message": "User does not have a UFacility account."})
 
         # Only admins can view all verifications
         if requesting_ufacilityuser.is_admin == False:
@@ -102,8 +112,8 @@ class VerificationView(APIView):
 
     def post(self, request):
         requesting_user = request.user
-        requesting_ufacilityuser = UFacilityUser.objects.get(user=requesting_user)
-        verification = Verification.objects.get(user=requesting_user)
+        requesting_ufacilityuser = UFacilityUser.objects.filter(user=requesting_user).first()
+        verification = Verification.objects.filter(user=requesting_user).first()
 
         # Check if requesting_user already has a verification or a ufacility account
         if verification != None or requesting_ufacilityuser != None:
@@ -123,48 +133,60 @@ class VerificationView(APIView):
 class VerificationDetailView(APIView):
     def get(self, request, verification_id):
         requesting_user = request.user
-        requesting_ufacilityuser = UFacilityUser.objects.get(user=requesting_user)
-        verification = Verification.objects.get(id=verification_id)
+        requesting_ufacilityuser = UFacilityUser.objects.filter(user=requesting_user).first()
+        verification = Verification.objects.filter(id=verification_id).first()
+
+        # Check if requesting_user has a ufacility account
+        if requesting_ufacilityuser == None:
+            return Response({"status": status.HTTP_401_UNAUTHORIZED, "message": "User does not have a UFacility account."})
+
+        # Only admins can view the verification details
+        if requesting_ufacilityuser.is_admin == False:
+            return Response({"status": status.HTTP_403_FORBIDDEN, "message": "User is neither a UFacility admin nor the owner of the verification."})
 
         # Check if verification exists
         if verification == None:
             return Response({"status": status.HTTP_404_NOT_FOUND, "message": "Verification does not exist."})
-
-        # Only admins or the user itself can view the verification details
-        if requesting_user != verification.user and requesting_ufacilityuser.is_admin == False:
-            return Response({"status": status.HTTP_403_FORBIDDEN, "message": "User is neither a UFacility admin nor the owner of the verification."})
 
         serializer = VerificationSerializer(verification)
         return Response(serializer.data)
 
     def delete(self, request, verification_id):
         requesting_user = request.user
-        requesting_ufacilityuser = UFacilityUser.objects.get(user=requesting_user)
-        verification = Verification.objects.get(id=verification_id)
+        requesting_ufacilityuser = UFacilityUser.objects.filter(user=requesting_user).first()
+        verification = Verification.objects.filter(id=verification_id).first()
+
+        # Check if requesting_user has a ufacility account
+        if requesting_ufacilityuser == None:
+            return Response({"status": status.HTTP_401_UNAUTHORIZED, "message": "User does not have a UFacility account."})
+
+        # Only admins or the user itself can delete the verification
+        if requesting_ufacilityuser.is_admin == False:
+            return Response({"status": status.HTTP_403_FORBIDDEN, "message": "User is neither a UFacility admin nor the owner of the verification."})
 
         # Check if verification exists
         if verification == None:
             return Response({"status": status.HTTP_404_NOT_FOUND, "message": "Verification does not exist."})
-
-        # Only admins or the user itself can delete the verification
-        if requesting_user != verification.user and requesting_ufacilityuser.is_admin == False:
-            return Response({"status": status.HTTP_403_FORBIDDEN, "message": "User is neither a UFacility admin nor the owner of the verification."})
 
         verification.delete()
         return Response({"status": status.HTTP_204_NO_CONTENT, "message": "Verification deleted."})
 
     def put(self, request, verification_id):
         requesting_user = request.user
-        requesting_ufacilityuser = UFacilityUser.objects.get(user=requesting_user)
-        verification = Verification.objects.get(id=verification_id)
+        requesting_ufacilityuser = UFacilityUser.objects.filter(user=requesting_user).first()
+        verification = Verification.objects.filter(id=verification_id).first()
+
+        # Check if requesting_user has a ufacility account
+        if requesting_ufacilityuser == None:
+            return Response({"status": status.HTTP_401_UNAUTHORIZED, "message": "User does not have a UFacility account."})
+
+        # Only admins or the user itself can delete the verification
+        if requesting_ufacilityuser.is_admin == False:
+            return Response({"status": status.HTTP_403_FORBIDDEN, "message": "User is neither a UFacility admin nor the owner of the verification."})
 
         # Check if verification exists
         if verification == None:
             return Response({"status": status.HTTP_404_NOT_FOUND, "message": "Verification does not exist."})
-
-        # Only admins or the user itself can delete the verification
-        if requesting_user != verification.user and requesting_ufacilityuser.is_admin == False:
-            return Response({"status": status.HTTP_403_FORBIDDEN, "message": "User is neither a UFacility admin nor the owner of the verification."})
 
         data = request.data
         data["user"] = verification.user.id
@@ -179,17 +201,15 @@ class VerificationDetailView(APIView):
 # GET, POST /bookings
 class BookingView(APIView):
     def get(self, request):
-        requesting_user = request.user
-        requesting_ufacilityuser = UFacilityUser.objects.get(user=requesting_user)
         bookings = Booking.objects.all()
         serializer = BookingSerializer(bookings, many=True)
         return Response(serializer.data)
 
     def post(self, request):
         requesting_user = request.user
-        requesting_ufacilityuser = UFacilityUser.objects.get(user=reqeusting_user)
+        requesting_ufacilityuser = UFacilityUser.objects.filter(user=requesting_user).first()
         data = request.data
-        data["user"] = ufacilityuser.id
+        data["user"] = requesting_ufacilityuser.id
         venue = Venue.objects.get(name=data["venue"])
         data["venue"] = venue.id
         data["status"] = "pending"
@@ -209,8 +229,12 @@ class BookingView(APIView):
 class BookingDetailView(APIView):
     def get(self, request, booking_id):
         requesting_user = request.user
-        requesting_ufacilityuser = UFacilityUser.objects.get(user=requesting_user)
-        booking = Booking.objects.get(id=booking_id)
+        requesting_ufacilityuser = UFacilityUser.objects.filter(user=requesting_user).first()
+        booking = Booking.objects.filter(id=booking_id).first()
+
+        # Check if requesting_user has a ufacility account
+        if requesting_ufacilityuser == None:
+            return Response({"status": status.HTTP_401_UNAUTHORIZED, "message": "User does not have a UFacility account."})
 
         # Check if booking exists
         if booking == None:
@@ -225,8 +249,12 @@ class BookingDetailView(APIView):
 
     def put(self, request, booking_id):
         requesting_user = request.user
-        requesting_ufacilityuser = UFacilityUser.objects.get(user=requesting_user)
-        booking = Booking.objects.get(id=booking_id)
+        requesting_ufacilityuser = UFacilityUser.objects.filter(user=requesting_user).first()
+        booking = Booking.objects.filter(id=booking_id).first()
+
+        # Check if requesting_user has a ufacility account
+        if requesting_ufacilityuser == None:
+            return Response({"status": status.HTTP_401_UNAUTHORIZED, "message": "User does not have a UFacility account."})
 
         # Check if booking exists
         if booking == None:
@@ -239,7 +267,7 @@ class BookingDetailView(APIView):
         data = request.data
         venue = Venue.objects.get(name=data["venue"])
         data["venue"] = venue.id
-        data["user"] = ufacilityuser.id
+        data["user"] = requesting_ufacilityuser.id
         data["status"] = booking.status
         serializer = BookingSerializer(booking, data=data, partial=True)
         if serializer.is_valid():
@@ -257,8 +285,12 @@ class BookingDetailView(APIView):
 
     def delete(self, request, booking_id):
         requesting_user = request.user
-        requesting_ufacilityuser = UFacilityUser.objects.get(user=requesting_user)
-        booking = Booking.objects.get(id=booking_id)
+        requesting_ufacilityuser = UFacilityUser.objects.filter(user=requesting_user).first()
+        booking = Booking.objects.filter(id=booking_id).first()
+
+        # Check if requesting_user has a ufacility account
+        if requesting_ufacilityuser == None:
+            return Response({"status": status.HTTP_401_UNAUTHORIZED, "message": "User does not have a UFacility account."})
 
         # Check if booking exists
         if booking == None:
@@ -281,10 +313,14 @@ class VenueView(APIView):
 
     def post(self, request):
         requesting_user = request.user
-        reqeusting_ufacilityUser = UFacilityUser.objects.get(user=requesting_user)
+        requesting_ufacilityuser = UFacilityUser.objects.filter(user=requesting_user).first()
+
+        # Check if requesting_user has a ufacility account
+        if requesting_ufacilityuser == None:
+            return Response({"status": status.HTTP_401_UNAUTHORIZED, "message": "User does not have a UFacility account."})
 
         # POST is only allowed for admins
-        if requesting_ufacilityUser.is_admin == False:
+        if requesting_ufacilityuser.is_admin == False:
             return Response({"status": status.HTTP_403_FORBIDDEN, "message": "User is not a UFacility admin."})
 
         data = request.data

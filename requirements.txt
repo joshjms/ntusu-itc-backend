@@ -62,3 +62,6 @@ lxml==4.9.2
 
 # WSGI (Gunicorn)
 gunicorn==20.1.0
+
+# Static file serving (WhiteNoise)
+whitenoise==6.3.0

@@ -93,7 +93,17 @@ There are 2 types of documentation provided here:
 
 ## Production Environment
 
-The server is deployed using AWS [here](http://ntusu-itc-backend.ap-southeast-1.elasticbeanstalk.com/) using Python 3.8 running on Linux2 Ver 3.4.3 machine. Current database is using AWS RDS Multi DB Cluster with MySQL engine. Database related configurations are set up through environment variables in the EB environment. Currently, the server has no certificate yet, meaning that we can't use 'https' yet to connect the live server.
+The server is deployed using AWS [here](http://ntusu-itc-backend.ap-southeast-1.elasticbeanstalk.com/) using Python 3.8 running on Linux2 Ver 3.4.3 machine. Current database is using AWS RDS Multi DB Cluster with MySQL engine. Database related configurations are set up through environment variables in the EB environment. Currently, the server has no certificate yet, meaning that we can't use 'https' yet to connect the live server. Static files are configured automatically via the 'WhiteNoise' middleware.
+
+In order to manually type Django manage.py commands, you have to first download [AWS EB CLI](https://github.com/aws/aws-elastic-beanstalk-cli-setup), then connect via ssh to the environment named `Ntusuitcbackendprod-env`, and finally type these commands referenced [here](https://stackoverflow.com/a/71045510).
+
+```powershell
+    eb ssh
+    sudo su -
+    export $(cat /opt/elasticbeanstalk/deployment/env | xargs)
+    source /var/app/venv/*/bin/activate
+    python3 /var/app/current/manage.py <command name>
+```
 
 ## Applications Explanation
 

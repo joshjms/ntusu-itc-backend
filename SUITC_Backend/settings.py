@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'django_summernote',
     'django_filters',
+    'whitenoise.runserver_nostatic',
     
     'docs',
     'portal',
@@ -56,6 +57,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     "django.contrib.sessions.middleware.SessionMiddleware",
     'corsheaders.middleware.CorsMiddleware',
     "django.middleware.common.CommonMiddleware",
@@ -119,12 +121,13 @@ PROD = bool(os.environ.get('PROD', 0))
 ALLOWED_HOSTS = []
 if PROD:
     ALLOWED_HOSTS += ['ntusu-itc-backend.ap-southeast-1.elasticbeanstalk.com']
-    ALLOWED_HOSTS += ['172.31.19.15']
+    ALLOWED_HOSTS += [os.environ.get('PROD_HOST')]
 else:
     ALLOWED_HOSTS += ['0.0.0.0', 'localhost', '127.0.0.1']
 
-# if PROD:
-#     DEBUG = False
+if PROD:
+    DEBUG = False
+
 
 if NAME:
     DATABASES = {
@@ -185,7 +188,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = "static/"
+if PROD:
+    STATIC_URL = "static/"
+    # TODO
+else:
+    STATIC_URL = "static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -235,4 +242,4 @@ REST_FRAMEWORK = {
 }
 
 # DEPLOYMENT SETTINGS
-STATIC_ROOT = 'static'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')

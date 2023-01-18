@@ -148,3 +148,6 @@ GitHub.sublime-settings
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+
+# Zip files
+*.zip

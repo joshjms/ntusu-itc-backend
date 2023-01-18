@@ -8,6 +8,8 @@ class UFacilityUserSerializer(serializers.ModelSerializer):
         fields = ["id", "user", "is_admin", "cca", "role", "status"]
         
     def create(self, validated_data):
+        validated_data["is_admin"] = False
+        validated_data["status"] = "pending"
         ufacilityuser = UFacilityUser.objects.create(**validated_data)
         return ufacilityuser
 

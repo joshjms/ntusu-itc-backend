@@ -34,7 +34,7 @@ class VerificationSerializer(serializers.ModelSerializer):
 class BookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking
-        fields = ["id", "user", "venue", "start_time", "end_time", "date", "purpose", "pax", "status"]
+        fields = ["id", "user", "venue", "start_time", "end_time", "purpose", "pax", "status"]
 
     def create(self, validated_data):
         booking = Booking.objects.create(**validated_data)
@@ -44,7 +44,6 @@ class BookingSerializer(serializers.ModelSerializer):
         instance.venue = validated_data.get("venue", instance.venue)
         instance.start_time = validated_data.get("start_time", instance.start_time)
         instance.end_time = validated_data.get("end_time", instance.end_time)
-        instance.date = validated_data.get("date", instance.date)
         instance.purpose = validated_data.get("purpose", instance.purpose)
         instance.pax = validated_data.get("pax", instance.pax)
         instance.save()

@@ -123,8 +123,8 @@ if PROD:
 else:
     ALLOWED_HOSTS += ['0.0.0.0', 'localhost', '127.0.0.1']
 
-if PROD:
-    DEBUG = False
+# if PROD:
+#     DEBUG = False
 
 if NAME:
     DATABASES = {

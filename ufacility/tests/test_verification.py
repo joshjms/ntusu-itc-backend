@@ -15,7 +15,7 @@ class UfacilityVerificationsTestCase(BaseAPITestCase):
             format = "json",
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(resp.data["email"], "test2We.ntu.edu.sg")
+        self.assertEqual(resp.data["email"], "test2@e.ntu.edu.sg")
         self.assertEqual(resp.data["cca"], "su")
         self.assertEqual(resp.data["role"], "member")
 

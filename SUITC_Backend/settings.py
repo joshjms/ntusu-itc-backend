@@ -32,7 +32,7 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-nd*^s9auc*ybc#!t%bxnwv!*ps+m#)&-3910+1ruo#sdc7!6jg"
+SECRET_KEY = "django-insecure-nd*^s9auc*ybc#!t%bxnwv!*ps+m#)&-3910+1ruo#sdc7!6jg" # TODO - change & keep in env var later on
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -157,9 +157,9 @@ elif PROD:
         'default': {
             'ENGINE': 'django.db.backends.mysql',
             'NAME': os.environ.get('DB_NAME'),
-            'USER': 'admin',
+            'USER': os.environ.get('DB_USER'),
             'PASSWORD': os.environ.get('DB_PASSWORD'),
-            'HOST': 'ntusu-itc-database.cluster-cubkol3kj008.ap-southeast-1.rds.amazonaws.com',
+            'HOST': os.environ.get('DB_HOST'),
             'PORT': '3306',
         }
     }

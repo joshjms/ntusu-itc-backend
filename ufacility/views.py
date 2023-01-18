@@ -36,7 +36,7 @@ class UserView(APIView):
         serializer = UFacilityUserSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            return Response(serializer.data, status = status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
@@ -60,7 +60,6 @@ class UserDetailView(APIView):
         # Check if ufacilityuser exists
         if ufacilityuser == None:
             return Response({"message": "User does not exist."}, status = status.HTTP_404_NOT_FOUND)
-
 
         serializer = UFacilityUserSerializer(ufacilityuser)
         return Response(serializer.data)
@@ -124,7 +123,7 @@ class VerificationView(APIView):
         serializer = VerificationSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            return Response(serializer.data, status = status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
@@ -162,7 +161,7 @@ class VerificationDetailView(APIView):
 
         # Only admins can delete the verification
         if requesting_ufacilityuser.is_admin == False:
-            return Response({"message": "User is not a UFacility admin and not the owner of the verification."}, status = status.HTTP_403_FORBIDDEN)
+            return Response({"message": "User is not a UFacility admin."}, status = status.HTTP_403_FORBIDDEN)
 
         # Check if verification exists
         if verification == None:
@@ -182,7 +181,7 @@ class VerificationDetailView(APIView):
 
         # Only admins can delete the verification
         if requesting_ufacilityuser.is_admin == False:
-            return Response({"message": "User is not a UFacility admin and not the owner of the verification."}, status = status.HTTP_403_FORBIDDEN)
+            return Response({"message": "User is not a UFacility admin."}, status = status.HTTP_403_FORBIDDEN)
 
         # Check if verification exists
         if verification == None:
@@ -220,7 +219,7 @@ class BookingView(APIView):
         serializer = BookingSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            return Response(serializer.data, status = status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
@@ -327,7 +326,7 @@ class VenueView(APIView):
         serializer = VenueSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            return Response(serializer.data, status = status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 

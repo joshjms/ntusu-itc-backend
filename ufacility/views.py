@@ -3,15 +3,12 @@ from rest_framework.response import Response
 from ufacility.models import Verification, Booking, Venue, UFacilityUser
 from ufacility.serializers import VerificationSerializer, BookingSerializer, VenueSerializer, UFacilityUserSerializer
 from rest_framework import status
-from sso.utils import send_email
-
-
-exco_email = ""
+from ufacility.utils import send_email_to_security, send_booking_email_to_admins, send_verification_email_to_admins
 
 
 # Clash check
-def clash_exists(venue, day, start_time, end_time):
-    bookings = Booking.objects.filter(venue=venue, date=day)
+def clash_exists(venue, start_time, end_time):
+    bookings = Booking.objects.filter(venue=venue)
     for booking in bookings:
         if start_time < booking.end_time and end_time > booking.start_time:
             return True
@@ -123,6 +120,7 @@ class VerificationView(APIView):
         serializer = VerificationSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
+            send_verification_email_to_admins()
             return Response(serializer.data, status = status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
@@ -207,18 +205,27 @@ class BookingView(APIView):
     def post(self, request):
         requesting_user = request.user
         requesting_ufacilityuser = UFacilityUser.objects.filter(user=requesting_user).first()
+        
+        if requesting_ufacilityuser == None:
+            return Response({"message": "User does not have a UFacility account."}, status = status.HTTP_401_UNAUTHORIZED)
+
         data = request.data
         data["user"] = requesting_ufacilityuser.id
-        venue = Venue.objects.get(name=data["venue"])
+        venue = Venue.objects.filter(name=data["venue"]).first()
+
+        if venue == None:
+            return Response({"message": "Venue does not exist."}, status = status.HTTP_400_BAD_REQUEST)
+
         data["venue"] = venue.id
         data["status"] = "pending"
 
-        if clash_exists(venue.id, data["date"], data["start_time"], data["end_time"]):
+        if clash_exists(venue.id, data["start_time"], data["end_time"]):
             return Response({"message": "Booking clashes with another booking."}, status = status.HTTP_409_CONFLICT)
 
         serializer = BookingSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
+            send_booking_email_to_admins()
             return Response(serializer.data, status = status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
@@ -264,19 +271,23 @@ class BookingDetailView(APIView):
             return Response({"message": "User is not a UFacility admin and not the owner of the booking."}, status = status.HTTP_403_FORBIDDEN)
 
         data = request.data
-        venue = Venue.objects.get(name=data["venue"])
+        venue = Venue.objects.filter(name=data["venue"]).first()
+
+        if venue == None:
+            return Response({"message": "Venue does not exist."}, status = status.HTTP_400_BAD_REQUEST)
+
         data["venue"] = venue.id
         data["user"] = requesting_ufacilityuser.id
-        data["status"] = booking.status
+
+        # Only admins can change status
+        if requesting_ufacilityuser.is_admin == False or "status" not in data:
+            data["status"] = booking.status
+
         serializer = BookingSerializer(booking, data=data, partial=True)
         if serializer.is_valid():
-            if requesting_ufacilityuser.is_admin:
-                email_subject = f"Booking request for {data['venue']} on {data['date']} from {data['start_time']} to {data['end_time']}"
-                email_body = """\
-                        This is an auto-generated email to inform you that a booking has been placed for {venue} on {date} from {start_time} to {end_time}.
-                        Please contact {exco_email} should you have any enquiries.
-                        """.format(venue=data["venue"], date=data["date"], start_time=data["start_time"], end_time=data["end_time"], exco_email=exco_email)
-                send_email(email_subject, email_body, recipients=[venue.security_email])
+            # If the admin changes the status to "approved", send an email to the security
+            if requesting_ufacilityuser.is_admin and data["status"] == "approved":
+                send_email_to_security(venue, data["start_time"], data["end_time"])
             serializer.save()
             return Response(serializer.data)
 

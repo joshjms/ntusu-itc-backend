@@ -51,7 +51,6 @@ class ChangePasswordView(APIView):
     
     def put(self, request):
         current_password = request.data.get('current_password', '')
-        print(current_password)
         new_password = request.data.get('new_password', '')
         user = User.objects.get(username=request.user.username)
         try:
@@ -98,9 +97,6 @@ class ResetPasswordView(APIView):
 class TokenCheckView(APIView):
     def get(self, _, token):
         user = get_object_or_404(User, custom_token=token)
-        print("TEST")
-        print(user.token_expiry_date)
-        print(tz.now())
         if tz.now() > user.token_expiry_date:
             return Response({ 'status': 'token expired', },
                 status=status.HTTP_401_UNAUTHORIZED)

@@ -143,3 +143,11 @@ GitHub.sublime-settings
 
 # vim
 .vim
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
+
+# Zip files
+*.zip

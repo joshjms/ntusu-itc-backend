@@ -14,13 +14,6 @@ This is NTUSU ITC Backend repository created on December 2022. It is built using
 
 ### How To Run Development Server
 
-- Note: For Macbook M1/M2, you must run this before doing all required steps below:
-
-  ```powershell
-      softwareupdate --install-rosetta
-      export DOCKER_DEFAULT_PLATFORM=linux/amd64
-  ```
-
 1. Install Docker Desktop based on your operating system ([MAC](https://docs.docker.com/desktop/install/mac-install/) / [Windows](https://docs.docker.com/desktop/install/windows-install/) / [Linux](https://docs.docker.com/desktop/install/linux-install/)) and launch the application
 
 2. Clone this repository and move into the project directory where `docker-compose.yml` file is located
@@ -46,6 +39,17 @@ This is NTUSU ITC Backend repository created on December 2022. It is built using
    Note: you might need to add `sudo` if you're using MAC
 
    You should do this when it is your first time running the development environment, and anytime there are new database migrations.
+
+### Troubleshoot
+
+This section is to document any problems that might occur when running the development environment along with its solution, as we all are using different devices which might have slightly different behaviour.
+
+- Note: For Macbook M1/M2, you must run this before doing all required steps below:
+
+```powershell
+    softwareupdate --install-rosetta
+    export DOCKER_DEFAULT_PLATFORM=linux/amd64
+```
 
 ### Executing Utility Commands
 
@@ -75,7 +79,7 @@ Sample data are generated using Django Fixtures. It is used to populate your dat
     docker exec -ti SUITC_Backend python manage.py loaddata sample_user
 ```
 
-Running this command will give you superuser access with the username `superuser` and password `123`. Other sample data can be seen on the fixtures folder.
+Running this command will give you superuser access with the username `superuser` and password `123`. Other sample data can be seen on the fixtures folder (password for other sample user: 1048576#).
 
 Warning: running the command may overwrite some existing data
 
@@ -85,11 +89,21 @@ There are 2 types of documentation provided here:
 
 - Automatic Documentation using Swagger UI
 
-- Manual Documentation in the `docs` app by writing markdown files (stored locally in this repository)
+- Manual Documentation in the `docs` app by writing markdown files (stored locally in this repository) (NOTE: this is not available in the live environment yet)
 
 ## Production Environment
 
-TODO
+The server is deployed using AWS [here](http://ntusu-itc-backend.ap-southeast-1.elasticbeanstalk.com/) using Python 3.8 running on Linux2 Ver 3.4.3 machine. Current database is stored using EC2 instance using MySQL (RDS is so expensive so we're not using this), static files are stored in S3 buckets. Database and S3 storage related configurations are set up through environment variables in the EB environment. SSL certificate maintained by Certbot.
+
+In order to manually type Django manage.py commands, you have to first download [AWS EB CLI](https://github.com/aws/aws-elastic-beanstalk-cli-setup), then connect via ssh to the environment named `Ntusuitcbackendprod-env`, and finally type these commands referenced [here](https://stackoverflow.com/a/71045510).
+
+```powershell
+    eb ssh
+    sudo su -
+    export $(cat /opt/elasticbeanstalk/deployment/env | xargs)
+    source /var/app/venv/*/bin/activate
+    python3 /var/app/current/manage.py <command name>
+```
 
 ## Applications Explanation
 
@@ -99,7 +113,7 @@ TODO
 
 ### UFacility
 
-### Inventory
+### ~~Inventory~~
 
 ### Event
 
@@ -107,7 +121,7 @@ TODO
 
 ### StarsWar
 
-### ULocker
+### ~~ULocker~~
 
 ### Workshop
 

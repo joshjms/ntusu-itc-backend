@@ -1,6 +1,7 @@
 # Django
 asgiref==3.5.2
 Django==4.1.2
+# Django==3.9
 sqlparse==0.4.3
 tzdata==2022.5
 pytz==2022.5
@@ -15,8 +16,12 @@ django-cors-headers==3.13.0
 djangorestframework-simplejwt==5.2.2
 PyJWT==2.6.0
 
+# Django Filter; dependent to DRF
+django-filter==22.1
+
 # Database
 psycopg2-binary==2.9.3
+mysqlclient==2.1.1
 
 # Unittest library
 mock==4.0.3
@@ -49,3 +54,18 @@ uritemplate==4.1.1
 # Markdown
 django-summernote==0.8.20.0
 markdown2==2.4.6
+
+# Web Scraper (BS4 0.0.1)
+bs4==0.0.1
+beautifulsoup4==4.11.1
+soupsieve==2.3.2post1
+lxml==4.9.2
+
+# WSGI (Gunicorn)
+gunicorn==20.1.0
+
+# Static file serving (WhiteNoise)
+whitenoise==6.3.0
+
+# AWS S3 bucket static file storages
+django-storages==1.13.2

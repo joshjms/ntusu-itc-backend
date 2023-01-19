@@ -10,24 +10,32 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
+
+# https://stackoverflow.com/a/70833150
+import django
+from django.utils.encoding import force_str
+django.utils.encoding.force_text = force_str
+
+
+
 from pathlib import Path
 import boto3
 import datetime
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-nd*^s9auc*ybc#!t%bxnwv!*ps+m#)&-3910+1ruo#sdc7!6jg"
+SECRET_KEY = "django-insecure-nd*^s9auc*ybc#!t%bxnwv!*ps+m#)&-3910+1ruo#sdc7!6jg" # TODO - change & keep in env var later on
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
-ALLOWED_HOSTS = ['0.0.0.0', 'localhost']
 
 # Application definition
 
@@ -44,6 +52,9 @@ INSTALLED_APPS = [
     'corsheaders',
     'drf_yasg',
     'django_summernote',
+    'django_filters',
+    'whitenoise.runserver_nostatic',
+    'storages',
     
     'docs',
     'portal',
@@ -56,6 +67,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     "django.contrib.sessions.middleware.SessionMiddleware",
     'corsheaders.middleware.CorsMiddleware',
     "django.middleware.common.CommonMiddleware",
@@ -112,8 +124,23 @@ WSGI_APPLICATION = "SUITC_Backend.wsgi.application"
     The testing done through Github Action will be
     defaulted to use the original sqlite3 file.
 """
-import os
+
 NAME = os.environ.get('POSTGRES_NAME')
+PROD = bool(os.environ.get('PROD', 0))
+
+ALLOWED_HOSTS = []
+if PROD:
+    ALLOWED_HOSTS += ['ntusu-itc-backend.ap-southeast-1.elasticbeanstalk.com']
+    ALLOWED_HOSTS += [os.environ.get('PROD_HOST')]
+else:
+    ALLOWED_HOSTS += ['0.0.0.0', 'localhost', '127.0.0.1']
+
+if PROD:
+    DEBUG = False
+    if os.environ.get('LIVE_DEBUG', 0) == 1:
+        DEBUG = True
+
+
 if NAME:
     DATABASES = {
         'default': {
@@ -123,6 +150,17 @@ if NAME:
             'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
             'HOST': 'db',
             'PORT': 5432,
+        }
+    }
+elif PROD:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ.get('DB_NAME'),
+            'USER': os.environ.get('DB_USER'),
+            'PASSWORD': os.environ.get('DB_PASSWORD'),
+            'HOST': os.environ.get('DB_HOST'),
+            'PORT': '3306',
         }
     }
 else:
@@ -162,7 +200,26 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = "static/"
+if PROD:
+    AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+    AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
+    AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+    AWS_S3_OBJECT_PARAMETERS = {
+        'CacheControl': 'max-age=86400',
+    }
+    AWS_LOCATION = 'static'
+
+    # Extra places for collectstatic to find static files.
+    STATICFILES_DIRS = (
+        os.path.join(PROJECT_ROOT, 'static'),
+    )
+    STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
+
+    STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+else:
+    STATIC_URL = "static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -178,7 +235,7 @@ ses_client = boto3.client(
     'ses',
     region_name='ap-southeast-1',
     aws_access_key_id='AKIASDA4XJS4KLMM4RV7',
-    aws_secret_access_key='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',
+    aws_secret_access_key=os.environ.get('SES_SECRET_ACCESS_KEY', 'Gr02PTgGt3OTCg5J2YgVX4M+7j4GpN36hWm46n3O'),
 )
 
 SWAGGER_SETTINGS = {
@@ -193,11 +250,10 @@ SWAGGER_SETTINGS = {
 
 SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ["Bearer"],
-    "ACCESS_TOKEN_LIFETIME": datetime.timedelta(minutes=5),
-    "REFRESH_TOKEN_LIFETIME": datetime.timedelta(days=1),
+    "ACCESS_TOKEN_LIFETIME": datetime.timedelta(days=30),
+    "REFRESH_TOKEN_LIFETIME": datetime.timedelta(days=30),
 }
 
-# TODO - change this during deployment env
 MEDIA_URL_SUMMERNOTE = '/media/'
 MEDIA_ROOT_SUMMERNOTE = os.path.join(BASE_DIR, 'media/')
 MEDIA_URL_DOCS = '/api-guide/'
@@ -206,5 +262,11 @@ MEDIA_ROOT_DOCS = os.path.join(BASE_DIR, 'docs/api-guide/')
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ]
+    ],
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend'
+    ],
 }
+
+# DEPLOYMENT SETTINGS
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')

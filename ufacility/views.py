@@ -3,16 +3,7 @@ from rest_framework.response import Response
 from ufacility.models import Verification, Booking, Venue, UFacilityUser
 from ufacility.serializers import VerificationSerializer, BookingSerializer, VenueSerializer, UFacilityUserSerializer
 from rest_framework import status
-from ufacility.utils import send_email_to_security, send_booking_email_to_admins, send_verification_email_to_admins
-
-
-# Clash check
-def clash_exists(venue, start_time, end_time):
-    bookings = Booking.objects.filter(venue=venue)
-    for booking in bookings:
-        if start_time < booking.end_time and end_time > booking.start_time:
-            return True
-    return False
+from ufacility.utils import send_email_to_security, send_booking_email_to_admins, send_verification_email_to_admins, clash_exists
 
 
 # POST /users

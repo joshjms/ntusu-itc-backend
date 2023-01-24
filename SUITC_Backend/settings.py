@@ -136,7 +136,8 @@ else:
     ALLOWED_HOSTS += ['0.0.0.0', 'localhost', '127.0.0.1']
 
 if PROD:
-    DEBUG = False
+#     DEBUG = False
+    DEBUG = True # TODO - CHANGE THIS LATER ON, JUST FOR THE SAKE OF LIVE TESTING & DEBUGGING (STRANGE ERROR IN ADMIN PAGE)
     if os.environ.get('LIVE_DEBUG', 0) == 1:
         DEBUG = True
 

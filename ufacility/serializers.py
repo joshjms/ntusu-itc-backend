@@ -32,6 +32,8 @@ class VerificationSerializer(serializers.ModelSerializer):
 
 
 class BookingSerializer(serializers.ModelSerializer):
+    start_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S')
+    end_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S')
     class Meta:
         model = Booking
         fields = ["id", "user", "venue", "start_time", "end_time", "purpose", "pax", "status"]

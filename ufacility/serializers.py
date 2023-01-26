@@ -1,4 +1,4 @@
-from ufacility.models import Verification, Booking, Venue, UFacilityUser
+from ufacility.models import Verification, Booking2, Venue, UFacilityUser
 from rest_framework import serializers
 
 
@@ -33,11 +33,11 @@ class VerificationSerializer(serializers.ModelSerializer):
 
 class BookingSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Booking
+        model = Booking2
         fields = ["id", "user", "venue", "start_time", "end_time", "purpose", "pax", "status"]
 
     def create(self, validated_data):
-        booking = Booking.objects.create(**validated_data)
+        booking = Booking2.objects.create(**validated_data)
         return booking
 
     def update(self, instance, validated_data):

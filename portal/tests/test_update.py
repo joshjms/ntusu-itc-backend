@@ -12,12 +12,21 @@ class PortalUpdate(BaseAPITestCase):
         self.update1 = UpdateNote.objects.create(
             title='title1',
             description='description1',
-            content='<p><b>content1</b></p>'
+            content='<p><b>content1</b></p>',
+            public=True,
         )
         self.update2 = UpdateNote.objects.create(
             title='title2',
             description='description2',
-            content='<p><b>content2</b></p>'
+            content='<p><b>content2</b></p>',
+            public=True,
+        )
+        # by default public=False, public should not able to retrieve this
+        # used to draft update note without reveraling it directly
+        self.update3 = UpdateNote.objects.create(
+            title='title3',
+            description='description3',
+            content='<p><b>content3</b></p>',
         )
     
     def test_update_list(self):
@@ -29,8 +38,8 @@ class PortalUpdate(BaseAPITestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(resp_json), 2)
         self.assertNotIn('content', resp_json[0])
-        self.assertEqual(resp_json[1]['description'], 'description1')
-        self.assertEqual(resp_json[0]['id'], 2)
+        self.assertEqual(resp_json[1]['description'], 'description2')
+        self.assertEqual(resp_json[0]['id'], 1)
 
     def test_update_post_unauthorized(self):
         # anonymous user & regular user cannot post update
@@ -78,21 +87,27 @@ class PortalUpdate(BaseAPITestCase):
             }
         )
         self.assertEqual(resp1.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(UpdateNote.objects.all().count(), 3)
+        self.assertEqual(UpdateNote.objects.all().count(), 4)
         
         # newest update will show up first
         resp2 = self.client3.get(
             reverse('portal:update')
         )
         resp_json2 = loads(resp2.content.decode('utf-8'))
-        self.assertEqual(resp_json2[0]['title'], 'some_title')
+        self.assertEqual(resp_json2[0]['title'], 'title1')
     
     def test_update_detail(self):
         # invalid id given
         resp1 = self.client1.get(
-            reverse('portal:update_detail', args=(3,))
+            reverse('portal:update_detail', args=(9,))
         )
         self.assertEqual(resp1.status_code, status.HTTP_404_NOT_FOUND)
+
+        # valid id but not open for public
+        resp1b = self.client1.get(
+            reverse('portal:update_detail', args=(3,))
+        )
+        self.assertEqual(resp1b.status_code, status.HTTP_404_NOT_FOUND)
 
         # get a specific update including its content
         resp2 = self.client3.get(
@@ -149,4 +164,28 @@ class PortalUpdate(BaseAPITestCase):
             reverse('portal:update_detail', args=(2,))
         )
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertEqual(UpdateNote.objects.all().count(), 1)
+        self.assertEqual(UpdateNote.objects.all().count(), 2)
+    
+    def test_update_get_prev_and_next_id(self):
+        # create another sample update that is open to public
+        # so we have: 1 (public), 2 (public), 3 (private), 4 (public)
+        self.update4 = UpdateNote.objects.create(
+            title='title3',
+            description='description3',
+            content='<p><b>content3</b></p>',
+            public=True,
+        )
+
+        resp1 = self.client3.get(
+            reverse('portal:update_detail', args=(2,))
+        )
+        resp_json1 = loads(resp1.content.decode('utf-8'))
+        self.assertEqual(resp_json1['has_prev'], 1)
+        self.assertEqual(resp_json1['has_next'], 4)
+
+        resp2 = self.client3.get(
+            reverse('portal:update_detail', args=(4,))
+        )
+        resp_json2 = loads(resp2.content.decode('utf-8'))
+        self.assertEqual(resp_json2['has_prev'], 2)
+        self.assertEqual(resp_json2['has_next'], None)

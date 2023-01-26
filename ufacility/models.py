@@ -1,6 +1,5 @@
 from django.db import models
 from sso.models import User
-from django.utils import timezone as tz
 
 
 STATUSES = (
@@ -32,8 +31,8 @@ class Venue(models.Model):
 class Booking(models.Model):
     user = models.ForeignKey(UFacilityUser, on_delete=models.CASCADE)
     venue = models.ForeignKey(Venue, on_delete=models.CASCADE)
-    start_time = models.DateTimeField(default=tz.now)
-    end_time = models.DateTimeField(default=tz.now)
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
     purpose = models.CharField(max_length=200)
     pax = models.PositiveIntegerField()
     status = models.CharField(max_length=10, choices=STATUSES)

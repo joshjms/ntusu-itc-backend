@@ -276,8 +276,8 @@ class BookingDetailView(APIView):
 
         serializer = BookingSerializer(booking, data=data, partial=True)
         if serializer.is_valid():
-            # If the admin changes the status to "approved", send an email to the security
-            if requesting_ufacilityuser.is_admin and data["status"] == "approved":
+            # If the admin changes the status to "accepted", send an email to the security
+            if requesting_ufacilityuser.is_admin and data["status"] == "accepted":
                 send_email_to_security(venue, data["start_time"], data["end_time"])
             serializer.save()
             return Response(serializer.data)

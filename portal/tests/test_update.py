@@ -12,12 +12,14 @@ class PortalUpdate(BaseAPITestCase):
         self.update1 = UpdateNote.objects.create(
             title='title1',
             description='description1',
-            content='<p><b>content1</b></p>'
+            content='<p><b>content1</b></p>',
+            public=True,
         )
         self.update2 = UpdateNote.objects.create(
             title='title2',
             description='description2',
-            content='<p><b>content2</b></p>'
+            content='<p><b>content2</b></p>',
+            public=True,
         )
     
     def test_update_list(self):
@@ -29,8 +31,8 @@ class PortalUpdate(BaseAPITestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(resp_json), 2)
         self.assertNotIn('content', resp_json[0])
-        self.assertEqual(resp_json[1]['description'], 'description1')
-        self.assertEqual(resp_json[0]['id'], 2)
+        self.assertEqual(resp_json[1]['description'], 'description2')
+        self.assertEqual(resp_json[0]['id'], 1)
 
     def test_update_post_unauthorized(self):
         # anonymous user & regular user cannot post update
@@ -85,7 +87,7 @@ class PortalUpdate(BaseAPITestCase):
             reverse('portal:update')
         )
         resp_json2 = loads(resp2.content.decode('utf-8'))
-        self.assertEqual(resp_json2[0]['title'], 'some_title')
+        self.assertEqual(resp_json2[0]['title'], 'title1')
     
     def test_update_detail(self):
         # invalid id given

@@ -46,6 +46,7 @@ class BookingSerializer(serializers.ModelSerializer):
         instance.end_time = validated_data.get("end_time", instance.end_time)
         instance.purpose = validated_data.get("purpose", instance.purpose)
         instance.pax = validated_data.get("pax", instance.pax)
+        instance.status = validated_data.get("status", instance.status)
         instance.save()
         return instance
 

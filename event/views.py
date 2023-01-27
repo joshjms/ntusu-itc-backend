@@ -42,7 +42,6 @@ class EventEdit(generics.RetrieveUpdateDestroyAPIView):
         return Event.objects.filter(pk=pk)
 
     def perform_update(self, serializer):
-        print('peko')
         serializer.save(auto_start=True, auto_end=True)
 
 

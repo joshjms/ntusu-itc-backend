@@ -4,6 +4,8 @@ from ufacility.models import Verification, Booking2, Venue, UFacilityUser
 from ufacility.serializers import VerificationSerializer, BookingSerializer, VenueSerializer, UFacilityUserSerializer
 from rest_framework import status
 from ufacility.utils import send_email_to_security, send_booking_email_to_admins, send_verification_email_to_admins, clash_exists
+from django.shortcuts import get_object_or_404
+from sso.models import User
 
 
 # POST /users
@@ -81,6 +83,10 @@ class UserBookingsView(APIView):
 
 # GET, POST /verifications
 class VerificationView(APIView):
+    '''
+    Verification ListView
+    Permission: UFacility Admin Only
+    '''
     def get(self, request):
         requesting_user = request.user
         requesting_ufacilityuser = UFacilityUser.objects.filter(user=requesting_user).first()
@@ -97,6 +103,10 @@ class VerificationView(APIView):
         serializer = VerificationSerializer(verifications, many=True)
         return Response(serializer.data)
 
+    '''
+    Verification CreateView
+    Permission: SSO User, not yet created verification nor be a UFacility User
+    '''
     def post(self, request):
         requesting_user = request.user
         requesting_ufacilityuser = UFacilityUser.objects.filter(user=requesting_user).first()
@@ -120,7 +130,21 @@ class VerificationView(APIView):
 
 # GET, DELETE /verifications/<verification_id>
 class VerificationDetailView(APIView):
+    '''
+    If verification_id = 0:
+    Get the verification instance of the currently requested user
+
+    Else:
+    Verification DetailView
+    Permission: UFacility Admin Only
+    '''
     def get(self, request, verification_id):
+        if verification_id == 0:
+            user = User.objects.get(id=request.user.id)
+            verification = get_object_or_404(Verification, user=user)
+            serializer = VerificationSerializer(verification)
+            return Response(serializer.data)
+
         requesting_user = request.user
         requesting_ufacilityuser = UFacilityUser.objects.filter(user=requesting_user).first()
         verification = Verification.objects.filter(id=verification_id).first()
@@ -140,7 +164,7 @@ class VerificationDetailView(APIView):
         serializer = VerificationSerializer(verification)
         return Response(serializer.data)
 
-    def delete(self, request, verification_id):
+    def delete(self, request, verification_id): # TODO - evaluate the need of this endpoint
         requesting_user = request.user
         requesting_ufacilityuser = UFacilityUser.objects.filter(user=requesting_user).first()
         verification = Verification.objects.filter(id=verification_id).first()
@@ -160,7 +184,7 @@ class VerificationDetailView(APIView):
         verification.delete()
         return Response({"message": "Verification deleted."}, status = status.HTTP_204_NO_CONTENT)
 
-    def put(self, request, verification_id):
+    def put(self, request, verification_id): # TODO - evaluate the need of this endpoint
         requesting_user = request.user
         requesting_ufacilityuser = UFacilityUser.objects.filter(user=requesting_user).first()
         verification = Verification.objects.filter(id=verification_id).first()

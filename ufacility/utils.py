@@ -1,5 +1,5 @@
 from sso.utils import send_email
-from ufacility.models import UFacilityUser, Booking
+from ufacility.models import UFacilityUser, Booking2
 
 
 exco_email = ""
@@ -37,9 +37,8 @@ def send_booking_email_to_admins():
     send_email(email_subject, email_body, recipients=admin_emails)
 
 def clash_exists(venue, start_time, end_time):
-    bookings = Booking.objects.filter(venue=venue, status="accepted")
+    bookings = Booking2.objects.filter(venue=venue, status="accepted")
     for booking in bookings:
         if start_time < booking.end_time and end_time > booking.start_time:
             return True
     return False
-

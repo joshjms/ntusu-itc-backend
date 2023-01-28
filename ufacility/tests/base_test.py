@@ -15,7 +15,8 @@ class BaseAPITestCase(APITestCase):
             user = self.user0,
             is_admin = True,
             cca = "su",
-            role = "admin",
+            hongen_name = "hongen",
+            hongen_phone_number = "12348754",
         )
 
         self.client1 = APIClient()
@@ -29,7 +30,8 @@ class BaseAPITestCase(APITestCase):
             user = self.user1,
             is_admin = False,
             cca = "su",
-            role = "member",
+            hongen_name = "hongen2",
+            hongen_phone_number = "12348759",
         )
 
         self.client2 = APIClient()
@@ -39,4 +41,3 @@ class BaseAPITestCase(APITestCase):
             username = "test2",
             password = "somerandompassword123$",
         )
-

@@ -21,7 +21,8 @@ class UfacilityUserBookingsTestCase(BaseAPITestCase):
             user = self.user,
             is_admin = False,
             cca = "su",
-            role = "member",
+            hongen_name = "hg",
+            hongen_phone_number = "87654321",
         )
 
         self.venue = Venue.objects.create(

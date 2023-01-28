@@ -54,9 +54,9 @@ class AdminList(generics.ListAPIView):
 class AdminUpdate(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = EventAdminSerializer
     permission_classes = [IsEventSuperAdmin]
-    def get_queryset(self):
-        pk = self.kwargs['pk']
-        return EventAdmin.objects.filter(pk=pk)
+#     def get_queryset(self):
+#         pk = self.kwargs['pk']
+#         return EventAdmin.objects.filter(pk=pk)
     
 
 class UserList(generics.ListAPIView):

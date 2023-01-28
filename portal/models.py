@@ -1,17 +1,16 @@
 from django.db import models
+from django.utils import timezone as tz
 
 
 class UpdateNote(models.Model):
     title = models.CharField(max_length=50)
     description = models.CharField(max_length=250)
     content = models.TextField()
-    added = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ['-added']
+    added = models.DateTimeField(default=tz.now)
+    public = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.title
+        return f'<Update {self.id} (public={self.public}): {self.title}>'
 
 
 class FeedbackForm(models.Model):

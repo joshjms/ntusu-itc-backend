@@ -41,6 +41,6 @@ class ManageEventsTestCase(BaseAPITestCase):
         self.assertEqual(resp.data[0]["name"], "test event")
         self.assertEqual(resp.data[0]["allow_non_undergraduate"], True)
         self.assertEqual(resp.data[0]["allow_exchange_student"], True)
-        self.assertEqual(resp.data[0]["event_admin"], self.event_admin)
+        self.assertEqual(resp.data[0]["event_admin"], self.event_admin.user_id)
         self.assertEqual(resp.data[0]["start_time"], "2023-01-20T08:00:00+08:00")
         self.assertEqual(resp.data[0]["end_time"], "2023-01-21T08:00:00+08:00")

@@ -19,7 +19,8 @@ class UfacilityUserDetailsTestCase(BaseAPITestCase):
             user = self.user,
             is_admin = False,
             cca = "su",
-            role = "member",
+            hongen_name = "hg",
+            hongen_phone_number = "87654321",
         )
         self.client = APIClient()
 
@@ -32,7 +33,8 @@ class UfacilityUserDetailsTestCase(BaseAPITestCase):
         self.assertEqual(resp.data["user"], self.user.id)
         self.assertEqual(resp.data["is_admin"], False)
         self.assertEqual(resp.data["cca"], "su")
-        self.assertEqual(resp.data["role"], "member")
+        self.assertEqual(resp.data["hongen_name"], "hg")
+        self.assertEqual(resp.data["hongen_phone_number"], "87654321")
 
         # Test request as the ufacility user itself
         self.client.force_authenticate(user = self.user)
@@ -42,7 +44,8 @@ class UfacilityUserDetailsTestCase(BaseAPITestCase):
         self.assertEqual(resp.data["user"], self.user.id)
         self.assertEqual(resp.data["is_admin"], False)
         self.assertEqual(resp.data["cca"], "su")
-        self.assertEqual(resp.data["role"], "member")
+        self.assertEqual(resp.data["hongen_name"], "hg")
+        self.assertEqual(resp.data["hongen_phone_number"], "87654321")
 
 
     def test_get_user_details_fail_unauthorized(self):

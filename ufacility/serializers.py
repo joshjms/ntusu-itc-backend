@@ -5,7 +5,7 @@ from rest_framework import serializers
 class UFacilityUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = UFacilityUser
-        fields = ["id", "user", "is_admin", "cca", "role"]
+        fields = ["id", "user", "is_admin", "cca", "hongen_name", "hongen_phone_number"]
         
     def create(self, validated_data):
         validated_data["is_admin"] = False

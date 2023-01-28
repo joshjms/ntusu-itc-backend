@@ -13,7 +13,8 @@ class UFacilityUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, unique=True)
     is_admin = models.BooleanField(default=False)
     cca = models.CharField(max_length=100)
-    role = models.CharField(max_length=100)
+    hongen_name = models.CharField(max_length=100, default='')
+    hongen_phone_number = models.CharField(max_length=100, default='')
 
     def __str__(self) -> str:
         return self.user.display_name

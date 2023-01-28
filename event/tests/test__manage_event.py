@@ -35,7 +35,7 @@ class ManageEventsTestCase(BaseAPITestCase):
     def test_get_event_success(self):
         # Try viewing all the events as event superadmin
         self.client0.force_authenticate(user = self.user0)
-        url = reverse('event:all_events')
+        url = reverse('event:event-list-all')
         resp = self.client0.get(url)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp.data[0]["name"], "test event")

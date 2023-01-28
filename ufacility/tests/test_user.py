@@ -19,7 +19,6 @@ class UfacilityUsersTestCase(BaseAPITestCase):
                 "user": new_user_id,
                 "cca": "su",
                 "role": "member",
-                "status": "pending",
                 "is_admin": False,
             },
             format = "json"
@@ -28,7 +27,6 @@ class UfacilityUsersTestCase(BaseAPITestCase):
         self.assertEqual(resp.data["user"], new_user_id)
         self.assertEqual(resp.data["cca"], "su")
         self.assertEqual(resp.data["role"], "member")
-        self.assertEqual(resp.data["status"], "pending")
         self.assertEqual(resp.data["is_admin"], False)
 
     def test_post_user_fail_unauthorized(self):

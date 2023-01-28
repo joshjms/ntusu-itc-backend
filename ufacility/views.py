@@ -108,6 +108,7 @@ class VerificationView(APIView):
 
         data = request.data
         data["user"] = requesting_user.id
+        data["status"] = "pending"
         serializer = VerificationSerializer(data=data)
         if serializer.is_valid():
             serializer.save()

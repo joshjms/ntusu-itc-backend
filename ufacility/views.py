@@ -261,6 +261,10 @@ class BookingDetailView(APIView):
         if requesting_ufacilityuser.is_admin == False and requesting_ufacilityuser != booking.user:
             return Response({"message": "User is not a UFacility admin and not the owner of the booking."}, status = status.HTTP_403_FORBIDDEN)
 
+        # Updating bookings is not allowed after it is accepted or declined
+        if booking.status == "accepted" or booking.status == "declined":
+            return Response({"message": "Booking is already accepted or declined. No further alteration is allowed."}, status = status.HTTP_409_CONFLICT)
+
         data = request.data
         venue = Venue.objects.filter(name=data["venue"]).first()
 

@@ -14,7 +14,6 @@ class UFacilityUser(models.Model):
     is_admin = models.BooleanField(default=False)
     cca = models.CharField(max_length=100)
     role = models.CharField(max_length=100)
-    status = models.CharField(max_length=10, choices=STATUSES)
 
     def __str__(self) -> str:
         return self.user.display_name
@@ -43,9 +42,10 @@ class Booking2(models.Model):
 
 class Verification(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, unique=True)
-    email = models.CharField(max_length=100, unique=True)
     cca = models.CharField(max_length=100)
-    role = models.CharField(max_length=100)
+    status = models.CharField(max_length=10, choices=STATUSES)
+    hongen_name = models.CharField(max_length=100)
+    hongen_phone_number = models.CharField(max_length=100)
 
     def __str__(self) -> str:
-        return self.email
+        return self.cca

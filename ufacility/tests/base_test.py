@@ -16,7 +16,6 @@ class BaseAPITestCase(APITestCase):
             is_admin = True,
             cca = "su",
             role = "admin",
-            status = "accepted",
         )
 
         self.client1 = APIClient()
@@ -31,7 +30,6 @@ class BaseAPITestCase(APITestCase):
             is_admin = False,
             cca = "su",
             role = "member",
-            status = "accepted",
         )
 
         self.client2 = APIClient()

@@ -15,9 +15,9 @@ class UfacilityVerificationDetailsTestCase(BaseAPITestCase):
                 username = "test",
                 password = "somevalidpassword123$",
             ),
-            email = "test2@e.ntu.edu.sg",
-            cca = "su",
-            role = "member",
+            cca =  "su",
+            hongen_name = "bc",
+            hongen_phone_number = "12345678",
         )
 
     def test_get_verification_detail_success(self):
@@ -58,9 +58,9 @@ class UfacilityVerificationDetailsTestCase(BaseAPITestCase):
             format = "json",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["email"], "new@e.ntu.edu.sg")
         self.assertEqual(response.data["cca"], "new su")
-        self.assertEqual(response.data["role"], verification.role)
+        self.assertEqual(response.data["hongen_name"], "bc")
+        self.assertEqual(response.data["hongen_phone_number"], "12345678")
 
     def test_put_verification_detail_fail_unauthorized(self):
         self.client2.force_authenticate(user = self.user2)

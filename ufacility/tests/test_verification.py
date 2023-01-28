@@ -1,6 +1,7 @@
 from rest_framework import status
-from ufacility.tests.base_test import BaseAPITestCase
 from rest_framework.reverse import reverse
+from ufacility.tests.base_test import BaseAPITestCase
+
 
 class UfacilityVerificationsTestCase(BaseAPITestCase):
     def test_post_verification_success(self):
@@ -8,16 +9,18 @@ class UfacilityVerificationsTestCase(BaseAPITestCase):
         resp = self.client2.post(
             reverse("ufacility:verifications"), 
             {
-                "email": "test2@e.ntu.edu.sg",
                 "cca": "su",
-                "role": "member",
+                "hongen_name": "bc",
+                "hongen_phone_number": "12345678",
+                "status": "accepted", # still will be pending regardless of this value
             },
             format = "json",
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(resp.data["email"], "test2@e.ntu.edu.sg")
         self.assertEqual(resp.data["cca"], "su")
-        self.assertEqual(resp.data["role"], "member")
+        self.assertEqual(resp.data["hongen_name"], "bc")
+        self.assertEqual(resp.data["hongen_phone_number"], "12345678")
+        self.assertEqual(resp.data["status"], "pending")
 
     def test_post_verification_fail_duplicate_verification(self):
         # First time success
@@ -25,9 +28,10 @@ class UfacilityVerificationsTestCase(BaseAPITestCase):
         resp = self.client2.post(
             reverse("ufacility:verifications"), 
             {
-                "email": "test2@e.ntu.edu.sg",
                 "cca": "su",
-                "role": "member",
+                "hongen_name": "bc",
+                "hongen_phone_number": "12345678",
+                "status": "pending",
             },
             format = "json",
         )
@@ -37,9 +41,10 @@ class UfacilityVerificationsTestCase(BaseAPITestCase):
         resp = self.client2.post(
             reverse("ufacility:verifications"), 
             {
-                "email": "test2@e.ntu.edu.sg",
                 "cca": "su",
-                "role": "member",
+                "hongen_name": "bc",
+                "hongen_phone_number": "12345678",
+                "status": "pending",
             },
             format = "json",
         )
@@ -79,4 +84,3 @@ class UfacilityVerificationsTestCase(BaseAPITestCase):
         self.client1.force_authenticate(user = self.user1)
         resp = self.client1.get(reverse("ufacility:verifications"))
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
-

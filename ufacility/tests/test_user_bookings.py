@@ -20,7 +20,6 @@ class UfacilityUserBookingsTestCase(BaseAPITestCase):
         self.ufacilityuser = UFacilityUser.objects.create(
             user = self.user,
             is_admin = False,
-            status = "accepted",
             cca = "su",
             role = "member",
         )

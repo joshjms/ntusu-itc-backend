@@ -18,7 +18,6 @@ class UfacilityUserDetailsTestCase(BaseAPITestCase):
         self.ufacilityuser = UFacilityUser.objects.create(
             user = self.user,
             is_admin = False,
-            status = "accepted",
             cca = "su",
             role = "member",
         )
@@ -32,7 +31,6 @@ class UfacilityUserDetailsTestCase(BaseAPITestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp.data["user"], self.user.id)
         self.assertEqual(resp.data["is_admin"], False)
-        self.assertEqual(resp.data["status"], "accepted")
         self.assertEqual(resp.data["cca"], "su")
         self.assertEqual(resp.data["role"], "member")
 
@@ -43,7 +41,6 @@ class UfacilityUserDetailsTestCase(BaseAPITestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp.data["user"], self.user.id)
         self.assertEqual(resp.data["is_admin"], False)
-        self.assertEqual(resp.data["status"], "accepted")
         self.assertEqual(resp.data["cca"], "su")
         self.assertEqual(resp.data["role"], "member")
 

@@ -2,7 +2,7 @@ from rest_framework import status
 from ufacility.tests.base_test import BaseAPITestCase
 from rest_framework.reverse import reverse
 from sso.models import User
-from ufacility.models import UFacilityUser, Booking, Venue
+from ufacility.models import UFacilityUser, Booking2, Venue
 import datetime
 from rest_framework.test import APIClient
 
@@ -30,7 +30,7 @@ class UfacilityUserBookingsTestCase(BaseAPITestCase):
             security_email = "security@e.ntu.edu.sg",
         )
 
-        self.booking = Booking.objects.create(
+        self.booking = Booking2.objects.create(
             user = self.ufacilityuser,
             venue = self.venue,
             start_time = datetime.datetime(2023, 1, 20, tzinfo=datetime.timezone.utc),

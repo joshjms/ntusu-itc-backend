@@ -5,7 +5,7 @@ from portal.models import UpdateNote, FeedbackForm
 
 class UpdateSummernote(SummernoteModelAdmin):
     summernote_fields = ('content',)
-    list_display = ('id', 'title', 'added',)
+    list_display = ('id', 'public', 'title', 'added',)
 
 
 admin.site.register(UpdateNote, UpdateSummernote)

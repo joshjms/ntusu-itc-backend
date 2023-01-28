@@ -136,7 +136,6 @@ else:
     ALLOWED_HOSTS += ['0.0.0.0', 'localhost', '127.0.0.1']
 
 if PROD:
-    DEBUG = False
     if os.environ.get('LIVE_DEBUG', 0) == 1:
         DEBUG = True
 

@@ -1,6 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from ufacility.models import Verification, Booking, Venue, UFacilityUser
+from ufacility.models import Verification, Booking2, Venue, UFacilityUser
 from ufacility.serializers import VerificationSerializer, BookingSerializer, VenueSerializer, UFacilityUserSerializer
 from rest_framework import status
 from ufacility.utils import send_email_to_security, send_booking_email_to_admins, send_verification_email_to_admins, clash_exists
@@ -74,7 +74,7 @@ class UserBookingsView(APIView):
         if ufacilityuser == None:
             return Response({"message": "UFacility user does not exist."}, status = status.HTTP_404_NOT_FOUND)
 
-        bookings = Booking.objects.filter(user=ufacilityuser)
+        bookings = Booking2.objects.filter(user=ufacilityuser)
         serializer = BookingSerializer(bookings, many=True)
         return Response(serializer.data)
 
@@ -189,7 +189,7 @@ class VerificationDetailView(APIView):
 # GET, POST /bookings
 class BookingView(APIView):
     def get(self, request):
-        bookings = Booking.objects.all()
+        bookings = Booking2.objects.all()
         serializer = BookingSerializer(bookings, many=True)
         return Response(serializer.data)
 
@@ -227,7 +227,7 @@ class BookingDetailView(APIView):
     def get(self, request, booking_id):
         requesting_user = request.user
         requesting_ufacilityuser = UFacilityUser.objects.filter(user=requesting_user).first()
-        booking = Booking.objects.filter(id=booking_id).first()
+        booking = Booking2.objects.filter(id=booking_id).first()
 
         # Check if requesting_user has a ufacility account
         if requesting_ufacilityuser == None:
@@ -247,7 +247,7 @@ class BookingDetailView(APIView):
     def put(self, request, booking_id):
         requesting_user = request.user
         requesting_ufacilityuser = UFacilityUser.objects.filter(user=requesting_user).first()
-        booking = Booking.objects.filter(id=booking_id).first()
+        booking = Booking2.objects.filter(id=booking_id).first()
 
         # Check if requesting_user has a ufacility account
         if requesting_ufacilityuser == None:
@@ -291,7 +291,7 @@ class BookingDetailView(APIView):
     def delete(self, request, booking_id):
         requesting_user = request.user
         requesting_ufacilityuser = UFacilityUser.objects.filter(user=requesting_user).first()
-        booking = Booking.objects.filter(id=booking_id).first()
+        booking = Booking2.objects.filter(id=booking_id).first()
 
         # Check if requesting_user has a ufacility account
         if requesting_ufacilityuser == None:

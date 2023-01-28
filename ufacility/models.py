@@ -27,7 +27,7 @@ class Venue(models.Model):
         return self.name
 
 
-class Booking(models.Model):
+class Booking2(models.Model):
     user = models.ForeignKey(UFacilityUser, on_delete=models.CASCADE)
     venue = models.ForeignKey(Venue, on_delete=models.CASCADE)
     start_time = models.DateTimeField()

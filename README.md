@@ -93,9 +93,9 @@ There are 2 types of documentation provided here:
 
 ## Production Environment
 
-The server is deployed using AWS [here](http://ntusu-itc-backend.ap-southeast-1.elasticbeanstalk.com/) using Python 3.8 running on Linux2 Ver 3.4.3 machine. Current database is stored using EC2 instance using MySQL (RDS is so expensive so we're not using this), static files are stored in S3 buckets. Database and S3 storage related configurations are set up through environment variables in the EB environment. SSL certificate maintained by Certbot.
+The live server is deployed using AWS Elastic Beanstalk (environment name: `Ntusuitcbackendprod-env`) [here](http://ntusu-itc-backend.ap-southeast-1.elasticbeanstalk.com/) using Python 3.8 running on Linux2 Ver 3.4.3 machine. Current database is stored using EC2 instance using MySQL (RDS is so expensive so we're not using this), static files are stored in S3 buckets. Database and S3 storage related configurations are set up through environment variables in the EB environment. SSL certificate is not issued yet, but most likely to be maintained using Certbot.
 
-In order to manually type Django manage.py commands, you have to first download [AWS EB CLI](https://github.com/aws/aws-elastic-beanstalk-cli-setup), then connect via ssh to the environment named `Ntusuitcbackendprod-env`, and finally type these commands referenced [here](https://stackoverflow.com/a/71045510).
+In order to manually type Django manage.py commands, you have to first download [AWS EB CLI](https://github.com/aws/aws-elastic-beanstalk-cli-setup), then connect via ssh by typing `eb ssh Ntusuitcbackendprod-env`, and finally type these commands referenced [here](https://stackoverflow.com/a/71045510).
 
 ```powershell
     eb ssh
@@ -104,6 +104,8 @@ In order to manually type Django manage.py commands, you have to first download 
     source /var/app/venv/*/bin/activate
     python3 /var/app/current/manage.py <command name>
 ```
+
+Important note: every time there are new migrations, please connect via ssh to perform migration in the live server (later please try to automate this process!)
 
 ## Applications Explanation
 

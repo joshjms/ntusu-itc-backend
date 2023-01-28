@@ -1,4 +1,5 @@
 from rest_framework import generics
+from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from portal.models import UpdateNote, FeedbackForm
 from portal.permissions import IsSuperUserOrReadOnly, IsSuperUser
@@ -8,10 +9,11 @@ from portal.serializers import (
     FeedbackFormUserSerializer,
     FeedbackFormAdminSerializer,
 )
+from portal.utils import get_prev_and_next_id
 
 
 class UpdateNoteMixin:
-    queryset = UpdateNote.objects.all()
+    queryset = UpdateNote.objects.filter(public=True)
     serializer_class = UpdateNoteSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsSuperUserOrReadOnly]
@@ -32,6 +34,12 @@ class UpdateNoteView(UpdateNoteMixin,
 class UpdateNoteDetailView(UpdateNoteMixin,
 		generics.RetrieveUpdateDestroyAPIView):
     lookup_field = 'id'
+
+    def get(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(get_prev_and_next_id(queryset, instance, serializer.data))
 
 
 class FeedbackView(FeedbackFormMixin,

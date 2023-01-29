@@ -20,7 +20,6 @@ class UfacilityUsersTestCase(BaseAPITestCase):
                 "cca": "su",
                 "hongen_name": "hongen",
                 "hongen_phone_number": "12345678",
-                "is_admin": False,
             },
             format = "json"
         )

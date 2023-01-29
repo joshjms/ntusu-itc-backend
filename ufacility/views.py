@@ -6,10 +6,15 @@ from rest_framework import status
 from ufacility.utils import send_email_to_security, send_booking_email_to_admins, send_verification_email_to_admins, clash_exists
 from django.shortcuts import get_object_or_404
 from sso.models import User
+from datetime import datetime as dt
 
 
 # POST /users
 class UserView(APIView):
+    '''
+    UFacilityUser CreateView
+    Permission: UFacility Admin Only
+    '''
     def post(self, request):
         requesting_user = request.user
         requesting_ufacilityuser = UFacilityUser.objects.filter(user=requesting_user).first()
@@ -33,7 +38,21 @@ class UserView(APIView):
 
 # GET /users/<user_id>
 class UserDetailView(APIView):
+    '''
+    If user_id = 0:
+    Get the UFacilityUser instance of the currently requested user
+
+    Else:
+    UFacilityUser DetailView
+    Permission: UFacility Admin Only or self
+    '''
     def get(self, request, user_id):
+        if user_id == 0:
+            user = User.objects.get(id=request.user.id)
+            ufacilityuser = get_object_or_404(UFacilityUser, user=user)
+            serializer = UFacilityUserSerializer(ufacilityuser)
+            return Response(serializer.data)
+        
         requesting_user = request.user
         requesting_ufacilityuser = UFacilityUser.objects.filter(user=requesting_user).first()
 
@@ -53,6 +72,9 @@ class UserDetailView(APIView):
 
         serializer = UFacilityUserSerializer(ufacilityuser)
         return Response(serializer.data)
+    
+    # TODO (?) PUT: allow user (self) to only edit 'hongen_name' and 'hongen_phone_number'
+    # TODO (?) DELETE: for admin to revoke access; delete ufacility user, change verification to rejected
 
 
 # GET /users/<user_id>/bookings
@@ -361,3 +383,4 @@ class VenueView(APIView):
         
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
+    # TODO - put method (allow edit venue name and security_email)

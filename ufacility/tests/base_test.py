@@ -2,6 +2,7 @@ from rest_framework.test import APITestCase, APIClient
 from sso.models import User
 from ufacility.models import UFacilityUser
 
+
 class BaseAPITestCase(APITestCase):
     def setUp(self):
         self.client0 = APIClient()

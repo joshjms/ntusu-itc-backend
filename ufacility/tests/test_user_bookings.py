@@ -1,10 +1,10 @@
 from rest_framework import status
-from ufacility.tests.base_test import BaseAPITestCase
-from rest_framework.reverse import reverse
-from sso.models import User
-from ufacility.models import UFacilityUser, Booking2, Venue
-import datetime
 from rest_framework.test import APIClient
+from rest_framework.reverse import reverse
+from ufacility.models import UFacilityUser, Booking2, Venue
+from ufacility.tests.base_test import BaseAPITestCase
+from sso.models import User
+import datetime as dt
 
 
 class UfacilityUserBookingsTestCase(BaseAPITestCase):
@@ -33,8 +33,9 @@ class UfacilityUserBookingsTestCase(BaseAPITestCase):
         self.booking = Booking2.objects.create(
             user = self.ufacilityuser,
             venue = self.venue,
-            start_time = datetime.datetime(2023, 1, 20, tzinfo=datetime.timezone.utc),
-            end_time = datetime.datetime(2023, 1, 21, tzinfo=datetime.timezone.utc),
+            date = dt.date(2023, 1, 29),
+            start_time = dt.time(hour=15),
+            end_time = dt.time(hour=19),
             purpose = "test purpose",
             status = "pending",
             pax = 10,
@@ -50,8 +51,9 @@ class UfacilityUserBookingsTestCase(BaseAPITestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp.data[0]["user"], self.ufacilityuser.id)
         self.assertEqual(resp.data[0]["venue"], self.venue.id)
-        self.assertEqual(resp.data[0]["start_time"], "2023-01-20T08:00:00+08:00")
-        self.assertEqual(resp.data[0]["end_time"], "2023-01-21T08:00:00+08:00")
+        self.assertEqual(resp.data[0]["date"], "2023-01-29")
+        self.assertEqual(resp.data[0]["start_time"], "15:00:00")
+        self.assertEqual(resp.data[0]["end_time"], "19:00:00")
         self.assertEqual(resp.data[0]["purpose"], "test purpose")
         self.assertEqual(resp.data[0]["status"], "pending")
         self.assertEqual(resp.data[0]["pax"], 10)
@@ -62,8 +64,9 @@ class UfacilityUserBookingsTestCase(BaseAPITestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp.data[0]["user"], self.ufacilityuser.id)
         self.assertEqual(resp.data[0]["venue"], self.venue.id)
-        self.assertEqual(resp.data[0]["start_time"], "2023-01-20T08:00:00+08:00")
-        self.assertEqual(resp.data[0]["end_time"], "2023-01-21T08:00:00+08:00")
+        self.assertEqual(resp.data[0]["date"], "2023-01-29")
+        self.assertEqual(resp.data[0]["start_time"], "15:00:00")
+        self.assertEqual(resp.data[0]["end_time"], "19:00:00")
         self.assertEqual(resp.data[0]["purpose"], "test purpose")
         self.assertEqual(resp.data[0]["status"], "pending")
         self.assertEqual(resp.data[0]["pax"], 10)
@@ -85,4 +88,3 @@ class UfacilityUserBookingsTestCase(BaseAPITestCase):
         url = reverse('ufacility:user-bookings', kwargs={"user_id": 999})
         resp = self.client0.get(url)
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-

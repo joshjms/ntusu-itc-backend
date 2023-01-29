@@ -34,7 +34,7 @@ class VerificationSerializer(serializers.ModelSerializer):
 class BookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking2
-        fields = ["id", "user", "venue", "start_time", "end_time", "purpose", "pax", "status"]
+        fields = ["id", "user", "venue", "date", "start_time", "end_time", "purpose", "pax", "status"]
 
     def create(self, validated_data):
         booking = Booking2.objects.create(**validated_data)

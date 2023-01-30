@@ -187,4 +187,13 @@ class VenueView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    # TODO - put method (allow edit venue name and security_email)
+
+# PUT /venues/<venue_id>/
+class VenueDetailView(APIView):
+    @method_decorator(decorators.ufacility_admin_required)
+    def put(self, request, venue_id, **kwargs):
+        venue = get_object_or_404(Venue, id=venue_id)
+        serializer = VenueSerializer(venue, data=request.data, partial=True)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data)

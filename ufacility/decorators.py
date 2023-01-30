@@ -67,6 +67,21 @@ def _ufacility_admin_or_booking_owner_required(func: callable):
 
 
 '''
+    Return 409 if booking has been accepted or rejected.
+'''
+def _pending_booking_only(func: callable):
+    @wraps(func)
+    def wrapper(request, *args, **kwargs):
+        booking = (kwargs['booking'] if 'booking' in kwargs else
+            get_object_or_404(Booking2, id=kwargs['booking_id']))
+        if booking.status in ['accepted', 'rejected']:
+            return Response('Booking is already accepted or declined. No further alteration is allowed.',
+                status=status.HTTP_409_CONFLICT)
+        return func(request, *args, **kwargs)
+    return wrapper
+
+
+'''
     When the 'lookup' kwargs is 0, get that user's own instance in 'Model' using 'serializer'.
     Assumes that 'model' has one to one relationship with User.
     Assumes that 'login_required' decorator has been applied.
@@ -96,3 +111,4 @@ ufacilityuser_decorator = login_required + [
 verification_decorator = login_required + [
     _get_own_instance_when_id_0(Verification, VerificationSerializer, 'verification_id'),
     _ufacility_user_required, _ufacility_admin_required]
+pending_booking_only = [_pending_booking_only]

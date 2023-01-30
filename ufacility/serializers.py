@@ -51,17 +51,8 @@ class BookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking2
         fields = ["id", "user", "venue", "date", "start_time", "end_time", "purpose", "pax", "status"]
+        read_only_fields = ['id', 'user', 'status']
 
     def create(self, validated_data):
         booking = Booking2.objects.create(**validated_data)
         return booking
-
-    def update(self, instance, validated_data):
-        instance.venue = validated_data.get("venue", instance.venue)
-        instance.start_time = validated_data.get("start_time", instance.start_time)
-        instance.end_time = validated_data.get("end_time", instance.end_time)
-        instance.purpose = validated_data.get("purpose", instance.purpose)
-        instance.pax = validated_data.get("pax", instance.pax)
-        instance.status = validated_data.get("status", instance.status)
-        instance.save()
-        return instance

@@ -117,12 +117,12 @@ class BookingView(APIView):
         data["user"] = requesting_ufacilityuser.id
         venue = Venue.objects.filter(name=data["venue"]).first()
 
-        if venue == None:
+        if venue == None: # TODO - giving the id is fine!
             return Response({"message": "Venue does not exist."}, status = status.HTTP_400_BAD_REQUEST)
 
         data["venue"] = venue.id
-        data["status"] = "pending"
 
+        # TODO - put this to 'validate' method in serializer
         if clash_exists(venue.id, data["start_time"], data["end_time"]):
             return Response({"message": "Booking clashes with another booking."}, status = status.HTTP_409_CONFLICT)
 
@@ -140,14 +140,10 @@ class BookingDetailView(APIView):
         serializer = BookingSerializer(kwargs["booking"])
         return Response(serializer.data)
 
-    @method_decorator(decorators.ufacility_admin_or_booking_owner_required)
+    @method_decorator(decorators.ufacility_admin_or_booking_owner_required + decorators.pending_booking_only)
     def put(self, request, booking_id, **kwargs):
         booking = kwargs["booking"]
         requesting_ufacilityuser = kwargs["ufacilityuser"]
-
-        # Updating bookings is not allowed after it is accepted or declined
-        if booking.status == "accepted" or booking.status == "declined":
-            return Response({"message": "Booking is already accepted or declined. No further alteration is allowed."}, status = status.HTTP_409_CONFLICT)
 
         data = request.data
         venue = get_object_or_404(Venue, name=data["venue"])
@@ -160,9 +156,6 @@ class BookingDetailView(APIView):
 
         serializer = BookingSerializer(booking, data=data, partial=True)
         if serializer.is_valid(raise_exception=True):
-            # If the admin changes the status to "accepted", send an email to the security
-            if requesting_ufacilityuser.is_admin and data["status"] == "accepted":
-                send_email_to_security(venue, data["start_time"], data["end_time"])
             serializer.save()
             return Response(serializer.data)
 
@@ -170,6 +163,29 @@ class BookingDetailView(APIView):
     def delete(self, request, booking_id, **kwargs):
         kwargs['booking'].delete()
         return Response({"message": "Booking deleted."}, status=status.HTTP_204_NO_CONTENT)
+
+
+# PUT /bookings/<booking_id>/accept/
+class AcceptBookingView(APIView):
+    @method_decorator(decorators.ufacility_admin_required + decorators.pending_booking_only)
+    def put(self, request, booking_id, **kwargs):
+        booking = kwargs['booking']
+        booking.status = 'accepted'
+        booking.save()
+        send_email_to_security(booking.venue, booking.start_time, booking.end_time)
+        # TODO - send email to ufacilityuser that their booking has been accepted
+        return Response('booking accepted', status=status.HTTP_200_OK)
+
+
+# PUT /bookings/<booking_id>/reject/
+class RejectBookingView(APIView):
+    @method_decorator(decorators.ufacility_admin_required + decorators.pending_booking_only)
+    def put(self, request, booking_id, **kwargs):
+        booking = kwargs['booking']
+        booking.status = 'rejected'
+        booking.save()
+        # TODO - send email to ufacilityuser that their booking has been rejected
+        return Response('booking rejected', status=status.HTTP_200_OK)
 
 
 # GET, POST /venues

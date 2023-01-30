@@ -16,7 +16,8 @@ def _login_required(func: callable):
     @wraps(func)
     def wrapper(request, *args, **kwargs):
         if request.user.is_anonymous:
-            return Response({'message': 'Anonymous User (not logged in)'}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'message': 'Anonymous User (not logged in)'},
+                status=status.HTTP_401_UNAUTHORIZED)
         return func(request, *args, **kwargs)
     return wrapper
 
@@ -31,7 +32,8 @@ def _ufacility_user_required(func: callable):
     def wrapper(request, *args, **kwargs):
         ufacilityuser = UFacilityUser.objects.filter(user=request.user).first()
         if ufacilityuser == None:
-            return Response({'message': 'User does not have a UFacility account.'}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'message': 'User does not have a UFacility account.'},
+                status=status.HTTP_401_UNAUTHORIZED)
         kwargs['ufacilityuser'] = ufacilityuser
         return func(request, *args, **kwargs)
     return wrapper
@@ -45,7 +47,8 @@ def _ufacility_admin_required(func: callable):
     @wraps(func)
     def wrapper(request, *args, **kwargs):
         if kwargs['ufacilityuser'].is_admin == False:
-            return Response({'message': 'User is not a UFacility admin.'}, status=status.HTTP_403_FORBIDDEN)
+            return Response({'message': 'User is not a UFacility admin.'},
+                status=status.HTTP_403_FORBIDDEN)
         return func(request, *args, **kwargs)
     return wrapper
 
@@ -61,7 +64,8 @@ def _ufacility_admin_or_booking_owner_required(func: callable):
         ufacilityuser = kwargs['ufacilityuser']
         kwargs['booking'] = get_object_or_404(Booking2, id=kwargs['booking_id'])
         if ufacilityuser.is_admin == False and ufacilityuser != kwargs['booking'].user:
-            return Response({'message': 'User is not a UFacility admin nor the owner of this instance.'}, status=status.HTTP_403_FORBIDDEN)
+            return Response({'message': 'User is not a UFacility admin nor the owner of this instance.'},
+                status=status.HTTP_403_FORBIDDEN)
         return func(request, *args, **kwargs)
     return wrapper
 

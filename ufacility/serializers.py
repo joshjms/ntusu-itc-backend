@@ -1,6 +1,11 @@
-from rest_framework import serializers
-from ufacility.models import Verification, Booking2, Venue, UFacilityUser
+from rest_framework import serializers, status
 from sso.serializers import UserProfileSerializer
+from ufacility.models import Verification, Booking2, Venue, UFacilityUser
+from ufacility.utils import clash_exists
+
+
+class ConflictValidationError(serializers.ValidationError):
+    status_code = status.HTTP_409_CONFLICT
 
 
 class UFacilityUserSerializer(serializers.ModelSerializer):
@@ -8,40 +13,20 @@ class UFacilityUserSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = UFacilityUser
-        fields = ["id", "user", "is_admin", "cca", "hongen_name", "hongen_phone_number"]
-        
-    def create(self, validated_data):
-        validated_data["is_admin"] = False
-        ufacilityuser = UFacilityUser.objects.create(**validated_data)
-        return ufacilityuser
+        fields = '__all__'
+        read_only_fields = ['id', 'user', 'is_admin', 'cca']
 
 
 class VerificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Verification
-        fields = ["id", "user", "cca", "hongen_name", "hongen_phone_number", "status"]
-
-    def create(self, validated_data):
-        verification = Verification.objects.create(**validated_data)
-        return verification
-
-    def update(self, instance, validated_data):
-        instance.cca = validated_data.get("cca", instance.cca)
-        instance.hongen_name = validated_data.get("hongen_name", instance.hongen_name)
-        instance.hongen_phone_number = validated_data.get("hongen_phone_number", instance.hongen_phone_number)
-        instance.status = validated_data.get("status", instance.status)
-        instance.save()
-        return instance
+        fields = '__all__'
 
 
 class VenueSerializer(serializers.ModelSerializer):
     class Meta:
         model = Venue
-        fields = ["id", "name", "security_email"]
-
-    def create(self, validated_data):
-        venue = Venue.objects.create(**validated_data)
-        return venue
+        fields = '__all__'
 
 
 class BookingSerializer(serializers.ModelSerializer):
@@ -50,9 +35,10 @@ class BookingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Booking2
-        fields = ["id", "user", "venue", "date", "start_time", "end_time", "purpose", "pax", "status"]
+        fields = '__all__'
         read_only_fields = ['id', 'user', 'status']
-
-    def create(self, validated_data):
-        booking = Booking2.objects.create(**validated_data)
-        return booking
+    
+    def validate(self, attrs):
+        if clash_exists(attrs['venue'].id, attrs['start_time'], attrs['end_time']):
+            raise ConflictValidationError('Booking clashes with another accepted booking')
+        return super().validate(attrs)

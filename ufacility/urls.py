@@ -14,5 +14,5 @@ urlpatterns = [
     path('bookings/<int:booking_id>/accept/', views.AcceptBookingView.as_view(), name='booking-accept'),
     path('bookings/<int:booking_id>/reject/', views.RejectBookingView.as_view(), name='booking-reject'),
     path('venues/', views.VenueView.as_view(), name='venues'),
-    path('venues/<int:venue_id>/', views.VenueDetailView.as_view(), name='venues-detail'),
+    path('venues/<int:venue_id>/', views.VenueDetailView.as_view(), name='venue-detail'),
 ]

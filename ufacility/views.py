@@ -5,7 +5,7 @@ from django.utils.decorators import method_decorator
 from django.shortcuts import get_object_or_404
 from ufacility.models import Verification, Booking2, Venue, UFacilityUser
 from ufacility.serializers import VerificationSerializer, BookingSerializer, VenueSerializer, UFacilityUserSerializer
-from ufacility.utils import send_email_to_security, send_booking_email_to_admins, send_verification_email_to_admins
+from ufacility.utils.email import send_email_to_security, send_booking_email_to_admins, send_verification_email_to_admins
 from ufacility import decorators
 
 

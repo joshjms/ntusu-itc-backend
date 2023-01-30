@@ -1,7 +1,7 @@
 from rest_framework import serializers, status
 from sso.serializers import UserProfileSerializer
 from ufacility.models import Verification, Booking2, Venue, UFacilityUser
-from ufacility.utils import clash_exists
+from ufacility.utils.email import clash_exists
 
 
 class ConflictValidationError(serializers.ValidationError):
@@ -21,6 +21,11 @@ class VerificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Verification
         fields = '__all__'
+        read_only_fields = ['id', 'user', 'status']
+    
+    def create(self, validated_data):
+        validated_data['status'] = 'pending'
+        return super().create(validated_data)
 
 
 class VenueSerializer(serializers.ModelSerializer):

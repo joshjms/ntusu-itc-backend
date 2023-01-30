@@ -1,5 +1,6 @@
 from django.db import models
 from sso.models import User
+from ufacility.utils.validator import validate_singapore_phone_number
 
 
 STATUSES = (
@@ -12,9 +13,10 @@ STATUSES = (
 class UFacilityUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, unique=True)
     is_admin = models.BooleanField(default=False)
-    cca = models.CharField(max_length=100)
-    hongen_name = models.CharField(max_length=100, default='')
-    hongen_phone_number = models.CharField(max_length=100, default='')
+    cca = models.CharField(max_length=30)
+    hongen_name = models.CharField(max_length=30)
+    hongen_phone_number = models.CharField(max_length=8,
+        validators=[validate_singapore_phone_number])
 
     def __str__(self) -> str:
         return self.user.display_name
@@ -44,10 +46,11 @@ class Booking2(models.Model):
 
 class Verification(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, unique=True)
-    cca = models.CharField(max_length=100)
-    status = models.CharField(max_length=10, choices=STATUSES)
-    hongen_name = models.CharField(max_length=100)
-    hongen_phone_number = models.CharField(max_length=100)
+    cca = models.CharField(max_length=30)
+    status = models.CharField(max_length=8, choices=STATUSES)
+    hongen_name = models.CharField(max_length=30)
+    hongen_phone_number = models.CharField(max_length=8,
+        validators=[validate_singapore_phone_number])
 
     def __str__(self) -> str:
         return self.cca

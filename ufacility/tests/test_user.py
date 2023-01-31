@@ -18,8 +18,8 @@ class UfacilityUsersTestCase(BaseAPITestCase):
             {
                 "user": new_user_id,
                 "cca": "su",
-                "role": "member",
-                "status": "pending",
+                "hongen_name": "hongen",
+                "hongen_phone_number": "12345678",
                 "is_admin": False,
             },
             format = "json"
@@ -27,9 +27,9 @@ class UfacilityUsersTestCase(BaseAPITestCase):
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         self.assertEqual(resp.data["user"], new_user_id)
         self.assertEqual(resp.data["cca"], "su")
-        self.assertEqual(resp.data["role"], "member")
-        self.assertEqual(resp.data["status"], "pending")
         self.assertEqual(resp.data["is_admin"], False)
+        self.assertEqual(resp.data["hongen_name"], "hongen")
+        self.assertEqual(resp.data["hongen_phone_number"], "12345678")
 
     def test_post_user_fail_unauthorized(self):
         self.client2.force_authenticate(user = self.user2)

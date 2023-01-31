@@ -3,23 +3,18 @@ from rest_framework.response import Response
 from ufacility.models import Verification, Booking2, Venue, UFacilityUser
 from ufacility.serializers import VerificationSerializer, BookingSerializer, VenueSerializer, UFacilityUserSerializer
 from rest_framework import status
-from sso.utils import send_email
-
-
-exco_email = ""
-
-
-# Clash check
-def clash_exists(venue, day, start_time, end_time):
-    bookings = Booking2.objects.filter(venue=venue, date=day)
-    for booking in bookings:
-        if start_time < booking.end_time and end_time > booking.start_time:
-            return True
-    return False
+from ufacility.utils import send_email_to_security, send_booking_email_to_admins, send_verification_email_to_admins, clash_exists
+from django.shortcuts import get_object_or_404
+from sso.models import User
+from datetime import datetime as dt
 
 
 # POST /users
 class UserView(APIView):
+    '''
+    UFacilityUser CreateView
+    Permission: UFacility Admin Only
+    '''
     def post(self, request):
         requesting_user = request.user
         requesting_ufacilityuser = UFacilityUser.objects.filter(user=requesting_user).first()
@@ -43,7 +38,21 @@ class UserView(APIView):
 
 # GET /users/<user_id>
 class UserDetailView(APIView):
+    '''
+    If user_id = 0:
+    Get the UFacilityUser instance of the currently requested user
+
+    Else:
+    UFacilityUser DetailView
+    Permission: UFacility Admin Only or self
+    '''
     def get(self, request, user_id):
+        if user_id == 0:
+            user = User.objects.get(id=request.user.id)
+            ufacilityuser = get_object_or_404(UFacilityUser, user=user)
+            serializer = UFacilityUserSerializer(ufacilityuser)
+            return Response(serializer.data)
+        
         requesting_user = request.user
         requesting_ufacilityuser = UFacilityUser.objects.filter(user=requesting_user).first()
 
@@ -63,6 +72,9 @@ class UserDetailView(APIView):
 
         serializer = UFacilityUserSerializer(ufacilityuser)
         return Response(serializer.data)
+    
+    # TODO (?) PUT: allow user (self) to only edit 'hongen_name' and 'hongen_phone_number'
+    # TODO (?) DELETE: for admin to revoke access; delete ufacility user, change verification to rejected
 
 
 # GET /users/<user_id>/bookings
@@ -93,6 +105,10 @@ class UserBookingsView(APIView):
 
 # GET, POST /verifications
 class VerificationView(APIView):
+    '''
+    Verification ListView
+    Permission: UFacility Admin Only
+    '''
     def get(self, request):
         requesting_user = request.user
         requesting_ufacilityuser = UFacilityUser.objects.filter(user=requesting_user).first()
@@ -109,6 +125,10 @@ class VerificationView(APIView):
         serializer = VerificationSerializer(verifications, many=True)
         return Response(serializer.data)
 
+    '''
+    Verification CreateView
+    Permission: SSO User, not yet created verification nor be a UFacility User
+    '''
     def post(self, request):
         requesting_user = request.user
         requesting_ufacilityuser = UFacilityUser.objects.filter(user=requesting_user).first()
@@ -120,9 +140,11 @@ class VerificationView(APIView):
 
         data = request.data
         data["user"] = requesting_user.id
+        data["status"] = "pending"
         serializer = VerificationSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
+            send_verification_email_to_admins()
             return Response(serializer.data, status = status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
@@ -130,7 +152,21 @@ class VerificationView(APIView):
 
 # GET, DELETE /verifications/<verification_id>
 class VerificationDetailView(APIView):
+    '''
+    If verification_id = 0:
+    Get the verification instance of the currently requested user
+
+    Else:
+    Verification DetailView
+    Permission: UFacility Admin Only
+    '''
     def get(self, request, verification_id):
+        if verification_id == 0:
+            user = User.objects.get(id=request.user.id)
+            verification = get_object_or_404(Verification, user=user)
+            serializer = VerificationSerializer(verification)
+            return Response(serializer.data)
+
         requesting_user = request.user
         requesting_ufacilityuser = UFacilityUser.objects.filter(user=requesting_user).first()
         verification = Verification.objects.filter(id=verification_id).first()
@@ -150,7 +186,7 @@ class VerificationDetailView(APIView):
         serializer = VerificationSerializer(verification)
         return Response(serializer.data)
 
-    def delete(self, request, verification_id):
+    def delete(self, request, verification_id): # TODO - evaluate the need of this endpoint
         requesting_user = request.user
         requesting_ufacilityuser = UFacilityUser.objects.filter(user=requesting_user).first()
         verification = Verification.objects.filter(id=verification_id).first()
@@ -170,7 +206,7 @@ class VerificationDetailView(APIView):
         verification.delete()
         return Response({"message": "Verification deleted."}, status = status.HTTP_204_NO_CONTENT)
 
-    def put(self, request, verification_id):
+    def put(self, request, verification_id): # TODO - evaluate the need of this endpoint
         requesting_user = request.user
         requesting_ufacilityuser = UFacilityUser.objects.filter(user=requesting_user).first()
         verification = Verification.objects.filter(id=verification_id).first()
@@ -207,18 +243,27 @@ class BookingView(APIView):
     def post(self, request):
         requesting_user = request.user
         requesting_ufacilityuser = UFacilityUser.objects.filter(user=requesting_user).first()
+        
+        if requesting_ufacilityuser == None:
+            return Response({"message": "User does not have a UFacility account."}, status = status.HTTP_401_UNAUTHORIZED)
+
         data = request.data
         data["user"] = requesting_ufacilityuser.id
-        venue = Venue.objects.get(name=data["venue"])
+        venue = Venue.objects.filter(name=data["venue"]).first()
+
+        if venue == None:
+            return Response({"message": "Venue does not exist."}, status = status.HTTP_400_BAD_REQUEST)
+
         data["venue"] = venue.id
         data["status"] = "pending"
 
-        if clash_exists(venue.id, data["date"], data["start_time"], data["end_time"]):
+        if clash_exists(venue.id, data["start_time"], data["end_time"]):
             return Response({"message": "Booking clashes with another booking."}, status = status.HTTP_409_CONFLICT)
 
         serializer = BookingSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
+            send_booking_email_to_admins()
             return Response(serializer.data, status = status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
@@ -263,20 +308,28 @@ class BookingDetailView(APIView):
         if requesting_ufacilityuser.is_admin == False and requesting_ufacilityuser != booking.user:
             return Response({"message": "User is not a UFacility admin and not the owner of the booking."}, status = status.HTTP_403_FORBIDDEN)
 
+        # Updating bookings is not allowed after it is accepted or declined
+        if booking.status == "accepted" or booking.status == "declined":
+            return Response({"message": "Booking is already accepted or declined. No further alteration is allowed."}, status = status.HTTP_409_CONFLICT)
+
         data = request.data
-        venue = Venue.objects.get(name=data["venue"])
+        venue = Venue.objects.filter(name=data["venue"]).first()
+
+        if venue == None:
+            return Response({"message": "Venue does not exist."}, status = status.HTTP_400_BAD_REQUEST)
+
         data["venue"] = venue.id
         data["user"] = requesting_ufacilityuser.id
-        data["status"] = booking.status
+
+        # Only admins can change status
+        if requesting_ufacilityuser.is_admin == False or "status" not in data:
+            data["status"] = booking.status
+
         serializer = BookingSerializer(booking, data=data, partial=True)
         if serializer.is_valid():
-            if requesting_ufacilityuser.is_admin:
-                email_subject = f"Booking request for {data['venue']} on {data['date']} from {data['start_time']} to {data['end_time']}"
-                email_body = """\
-                        This is an auto-generated email to inform you that a booking has been placed for {venue} on {date} from {start_time} to {end_time}.
-                        Please contact {exco_email} should you have any enquiries.
-                        """.format(venue=data["venue"], date=data["date"], start_time=data["start_time"], end_time=data["end_time"], exco_email=exco_email)
-                send_email(email_subject, email_body, recipients=[venue.security_email])
+            # If the admin changes the status to "accepted", send an email to the security
+            if requesting_ufacilityuser.is_admin and data["status"] == "accepted":
+                send_email_to_security(venue, data["start_time"], data["end_time"])
             serializer.save()
             return Response(serializer.data)
 
@@ -330,3 +383,4 @@ class VenueView(APIView):
         
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
+    # TODO - put method (allow edit venue name and security_email)

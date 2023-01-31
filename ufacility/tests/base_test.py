@@ -2,6 +2,7 @@ from rest_framework.test import APITestCase, APIClient
 from sso.models import User
 from ufacility.models import UFacilityUser
 
+
 class BaseAPITestCase(APITestCase):
     def setUp(self):
         self.client0 = APIClient()
@@ -15,8 +16,8 @@ class BaseAPITestCase(APITestCase):
             user = self.user0,
             is_admin = True,
             cca = "su",
-            role = "admin",
-            status = "accepted",
+            hongen_name = "hongen",
+            hongen_phone_number = "12348754",
         )
 
         self.client1 = APIClient()
@@ -30,8 +31,8 @@ class BaseAPITestCase(APITestCase):
             user = self.user1,
             is_admin = False,
             cca = "su",
-            role = "member",
-            status = "accepted",
+            hongen_name = "hongen2",
+            hongen_phone_number = "12348759",
         )
 
         self.client2 = APIClient()
@@ -41,4 +42,3 @@ class BaseAPITestCase(APITestCase):
             username = "test2",
             password = "somerandompassword123$",
         )
-

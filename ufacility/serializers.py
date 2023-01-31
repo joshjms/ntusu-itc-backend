@@ -5,11 +5,10 @@ from rest_framework import serializers
 class UFacilityUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = UFacilityUser
-        fields = ["id", "user", "is_admin", "cca", "role", "status"]
+        fields = ["id", "user", "is_admin", "cca", "hongen_name", "hongen_phone_number"]
         
     def create(self, validated_data):
         validated_data["is_admin"] = False
-        validated_data["status"] = "pending"
         ufacilityuser = UFacilityUser.objects.create(**validated_data)
         return ufacilityuser
 
@@ -17,16 +16,17 @@ class UFacilityUserSerializer(serializers.ModelSerializer):
 class VerificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Verification
-        fields = ["id", "user", "email", "cca", "role"]
+        fields = ["id", "user", "cca", "hongen_name", "hongen_phone_number", "status"]
 
     def create(self, validated_data):
         verification = Verification.objects.create(**validated_data)
         return verification
 
     def update(self, instance, validated_data):
-        instance.email = validated_data.get("email", instance.email)
         instance.cca = validated_data.get("cca", instance.cca)
-        instance.role = validated_data.get("role", instance.role)
+        instance.hongen_name = validated_data.get("hongen_name", instance.hongen_name)
+        instance.hongen_phone_number = validated_data.get("hongen_phone_number", instance.hongen_phone_number)
+        instance.status = validated_data.get("status", instance.status)
         instance.save()
         return instance
 
@@ -34,7 +34,7 @@ class VerificationSerializer(serializers.ModelSerializer):
 class BookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking2
-        fields = ["id", "user", "venue", "start_time", "end_time", "purpose", "pax", "status"]
+        fields = ["id", "user", "venue", "date", "start_time", "end_time", "purpose", "pax", "status"]
 
     def create(self, validated_data):
         booking = Booking2.objects.create(**validated_data)
@@ -46,6 +46,7 @@ class BookingSerializer(serializers.ModelSerializer):
         instance.end_time = validated_data.get("end_time", instance.end_time)
         instance.purpose = validated_data.get("purpose", instance.purpose)
         instance.pax = validated_data.get("pax", instance.pax)
+        instance.status = validated_data.get("status", instance.status)
         instance.save()
         return instance
 

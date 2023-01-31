@@ -4,7 +4,7 @@ from . import views
 
 app_name = 'ufacility'
 urlpatterns = [
-    path("users/", views.UserView.as_view(), name="users"),
+    path('check_status/', views.CheckStatusView.as_view(), name='check-status'),
     path("users/<int:user_id>/", views.UserDetailView.as_view(), name="user-detail"),
     path("users/<int:user_id>/bookings/", views.UserBookingsView.as_view(), name="user-bookings"),
     path("verifications/", views.VerificationView.as_view(), name="verifications"),

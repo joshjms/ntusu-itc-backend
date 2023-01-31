@@ -8,16 +8,21 @@ from ufacility.models import Verification, Booking2, Venue, UFacilityUser
 from ufacility.serializers import VerificationSerializer, BookingSerializer, VenueSerializer, UFacilityUserSerializer
 from ufacility.utils import send_email_to_security, send_booking_email_to_admins, send_verification_email_to_admins
 from ufacility import decorators
+from datetime import datetime as dt
 
 
-# POST /users/
-class UserView(APIView): # TODO - maybe no need? ufacility user creation happen once verification accepted
-    @method_decorator(decorators.ufacility_admin_required) # TODO - consider merging verification and ufacility user model
-    def post(self, request, **kwargs):
-        serializer = UFacilityUserSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data, status = status.HTTP_201_CREATED)
+# GET /check_status/
+class CheckStatusView(APIView):
+    def get(self, request):
+        pass
+    '''
+        TODO
+        Given the current request, identify whether:
+        - User is a ufacility admin OR
+        - User is a ufacility user OR
+        - User is a regular sso user OR
+        - Anonymous user
+    '''
 
 
 # GET /users/<user_id>/
@@ -140,8 +145,65 @@ class BookingView(APIView):
     @method_decorator(decorators.login_required)
     def get(self, request, **kwargs):
         bookings = Booking2.objects.all()
-        serializer = BookingSerializer(bookings, many=True)
-        return Response(serializer.data)
+
+        # TODO - create test cases, move this to or decorator, check logic!
+        # just doing this real quick so frontend can work
+        from django.db.models import Q # TODO - can filter multiple selection
+
+       # filter feature 
+        filter_start_date = request.GET.get('start_date', '')
+        filter_end_date = request.GET.get('end_date', '')
+        filter_facility = request.GET.get('facility', '')
+        filter_status = request.GET.get('status', '')
+        filter_kwargs = {}
+        try: filter_kwargs['date__gte'] = dt.strptime(filter_start_date, '%Y-%m-%d').date()
+        except: pass
+        try: filter_kwargs['date__lte'] = dt.strptime(filter_end_date, '%Y-%m-%d').date()
+        except: pass
+        if filter_facility: filter_kwargs['venue__name'] = filter_facility
+        bookings = Booking2.objects.filter(**filter_kwargs)
+        if filter_status: filter_kwargs['status'] = filter_status
+
+        # sort feature - TODO
+        sortcodes = request.GET.get('sort', 'ascid').split('-')
+        try: bookings.order_by(*[('-' if sortcode[0:3:] == 'des' else '') + \
+            sortcode[3::] for sortcode in sortcodes])
+        except: pass
+
+        # dynamic pagination feature
+        '''
+        TODO - here are a bit of starter code (untested)
+        Example usage: assume there are 25 bookings id 1 - 25
+        By default, you get bookings id 1-10
+        If ?page=2, get bookings id 11-20
+        If ?page=3, get bookings id 21-25
+        If ?page=999, get bookings id 21-25
+        If ?page=abc, get bookings id 1-10
+        If ?items_per_page=8&page=2, get bookings id 9-16
+        Also return information of whether next & prev page num valid or not
+        '''
+        from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+        pagination_items_per_page = request.GET.get('items_per_page', 10)
+        pagination_page = request.GET.get('page', 10)
+        paginator = Paginator(bookings, pagination_items_per_page)
+        try:
+            paginator = Paginator(bookings, pagination_items_per_page)
+        except:
+            paginator = Paginator(bookings, 10)
+        try:
+            page = paginator.page(pagination_page)
+        except PageNotAnInteger:
+            page = paginator.page(1)
+        except EmptyPage:
+            page = paginator.page(paginator.num_pages)
+
+        serializer = BookingSerializer(list(bookings), many=True)
+        return Response({
+            'bookings': serializer.data,
+            'pagination_info': {
+                'has_next': page.has_next(), 'has_prev': page.has_previous(),
+            }
+        })
 
     @method_decorator(decorators.ufacility_user_required)
     def post(self, request, **kwargs):

@@ -4,9 +4,12 @@ from sso.models import User
 
 
 class EventSerializer(serializers.ModelSerializer):
+    start_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S')
+    end_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S')
     class Meta:
         model = Event
-        fields = ['name', 
+        fields = ['id',
+                  'name', 
                   'is_active', 
                   'allow_non_undergraduate', 
                   'allow_exchange_student',

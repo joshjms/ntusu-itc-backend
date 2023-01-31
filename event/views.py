@@ -5,6 +5,8 @@ from event.permissions import IsEventAdmin, IsEventCreator, IsEventSuperAdmin
 from sso.models import User
 from rest_framework.response import Response
 from rest_framework import status
+from django.contrib.auth.mixins import LoginRequiredMixin
+from rest_framework.views import APIView
 
 class EventListAll(generics.ListAPIView):
     queryset = Event.objects.all()
@@ -54,10 +56,10 @@ class AdminList(generics.ListAPIView):
 class AdminUpdate(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = EventAdminSerializer
     permission_classes = [IsEventSuperAdmin]
-#     def get_queryset(self):
-#         pk = self.kwargs['pk']
-#         return EventAdmin.objects.filter(pk=pk)
-    
+    def get_queryset(self):
+        pk = self.kwargs['pk']
+        return EventAdmin.objects.filter(pk=pk)
+
 
 class UserList(generics.ListAPIView):
     serializer_class = UserSerializer
@@ -80,3 +82,15 @@ class AddEventAdmin(generics.CreateAPIView):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+class CheckAdminStatus(LoginRequiredMixin, APIView):
+     def get(self, request):
+          user = User.objects.get(id=request.user.id)
+          try:
+               event_admin = EventAdmin.objects.get(user=user)
+               if event_admin.is_superadmin:
+                 return Response('event_superadmin', status=status.HTTP_200_OK)
+               else:
+                 return Response('event_admin', status=status.HTTP_200_OK)
+          except EventAdmin.DoesNotExist:
+               return Response('regular_user', status=status.HTTP_200_OK)

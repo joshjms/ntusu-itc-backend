@@ -1,5 +1,6 @@
 from django.db import models
 from sso.models import User
+from django.utils import timezone as tz
 
 class EventAdmin(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
@@ -24,7 +25,6 @@ class Event(models.Model):
     
     @property
     def is_active(self) -> bool:
-        from django.utils import timezone as tz
         current_time = tz.now()
 
         if self.start_time <= current_time and self.auto_start == True:

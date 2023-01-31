@@ -1,6 +1,6 @@
 from django.db import models
 from sso.models import User
-from ufacility.utils.validator import validate_singapore_phone_number
+from django.core.validators import RegexValidator
 
 
 STATUSES = (
@@ -10,13 +10,25 @@ STATUSES = (
 )
 
 
-class UFacilityUser(models.Model):
+validate_singapore_phone_number = RegexValidator(
+    regex=r'^[689]\d{7}$',
+    message='Singapore phone number required (8 digits, without the +65)'
+)
+
+
+class AbstractUFacilityUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, unique=True)
-    is_admin = models.BooleanField(default=False)
     cca = models.CharField(max_length=30)
     hongen_name = models.CharField(max_length=30)
     hongen_phone_number = models.CharField(max_length=8,
         validators=[validate_singapore_phone_number])
+    
+    class Meta:
+        abstract = True
+
+
+class UFacilityUser(AbstractUFacilityUser):
+    is_admin = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return self.user.display_name
@@ -44,13 +56,8 @@ class Booking2(models.Model):
         return f"{self.venue} {self.date} {self.start_time} - {self.end_time}"
 
 
-class Verification(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, unique=True)
-    cca = models.CharField(max_length=30)
+class Verification(AbstractUFacilityUser):
     status = models.CharField(max_length=8, choices=STATUSES)
-    hongen_name = models.CharField(max_length=30)
-    hongen_phone_number = models.CharField(max_length=8,
-        validators=[validate_singapore_phone_number])
 
     def __str__(self) -> str:
         return self.cca

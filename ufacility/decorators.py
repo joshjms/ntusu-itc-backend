@@ -86,6 +86,22 @@ def _pending_booking_only(func: callable):
 
 
 '''
+    Return 409 if user already created a verification or already has ufacility account.
+    Assumes that '_login_required' decorator has been applied.
+'''
+def _no_verification_and_ufacility_account(func: callable):
+    @wraps(func)
+    def wrapper(request, *args, **kwargs):
+        requesting_ufacilityuser = UFacilityUser.objects.filter(user=request.user).first()
+        verification = Verification.objects.filter(user=request.user).first()
+        if verification != None or requesting_ufacilityuser != None:
+            return Response({"message": "User already has a verification or a UFacility account."},
+                status = status.HTTP_409_CONFLICT)
+        return func(request, *args, **kwargs)
+    return wrapper
+
+
+'''
     When the 'lookup' kwargs is 0, get that user's own instance in 'Model' using 'serializer'.
     Assumes that 'model' has one to one relationship with User.
     Assumes that 'login_required' decorator has been applied.
@@ -116,3 +132,4 @@ verification_decorator = login_required + [
     _get_own_instance_when_id_0(Verification, VerificationSerializer, 'verification_id'),
     _ufacility_user_required, _ufacility_admin_required]
 pending_booking_only = [_pending_booking_only]
+no_verification_and_ufacility_account = login_required + [_no_verification_and_ufacility_account]

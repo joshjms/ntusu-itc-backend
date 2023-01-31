@@ -22,7 +22,7 @@ class UfacilityVerificationsTestCase(BaseAPITestCase):
         self.assertEqual(resp.data['hongen_name'], 'bc')
         self.assertEqual(resp.data['hongen_phone_number'], '61235874')
         self.assertEqual(resp.data['status'], 'pending')
-        self.assertEqual(resp.data['user'], self.user2.id)
+        self.assertEqual(resp.data['user']['id'], self.user2.id)
         self.assertEqual(resp.data['id'], 1)
         self.assertEqual(Verification.objects.all().count(), 1)
 

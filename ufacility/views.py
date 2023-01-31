@@ -1,17 +1,18 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from django.forms.models import model_to_dict
 from django.utils.decorators import method_decorator
 from django.shortcuts import get_object_or_404
 from ufacility.models import Verification, Booking2, Venue, UFacilityUser
 from ufacility.serializers import VerificationSerializer, BookingSerializer, VenueSerializer, UFacilityUserSerializer
-from ufacility.utils.email import send_email_to_security, send_booking_email_to_admins, send_verification_email_to_admins
+from ufacility.utils import send_email_to_security, send_booking_email_to_admins, send_verification_email_to_admins
 from ufacility import decorators
 
 
-# POST /users
-class UserView(APIView):
-    @method_decorator(decorators.ufacility_admin_required)
+# POST /users/
+class UserView(APIView): # TODO - maybe no need? ufacility user creation happen once verification accepted
+    @method_decorator(decorators.ufacility_admin_required) # TODO - consider merging verification and ufacility user model
     def post(self, request, **kwargs):
         serializer = UFacilityUserSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
@@ -39,7 +40,7 @@ class UserDetailView(APIView):
             return Response(serializer.data)
 
 
-# GET /users/<user_id>/bookings
+# GET /users/<user_id>/bookings/
 class UserBookingsView(APIView):
     @method_decorator(decorators.ufacility_user_required)
     def get(self, request, user_id, **kwargs):
@@ -49,7 +50,7 @@ class UserBookingsView(APIView):
         # Only admins or the ufacility user itself can view the user bookings
         if requesting_ufacilityuser != ufacilityuser and requesting_ufacilityuser.is_admin == False:
             return Response({"message": "User is not a UFacility admin and not the user itself."}, status = status.HTTP_403_FORBIDDEN)
-        # TODO - isn't this wierd??? other endpoints are open for everyone, why not this one?
+        # TODO - isn't this weird??? other endpoints are open for everyone, why not this one?
         # consider making partial and complete serializer for booking (?)
 
         bookings = Booking2.objects.filter(user=ufacilityuser)
@@ -57,7 +58,7 @@ class UserBookingsView(APIView):
         return Response(serializer.data)
 
 
-# GET, POST /verifications
+# GET, POST /verifications/
 class VerificationView(APIView):
     @method_decorator(decorators.ufacility_admin_required)
     def get(self, request, **kwargs):
@@ -65,24 +66,16 @@ class VerificationView(APIView):
         serializer = VerificationSerializer(verifications, many=True)
         return Response(serializer.data)
 
-    @method_decorator(decorators.login_required)
+    @method_decorator(decorators.no_verification_and_ufacility_account)
     def post(self, request, **kwargs):
-        requesting_ufacilityuser = UFacilityUser.objects.filter(user=request.user).first()
-        verification = Verification.objects.filter(user=request.user).first()
-
-        # Check if requesting_user already has a verification or a ufacility account
-        if verification != None or requesting_ufacilityuser != None:
-            return Response({"message": "User already has a verification or a UFacility account."},
-                status = status.HTTP_409_CONFLICT)
-
         serializer = VerificationSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save(user=request.user)
             send_verification_email_to_admins()
-            return Response(serializer.data, status = status.HTTP_201_CREATED)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-# GET, DELETE /verifications/<verification_id>
+# GET, DELETE /verifications/<verification_id>/
 class VerificationDetailView(APIView):
     @method_decorator(decorators.verification_decorator)
     def get(self, request, verification_id, **kwargs):
@@ -97,7 +90,7 @@ class VerificationDetailView(APIView):
         return Response({"message": "Verification deleted."}, status = status.HTTP_204_NO_CONTENT)
 
     @method_decorator(decorators.ufacility_admin_required)
-    def put(self, request, verification_id, **kwargs): # TODO - evaluate the need of this endpoint
+    def put(self, request, verification_id, **kwargs): # TODO - evaluate the need of this endpoint, can edit even when rejected or accepted ???
         verification = get_object_or_404(Verification, id=verification_id)
         data = request.data
         data["user"] = verification.user.id
@@ -107,7 +100,42 @@ class VerificationDetailView(APIView):
             return Response(serializer.data)
 
 
-# GET, POST /bookings
+# PUT /verifications/<verification_id>/accept/
+class VerificationAcceptView(APIView):
+    @method_decorator(decorators.ufacility_admin_required)
+    def put(self, request, verification_id, **kwargs):
+        verification = get_object_or_404(Verification, id=verification_id)
+        verification.status = 'accepted'
+        verification.save()
+        if UFacilityUser.objects.filter(user=verification.user).count() == 0:
+            UFacilityUser.objects.create(
+                user=verification.user,
+                is_admin=False,
+                **model_to_dict(verification, fields=['cca', 'hongen_name', 'hongen_phone_number'])
+            )
+            return Response({'message': 'Verification accepted.'})
+        return Response({'message': 'Verication has been accepted and ufacility user model existed.'},
+            status=status.HTTP_409_CONFLICT)
+
+
+# PUT /verifications/<verification_id>/reject/
+class VerificationRejectView(APIView):
+    @method_decorator(decorators.ufacility_admin_required)
+    def put(self, request, verification_id, **kwargs):
+        verification = get_object_or_404(Verification, id=verification_id)
+        if verification.status == 'declined':
+            UFacilityUser.objects.filter(user=verification.user).delete() # just in case
+            return Response({'message': 'Verification has been declined and no such ufacility user model.'},
+                status=status.HTTP_409_CONFLICT)
+        verification.status = 'declined'
+        verification.save()
+        deleted, _ = UFacilityUser.objects.filter(user=verification.user).delete()
+        if deleted == 1:
+            return Response({'message': 'Access revoked.'})
+        return Response({'message': 'Verification rejected.'})
+
+
+# GET, POST /bookings/
 class BookingView(APIView):
     @method_decorator(decorators.login_required)
     def get(self, request, **kwargs):
@@ -124,7 +152,7 @@ class BookingView(APIView):
             return Response(serializer.data, status = status.HTTP_201_CREATED)
 
 
-# GET, PUT, DELETE /bookings/<booking_id>
+# GET, PUT, DELETE /bookings/<booking_id>/
 class BookingDetailView(APIView):
     @method_decorator(decorators.ufacility_admin_or_booking_owner_required)
     def get(self, request, booking_id, **kwargs):
@@ -145,7 +173,7 @@ class BookingDetailView(APIView):
 
 
 # PUT /bookings/<booking_id>/accept/
-class AcceptBookingView(APIView):
+class BookingAcceptView(APIView):
     @method_decorator(decorators.ufacility_admin_required + decorators.pending_booking_only)
     def put(self, request, booking_id, **kwargs):
         booking = kwargs['booking']
@@ -157,7 +185,7 @@ class AcceptBookingView(APIView):
 
 
 # PUT /bookings/<booking_id>/reject/
-class RejectBookingView(APIView):
+class BookingRejectView(APIView):
     @method_decorator(decorators.ufacility_admin_required + decorators.pending_booking_only)
     def put(self, request, booking_id, **kwargs):
         booking = kwargs['booking']
@@ -167,7 +195,7 @@ class RejectBookingView(APIView):
         return Response('Booking rejected.', status=status.HTTP_200_OK)
 
 
-# GET, POST /venues
+# GET, POST /venues/
 class VenueView(APIView):
     @method_decorator(decorators.login_required)
     def get(self, request, **kwargs):

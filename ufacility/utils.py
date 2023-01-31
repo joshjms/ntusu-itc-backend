@@ -36,6 +36,7 @@ def send_booking_email_to_admins():
         admin_emails.append(admin.user.email)
     send_email(email_subject, email_body, recipients=admin_emails)
 
+
 def clash_exists(venue, start_time, end_time):
     bookings = Booking2.objects.filter(venue=venue)
     for booking in bookings:

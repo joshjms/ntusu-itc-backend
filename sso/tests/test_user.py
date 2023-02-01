@@ -14,6 +14,7 @@ class SSOUserProfileTest(BaseAPITestCase):
         self.assertJSONEqual(
             str(resp.content, encoding='utf8'),
             {
+                'id': 1,
                 'username': 'user1',
                 'email': 'user1@e.ntu.edu.sg',
                 'display_name': 'User1',

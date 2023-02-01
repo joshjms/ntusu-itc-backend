@@ -2,6 +2,7 @@ from rest_framework import serializers, status
 from sso.serializers import UserProfileSerializer
 from ufacility.models import Verification, Booking2, Venue, UFacilityUser
 from ufacility.utils import clash_exists
+from ufacility import utils
 
 
 class ConflictValidationError(serializers.ValidationError):
@@ -27,6 +28,7 @@ class VerificationSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         validated_data['status'] = 'pending'
+        utils.send_verification_email_to_admins()
         return super().create(validated_data)
 
 
@@ -49,3 +51,7 @@ class BookingSerializer(serializers.ModelSerializer):
         if clash_exists(attrs['venue'].id, attrs['start_time'], attrs['end_time']):
             raise ConflictValidationError('Booking clashes with another accepted booking')
         return super().validate(attrs)
+    
+    def create(self, validated_data):
+        utils.send_booking_email_to_admins()
+        super().create(validated_data)

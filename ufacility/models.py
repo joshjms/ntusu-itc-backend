@@ -35,8 +35,8 @@ class UFacilityUser(AbstractUFacilityUser):
 
 
 class Venue(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-    security_email = models.CharField(max_length=100)
+    name = models.CharField(max_length=30, unique=True)
+    security_email = models.EmailField(max_length=50)
 
     def __str__(self) -> str:
         return self.name
@@ -53,7 +53,7 @@ class Booking2(models.Model):
     status = models.CharField(max_length=10, choices=STATUSES)
 
     def __str__(self) -> str:
-        return f"{self.venue} {self.date} {self.start_time} - {self.end_time}"
+        return f"<Booking ID {self.id}>: {self.venue} - {self.date} ({self.start_time} - {self.end_time})"
 
 
 class Verification(AbstractUFacilityUser):

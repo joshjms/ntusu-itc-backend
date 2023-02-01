@@ -1,8 +1,10 @@
 from rest_framework.serializers import BaseSerializer
 from rest_framework.response import Response
 from rest_framework import status
-from django.db.models import Model
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.db.models import Model, QuerySet
 from django.shortcuts import get_object_or_404
+from datetime import datetime as dt
 from functools import wraps
 from sso.models import User
 from ufacility.models import UFacilityUser, Booking2, Verification
@@ -121,6 +123,68 @@ def _get_own_instance_when_id_0(Model: Model, serializer: BaseSerializer, lookup
     return decorator
 
 
+'''
+    Accepts a booking queryset.
+    Added filter, sort, pagination feature, based on query parameter.
+    Store final bookings queryset in kwargs['booking'].
+    Store pagination related info in kwargs['pagination_info'].
+
+    Example:
+    '?start_date=2023-01-19&end_date=2023-01-22&facility=1-3-4&status=pending-declined
+    &sortcodes=ascstart_date-desfacility__name-desid&items_per_page=3&page=2', means:
+    Filter from date 19 Jan 2023 to 22 Jan 2023 inclusive, facility id 1 or 3 or 4,
+    status pending or declined, sort by start date ascendingly, if there are ties
+    sort by facility name descendingly, if there are ties sort by id descendingly,
+    paginate 3 bookings per page, open page 2.
+'''
+def _booking_utilities(get_queryset_args: list=[]):
+    def decorator(func: callable):
+        @wraps(func)
+        def wrapper(request, *args, **kwargs):
+            bookings = Booking2.objects.filter(*get_queryset_args)
+
+            # filter feature
+            filter_start_date = request.GET.get('start_date', '')
+            filter_end_date = request.GET.get('end_date', '')
+            filter_facility = request.GET.get('facility', '')
+            filter_status = request.GET.get('status', '')
+            filter_kwargs = {}
+            try: filter_kwargs['date__gte'] = dt.strptime(filter_start_date, '%Y-%m-%d').date()
+            except: pass
+            try: filter_kwargs['date__lte'] = dt.strptime(filter_end_date, '%Y-%m-%d').date()
+            except: pass
+            if filter_facility: filter_kwargs['venue__id__in'] = filter_facility.split('-')
+            if filter_status: filter_kwargs['status__in'] = filter_status.split('-')
+            try: bookings = Booking2.objects.filter(**filter_kwargs)
+            except: pass
+
+            # sort feature
+            sortcodes = request.GET.get('sort', 'ascid').split('-')
+            try: bookings = bookings.order_by(*[('-' if sortcode[0:3] == 'des' else '') + \
+                sortcode[3::] for sortcode in sortcodes])
+            except: pass
+
+            # dynamic pagination feature
+            pagination_items_per_page = request.GET.get('items_per_page', 10)
+            pagination_page = request.GET.get('page', 1)
+            paginator = Paginator(bookings, pagination_items_per_page)
+            try: paginator = Paginator(bookings, pagination_items_per_page)
+            except: paginator = Paginator(bookings, 10)
+            try: page = paginator.page(pagination_page)
+            except PageNotAnInteger: page = paginator.page(1)
+            except EmptyPage: page = paginator.page(paginator.num_pages)
+
+            # store important data in kwargs
+            kwargs['bookings'] = bookings
+            kwargs['pagination_info'] = {
+                'has_next': page.has_next(), 'has_prev': page.has_previous(),
+                'total_pages': paginator.num_pages
+            }
+            return func(request, *args, **kwargs)
+        return wrapper
+    return decorator
+
+
 login_required = [_login_required]
 ufacility_user_required = login_required + [_ufacility_user_required]
 ufacility_admin_required = ufacility_user_required + [_ufacility_admin_required]
@@ -133,3 +197,4 @@ verification_decorator = login_required + [
     _ufacility_user_required, _ufacility_admin_required]
 pending_booking_only = [_pending_booking_only]
 no_verification_and_ufacility_account = login_required + [_no_verification_and_ufacility_account]
+booking_utilities = [_booking_utilities()]

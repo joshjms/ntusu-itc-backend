@@ -5,7 +5,7 @@ import os
 from SUITC_Backend.settings import BASE_DIR
 
 
-STORAGE_PATH = os.path.join(BASE_DIR, 'docs/api-guide')
+STORAGE_PATH = os.path.join(BASE_DIR, 'static/api-guide')
 
 
 def list_entries():

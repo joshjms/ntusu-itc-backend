@@ -51,9 +51,13 @@ class Booking2(models.Model):
     purpose = models.CharField(max_length=200)
     pax = models.PositiveIntegerField()
     status = models.CharField(max_length=10, choices=STATUSES)
+    attachment = models.FileField(
+        upload_to=lambda instance, filename: f'ufacility2/booking_file/{instance.id}/{filename}',
+        blank=True, null=True
+    )
 
     def __str__(self) -> str:
-        return f"<Booking ID {self.id}>: {self.venue} - {self.date} ({self.start_time} - {self.end_time})"
+        return f'<Booking ID {self.id}>: {self.venue} - {self.date} ({self.start_time} - {self.end_time})'
 
 
 class Verification(AbstractUFacilityUser):

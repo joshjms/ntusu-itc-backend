@@ -54,4 +54,5 @@ class BookingSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         utils.send_booking_email_to_admins()
+        validated_data['status'] = 'pending'
         super().create(validated_data)

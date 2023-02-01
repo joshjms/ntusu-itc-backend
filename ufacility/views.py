@@ -45,20 +45,13 @@ class UserDetailView(APIView):
 
 # GET /users/<user_id>/bookings/
 class UserBookingsView(APIView):
-    @method_decorator(decorators.ufacility_user_required)
-    def get(self, request, user_id, **kwargs):
-        requesting_ufacilityuser = kwargs['ufacilityuser']
-        ufacilityuser = get_object_or_404(UFacilityUser, id=user_id)
-
-        # Only admins or the ufacility user itself can view the user bookings
-        if requesting_ufacilityuser != ufacilityuser and requesting_ufacilityuser.is_admin == False:
-            return Response({"message": "User is not a UFacility admin and not the user itself."}, status = status.HTTP_403_FORBIDDEN)
-        # TODO - isn't this weird??? other endpoints are open for everyone, why not this one?
-        # consider making partial and complete serializer for booking (?)
-
-        bookings = Booking2.objects.filter(user=ufacilityuser)
-        serializer = BookingSerializer(bookings, many=True)
-        return Response(serializer.data)
+    @method_decorator(decorators.ufacility_user_required + decorators.booking_utilities_self)
+    def get(self, request, **kwargs):
+        serializer = BookingSerializer(kwargs['bookings'], many=True)
+        return Response({
+            'bookings': serializer.data,
+            'pagination_info': kwargs['pagination_info']
+        })
 
 
 # GET, POST /verifications/
@@ -151,7 +144,7 @@ class BookingView(APIView):
     def post(self, request, **kwargs):
         serializer = BookingSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            serializer.save()
+            serializer.save(user=kwargs['ufacilityuser'])
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 

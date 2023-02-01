@@ -137,11 +137,14 @@ def _get_own_instance_when_id_0(Model: Model, serializer: BaseSerializer, lookup
     sort by facility name descendingly, if there are ties sort by id descendingly,
     paginate 3 bookings per page, open page 2.
 '''
-def _booking_utilities(get_queryset_args: list=[]):
+def _booking_utilities(own_booking: bool=False):
     def decorator(func: callable):
         @wraps(func)
         def wrapper(request, *args, **kwargs):
-            bookings = Booking2.objects.filter(*get_queryset_args)
+            if own_booking:
+                booking = Booking2.objects.filter(user=kwargs['ufacilityuser'])
+            else:
+                bookings = Booking2.objects.all()
 
             # filter feature
             filter_start_date = request.GET.get('start_date', '')
@@ -198,3 +201,4 @@ verification_decorator = login_required + [
 pending_booking_only = [_pending_booking_only]
 no_verification_and_ufacility_account = login_required + [_no_verification_and_ufacility_account]
 booking_utilities = [_booking_utilities()]
+booking_utilities_self = [_booking_utilities(True)]

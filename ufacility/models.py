@@ -53,7 +53,7 @@ class Booking2(models.Model):
     status = models.CharField(max_length=10, choices=STATUSES)
 
     def __str__(self) -> str:
-        return f"{self.venue} {self.date} {self.start_time} - {self.end_time}"
+        return f"<Booking ID {self.id}>: {self.venue} - {self.date} ({self.start_time} - {self.end_time})"
 
 
 class Verification(AbstractUFacilityUser):

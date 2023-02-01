@@ -42,6 +42,10 @@ class Venue(models.Model):
         return self.name
 
 
+def get_booking_path(instance, filename):
+    return f'ufacility2/booking_file/{instance.id}/{filename}'
+
+
 class Booking2(models.Model):
     user = models.ForeignKey(UFacilityUser, on_delete=models.CASCADE)
     venue = models.ForeignKey(Venue, on_delete=models.CASCADE)
@@ -52,7 +56,7 @@ class Booking2(models.Model):
     pax = models.PositiveIntegerField()
     status = models.CharField(max_length=10, choices=STATUSES)
     attachment = models.FileField(
-        upload_to=lambda instance, filename: f'ufacility2/booking_file/{instance.id}/{filename}',
+        upload_to=get_booking_path,
         blank=True, null=True
     )
 

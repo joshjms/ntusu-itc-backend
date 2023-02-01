@@ -5,7 +5,7 @@ from django.forms.models import model_to_dict
 from django.utils.decorators import method_decorator
 from django.shortcuts import get_object_or_404
 from ufacility.models import Verification, Booking2, Venue, UFacilityUser
-from ufacility.serializers import VerificationSerializer, BookingSerializer, VenueSerializer, UFacilityUserSerializer
+from ufacility.serializers import VerificationSerializer, BookingSerializer, BookingReadSerializer, VenueSerializer, UFacilityUserSerializer
 from ufacility import decorators, utils
 
 
@@ -47,7 +47,7 @@ class UserDetailView(APIView):
 class UserBookingsView(APIView):
     @method_decorator(decorators.ufacility_user_required + decorators.booking_utilities_self)
     def get(self, request, **kwargs):
-        serializer = BookingSerializer(kwargs['bookings'], many=True)
+        serializer = BookingReadSerializer(kwargs['bookings'], many=True)
         return Response({
             'bookings': serializer.data,
             'pagination_info': kwargs['pagination_info']
@@ -134,7 +134,7 @@ class VerificationRejectView(APIView):
 class BookingView(APIView):
     @method_decorator(decorators.login_required + decorators.booking_utilities)
     def get(self, request, **kwargs):
-        serializer = BookingSerializer(kwargs['bookings'], many=True)
+        serializer = BookingReadSerializer(kwargs['bookings'], many=True)
         return Response({
             'bookings': serializer.data,
             'pagination_info': kwargs['pagination_info']
@@ -152,7 +152,7 @@ class BookingView(APIView):
 class BookingDetailView(APIView):
     @method_decorator(decorators.ufacility_admin_or_booking_owner_required)
     def get(self, request, booking_id, **kwargs):
-        serializer = BookingSerializer(kwargs["booking"])
+        serializer = BookingReadSerializer(kwargs["booking"])
         return Response(serializer.data)
 
     @method_decorator(decorators.ufacility_admin_or_booking_owner_required + decorators.pending_booking_only)

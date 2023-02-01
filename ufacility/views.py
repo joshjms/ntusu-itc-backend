@@ -200,6 +200,7 @@ class BookingRejectView(APIView):
 
 # GET /bookings/<int:venue_id>/<str:date>/
 class BookingHourlyView(APIView):
+    @method_decorator(decorators.login_required)
     def get(self, request, venue_id, date):
         pass
     '''

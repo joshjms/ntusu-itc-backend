@@ -2,7 +2,7 @@ from rest_framework.serializers import BaseSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.db.models import Model, QuerySet
+from django.db.models import Model
 from django.shortcuts import get_object_or_404
 from datetime import datetime as dt
 from functools import wraps
@@ -131,9 +131,9 @@ def _get_own_instance_when_id_0(Model: Model, serializer: BaseSerializer, lookup
 
     Example:
     '?start_date=2023-01-19&end_date=2023-01-22&facility=1-3-4&status=pending-declined
-    &sortcodes=ascstart_date-desfacility__name-desid&items_per_page=3&page=2', means:
+    &sort=ascstart_time-desvenue__name-desid&items_per_page=3&page=2', means:
     Filter from date 19 Jan 2023 to 22 Jan 2023 inclusive, facility id 1 or 3 or 4,
-    status pending or declined, sort by start date ascendingly, if there are ties
+    status pending or declined, sort by start time ascendingly, if there are ties
     sort by facility name descendingly, if there are ties sort by id descendingly,
     paginate 3 bookings per page, open page 2.
 '''
@@ -175,7 +175,7 @@ def _booking_utilities(get_queryset_args: list=[]):
             except EmptyPage: page = paginator.page(paginator.num_pages)
 
             # store important data in kwargs
-            kwargs['bookings'] = bookings
+            kwargs['bookings'] = list(page)
             kwargs['pagination_info'] = {
                 'has_next': page.has_next(), 'has_prev': page.has_previous(),
                 'total_pages': paginator.num_pages

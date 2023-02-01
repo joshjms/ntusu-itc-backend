@@ -1,9 +1,7 @@
 from rest_framework import status
 from rest_framework.reverse import reverse
-from json import loads
 from ufacility.tests.base_test import BaseAPITestCase
 from ufacility.models import Venue
-from sso.models import User
 
 
 class UfacilityVerificationDetailsTestCase(BaseAPITestCase):

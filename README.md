@@ -91,11 +91,15 @@ There are 2 types of documentation provided here:
 
 - Manual Documentation in the `docs` app by writing markdown files (stored locally in this repository) (NOTE: this is not available in the live environment yet)
 
+See some of the manual documentations here:
+
+- [Index Swapper](/docs/api-guide/index%20swapper.md)
+
 ## Production Environment
 
 The live server is deployed using AWS Elastic Beanstalk (environment name: `Ntusuitcbackendprod-env`) [here](http://ntusu-itc-backend.ap-southeast-1.elasticbeanstalk.com/) using Python 3.8 running on Linux2 Ver 3.4.3 machine. Current database is stored using EC2 instance using MySQL (RDS is so expensive so we're not using this), static files are stored in S3 buckets. Database and S3 storage related configurations are set up through environment variables in the EB environment. SSL certificate is not issued yet, but most likely to be maintained using Certbot.
 
-In order to manually type Django manage.py commands, you have to first download [AWS EB CLI](https://github.com/aws/aws-elastic-beanstalk-cli-setup), then connect via ssh by typing `eb ssh Ntusuitcbackendprod-env`, and finally type these commands referenced [here](https://stackoverflow.com/a/71045510).
+In order to manually type Django manage.py commands, you have to first download [AWS EB CLI](https://github.com/aws/aws-elastic-beanstalk-cli-setup), then connect via ssh by typing `eb ssh Ntusuitcbackendprod-env`, enter secret key pair, and finally type these commands referenced [here](https://stackoverflow.com/a/71045510).
 
 ```powershell
     eb ssh

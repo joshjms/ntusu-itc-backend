@@ -38,7 +38,7 @@ def send_booking_email_to_admins():
 
 
 def clash_exists(venue, start_time, end_time):
-    bookings = Booking2.objects.filter(venue=venue)
+    bookings = Booking2.objects.filter(venue=venue, date=booking.date)
     for booking in bookings:
         if start_time < booking.end_time and end_time > booking.start_time:
             return True

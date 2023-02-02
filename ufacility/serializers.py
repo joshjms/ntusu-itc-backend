@@ -39,8 +39,7 @@ class VenueSerializer(serializers.ModelSerializer):
 
 
 class BookingSerializer(serializers.ModelSerializer):
-    user = UFacilityUserSerializer(many=False)
-    venue = VenueSerializer(many=False)
+    user = UFacilityUserSerializer(many=False, read_only=True)
 
     class Meta:
         model = Booking2
@@ -56,3 +55,7 @@ class BookingSerializer(serializers.ModelSerializer):
         utils.send_booking_email_to_admins()
         validated_data['status'] = 'pending'
         super().create(validated_data)
+
+
+class BookingReadSerializer(BookingSerializer):
+    venue = VenueSerializer(many=False, read_only=True)

@@ -83,8 +83,10 @@ class AddEventAdmin(generics.CreateAPIView):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-class CheckAdminStatus(LoginRequiredMixin, APIView):
+class CheckAdminStatus(APIView):
      def get(self, request):
+          if request.user.is_anonymous:
+               return Response('Unauthorized', status=status.HTTP_401_UNAUTHORIZED)
           user = User.objects.get(id=request.user.id)
           try:
                event_admin = EventAdmin.objects.get(user=user)

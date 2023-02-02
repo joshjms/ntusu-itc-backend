@@ -47,7 +47,7 @@ class BookingSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'user', 'status']
     
     def validate(self, attrs):
-        if clash_exists(attrs['venue'].id, attrs['start_time'], attrs['end_time']):
+        if clash_exists(attrs['venue'].id, attrs['date'], attrs['start_time'], attrs['end_time']):
             raise ConflictValidationError('Booking clashes with another accepted booking')
         return super().validate(attrs)
     

@@ -65,6 +65,8 @@ class VerificationView(APIView):
     @method_decorator(decorators.ufacility_admin_required)
     def get(self, request, **kwargs):
         verifications = Verification.objects.all()
+        filter_status = request.GET.get('status', '')
+        if filter_status: verifications = verifications.filter(status__in=filter_status.split('-'))
         serializer = VerificationSerializer(verifications, many=True)
         return Response(serializer.data)
 

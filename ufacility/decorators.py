@@ -144,7 +144,7 @@ def _booking_utilities(own_booking: bool=False):
         @wraps(func)
         def wrapper(request, *args, **kwargs):
             if own_booking:
-                booking = Booking2.objects.filter(user=kwargs['ufacilityuser'])
+                bookings = Booking2.objects.filter(user=kwargs['ufacilityuser'])
             else:
                 bookings = Booking2.objects.all()
 

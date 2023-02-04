@@ -99,7 +99,7 @@ class UfacilityVerificationsTestCase(BaseAPITestCase):
         self.assertEqual(booking['end_time'], '16:00:00')
         self.assertEqual(booking['purpose'], 'dance practice')
         self.assertEqual(booking['pax'], 20)
-        self.assertEqual(booking['status'], 'pending')\
+        self.assertEqual(booking['status'], 'pending')
 
         # pagination related data
         self.assertEqual(resp_json['pagination_info']['has_next'], False)

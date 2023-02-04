@@ -4,8 +4,14 @@ from rest_framework import status
 from django.forms.models import model_to_dict
 from django.utils.decorators import method_decorator
 from django.shortcuts import get_object_or_404
-from ufacility.models import Verification, Booking2, Venue, UFacilityUser
-from ufacility.serializers import VerificationSerializer, BookingSerializer, BookingReadSerializer, VenueSerializer, UFacilityUserSerializer
+from ufacility.models import Verification, Venue, UFacilityUser
+from ufacility.serializers import (
+    VerificationSerializer,
+    BookingSerializer,
+    BookingReadSerializer,
+    VenueSerializer,
+    UFacilityUserSerializer
+)
 from ufacility import decorators, utils
 
 
@@ -177,7 +183,7 @@ class BookingAcceptView(APIView):
         booking.save()
         utils.send_email_to_security(booking.venue, booking.start_time, booking.end_time)
         # TODO - send email to ufacilityuser that their booking has been accepted
-        return Response('Booking accepted.', status=status.HTTP_200_OK)
+        return Response({'message': 'Booking accepted.'}, status=status.HTTP_200_OK)
 
 
 # PUT /bookings/<booking_id>/reject/
@@ -185,10 +191,10 @@ class BookingRejectView(APIView):
     @method_decorator(decorators.ufacility_admin_required + decorators.pending_booking_only)
     def put(self, request, booking_id, **kwargs):
         booking = kwargs['booking']
-        booking.status = 'rejected'
+        booking.status = 'declined'
         booking.save()
         # TODO - send email to ufacilityuser that their booking has been rejected
-        return Response('Booking rejected.', status=status.HTTP_200_OK)
+        return Response({'message': 'Booking rejected.'}, status=status.HTTP_200_OK)
 
 
 # GET /bookings/<int:venue_id>/<str:date>/
@@ -198,9 +204,10 @@ class BookingHourlyView(APIView):
         pass
     '''
         TODO
+
         Given a venue id and a date,
         return for each hour,
-        if that venue in that particular date,
+        if that venue in that particular date (YYYY-MM-DD),
         is booked / soft-chopped (someone created booking but not confirmed) / rejected,
         and who booked / soft-chopped if there are any
         (basically all bookings that are in that book that venue in this date and hour)

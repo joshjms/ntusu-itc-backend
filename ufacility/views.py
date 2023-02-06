@@ -15,7 +15,7 @@ from ufacility.serializers import (
 from ufacility import decorators, utils
 
 
-# GET /check-status
+# GET /check_status
 class CheckStatusView(APIView):
     def get(self, request):
         requesting_user = request.user

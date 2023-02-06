@@ -15,18 +15,50 @@ from ufacility.serializers import (
 from ufacility import decorators, utils
 
 
-# GET /check_status/
+# GET /check-status
 class CheckStatusView(APIView):
     def get(self, request):
-        pass
-    '''
-        TODO
-        Given the current request, identify whether:
-        - User is a ufacility admin OR
-        - User is a ufacility user OR
-        - User is a regular sso user OR
-        - Anonymous user
-    '''
+        requesting_user = request.user
+        requesting_ufacilityuser = UFacilityUser.objects.filter(user=requesting_user).first()
+
+        # Check if requesting_user is Anonymous User
+        if requesting_user.is_anonymous:
+            return Response({"message": "User is Anonymous.", "type": "anonymous"}, status = status.HTTP_401_UNAUTHORIZED)
+
+        # Check if requesting_user has a ufacility account
+        if requesting_ufacilityuser == None:
+            return Response({"message": "User does not have a UFacility account.", "type": "sso user"}, status = status.HTTP_401_UNAUTHORIZED)
+
+        # Check if requesting_user is a ufacility user
+        if requesting_ufacilityuser.is_admin == False:
+            return Response({"message": "User is a UFacility user.", "type": "ufacility user"}, status = status.HTTP_200_OK)
+
+        # Otherwise, user is admin
+        return Response({"message": "User is a UFacility admin.", "type": "ufacility admin"}, status = status.HTTP_200_OK)
+
+
+# POST /users
+class UserView(APIView):
+    def post(self, request):
+        requesting_user = request.user
+        requesting_ufacilityuser = UFacilityUser.objects.filter(user=requesting_user).first()
+
+        # Check if requesting_user has a ufacility account
+        if requesting_ufacilityuser == None:
+            return Response({"message": "User does not have a UFacility account."}, status = status.HTTP_401_UNAUTHORIZED)
+        
+        # Only admins can create ufacility users
+        if requesting_ufacilityuser.is_admin == False:
+            return Response({"message": "User is not a UFacility admin."}, status = status.HTTP_403_FORBIDDEN)
+
+        data = request.data
+        serializer = UFacilityUserSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status = status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+>>>>>>> c8738e0 ([Ufacility] Add /check_status views)
 
 
 # GET /users/<user_id>/

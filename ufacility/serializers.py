@@ -31,6 +31,14 @@ class VerificationSerializer(serializers.ModelSerializer):
         utils.send_verification_email_to_admins()
         return super().create(validated_data)
 
+    def update(self, instance, validated_data):
+        instance.cca = validated_data.get("cca", instance.cca)
+        instance.hongen_name = validated_data.get("hongen_name", instance.hongen_name)
+        instance.hongen_phone_number = validated_data.get("hongen_phone_number", instance.hongen_phone_number)
+        instance.status = validated_data.get("status", instance.status)
+        instance.save()
+        return instance
+
 
 class VenueSerializer(serializers.ModelSerializer):
     class Meta:
@@ -44,7 +52,7 @@ class BookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking2
         fields = '__all__'
-        read_only_fields = ['id', 'user', 'status']
+        read_only_fields = ['id', 'user', 'status', 'get_clashing_booking_id']
     
     def validate(self, attrs):
         if clash_exists(attrs['venue'].id, attrs['date'], attrs['start_time'], attrs['end_time']):

@@ -60,6 +60,15 @@ class Booking2(models.Model):
         blank=True, null=True
     )
 
+    @property
+    def get_clashing_booking_id(self):
+        clashes = Booking2.objects.filter(
+            venue=self.venue,
+            start_time__lt=self.end_time,
+            end_time__gte=self.start_time,
+        ).exclude(id=self.id).values_list("id", flat=True)
+        return clashes
+
     def __str__(self) -> str:
         return f'<Booking ID {self.id}>: {self.venue} - {self.date} ({self.start_time} - {self.end_time})'
 

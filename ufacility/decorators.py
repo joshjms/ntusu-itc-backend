@@ -74,15 +74,17 @@ def _ufacility_admin_or_booking_owner_required(func: callable):
 
 '''
     Return 409 if booking has been accepted or rejected.
+    kwargs['booking'] stores the current booking.
 '''
 def _pending_booking_only(func: callable):
     @wraps(func)
     def wrapper(request, *args, **kwargs):
         booking = (kwargs['booking'] if 'booking' in kwargs else
             get_object_or_404(Booking2, id=kwargs['booking_id']))
-        if booking.status in ['accepted', 'rejected']:
+        if booking.status in ['accepted', 'declined']:
             return Response('Booking is already accepted or declined. No further alteration is allowed.',
                 status=status.HTTP_409_CONFLICT)
+        kwargs['booking'] = booking
         return func(request, *args, **kwargs)
     return wrapper
 
@@ -142,7 +144,7 @@ def _booking_utilities(own_booking: bool=False):
         @wraps(func)
         def wrapper(request, *args, **kwargs):
             if own_booking:
-                bookings = Booking2.objects.filter(user=kwargs['ufacilityuser'])
+                booking = Booking2.objects.filter(user=kwargs['ufacilityuser']) # TODO - bug (for own booking)
             else:
                 bookings = Booking2.objects.all()
 

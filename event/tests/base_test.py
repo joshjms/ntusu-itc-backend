@@ -3,6 +3,11 @@ from sso.models import User
 from event.models import EventAdmin
 
 class BaseAPITestCase(APITestCase):
+    # Create 3 different user as initial setup
+    # user0 -> event superadmin
+    # user1 -> event admin
+    # user2 -> regular user
+
     def setUp(self):
         self.client0 = APIClient()
         self.user0 = User.objects.create_user(

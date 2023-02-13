@@ -15,21 +15,23 @@ from ufacility.serializers import (
 )
 from ufacility import decorators, utils
 from django.db.models import Q
+import datetime as dt
 
 
 # GET /check_user_status
 class CheckStatusView(APIView):
     def get(self, request):
         requesting_user = request.user
-        requesting_ufacilityuser = UFacilityUser.objects.filter(user=requesting_user).first()
 
         # Check if requesting_user is Anonymous User
         if requesting_user.is_anonymous:
-            return Response({"message": "User is Anonymous.", "type": "anonymous"}, status = status.HTTP_401_UNAUTHORIZED)
+            return Response({"message": "User is Anonymous.", "type": "anonymous"}, status = status.HTTP_200_OK)
+
+        requesting_ufacilityuser = UFacilityUser.objects.filter(user=requesting_user).first()
 
         # Check if requesting_user has a ufacility account
         if requesting_ufacilityuser == None:
-            return Response({"message": "User does not have a UFacility account.", "type": "sso user"}, status = status.HTTP_401_UNAUTHORIZED)
+            return Response({"message": "User does not have a UFacility account.", "type": "sso user"}, status = status.HTTP_200_OK)
 
         # Check if requesting_user is a ufacility user
         if requesting_ufacilityuser.is_admin == False:
@@ -242,12 +244,11 @@ class BookingRejectView(APIView):
 class BookingHourlyView(APIView):
     @method_decorator(decorators.login_required)
     def get(self, request, venue_id, date):
+        year, month, day = int(date[:4]), int(date[5:7]), int(date[8:])
         venue = get_object_or_404(Venue, id=venue_id)
-        bookings = Booking2.objects.filter(Q(venue=venue), Q(date__date=date), Q(status='pending') | Q(status='accepted'))
+        bookings = Booking2.objects.filter(Q(venue=venue), Q(date__year=year), Q(date__month=month), Q(date__day=day), Q(status='pending') | Q(status='accepted'))
         serializer = BookingPartialSerializer(bookings, many=True)
-        if serializer.is_valid():
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.data)
     '''
         TODO
 

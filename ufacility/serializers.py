@@ -67,3 +67,13 @@ class BookingSerializer(serializers.ModelSerializer):
 
 class BookingReadSerializer(BookingSerializer):
     venue = VenueSerializer(many=False, read_only=True)
+
+
+class BookingPartialSerializer(serializers.ModelSerializer):
+    user = UFacilityUserSerializer(many=False, read_only=True)
+
+    class Meta:
+        model = Booking2
+        fields = ['user', 'start_time', 'end_time', 'purpose', 'pax', 'status']
+        read_only_fields = ['user', 'status']
+

@@ -4,18 +4,20 @@ from rest_framework import status
 from django.forms.models import model_to_dict
 from django.utils.decorators import method_decorator
 from django.shortcuts import get_object_or_404
-from ufacility.models import Verification, Venue, UFacilityUser
+from ufacility.models import Verification, Venue, UFacilityUser, Booking2
 from ufacility.serializers import (
     VerificationSerializer,
     BookingSerializer,
     BookingReadSerializer,
     VenueSerializer,
-    UFacilityUserSerializer
+    UFacilityUserSerializer,
+    BookingPartialSerializer
 )
 from ufacility import decorators, utils
+from django.db.models import Q
 
 
-# GET /check_status
+# GET /check_user_status
 class CheckStatusView(APIView):
     def get(self, request):
         requesting_user = request.user
@@ -58,7 +60,6 @@ class UserView(APIView):
             return Response(serializer.data, status = status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
->>>>>>> c8738e0 ([Ufacility] Add /check_status views)
 
 
 # GET /users/<user_id>/
@@ -217,6 +218,9 @@ class BookingAcceptView(APIView):
         booking.save()
         utils.send_email_to_security(booking.venue, booking.start_time, booking.end_time)
         # TODO - send email to ufacilityuser that their booking has been accepted
+        ufacilityuser = booking.user
+        user = ufacilityuser.user
+        utils.send_booking_results_email(user.email, booking.venue, booking.start_time, booking.end_time, booking.status)
         return Response({'message': 'Booking accepted.'}, status=status.HTTP_200_OK)
 
 
@@ -228,6 +232,9 @@ class BookingRejectView(APIView):
         booking.status = 'declined'
         booking.save()
         # TODO - send email to ufacilityuser that their booking has been rejected
+        ufacilityuser = booking.user
+        user = ufacilityuser.user
+        utils.send_booking_results_email(user.email, booking.venue, booking.start_time, booking.end_time, booking.status)
         return Response({'message': 'Booking rejected.'}, status=status.HTTP_200_OK)
 
 
@@ -235,7 +242,12 @@ class BookingRejectView(APIView):
 class BookingHourlyView(APIView):
     @method_decorator(decorators.login_required)
     def get(self, request, venue_id, date):
-        pass
+        venue = get_object_or_404(Venue, id=venue_id)
+        bookings = Booking2.objects.filter(Q(venue=venue), Q(date__date=date), Q(status='pending') | Q(status='accepted'))
+        serializer = BookingPartialSerializer(bookings, many=True)
+        if serializer.is_valid():
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     '''
         TODO
 

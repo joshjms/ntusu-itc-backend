@@ -36,6 +36,13 @@ def send_booking_email_to_admins():
         admin_emails.append(admin.user.email)
     send_email(email_subject, email_body, recipients=admin_emails)
 
+def send_booking_results_email(email, venue, start, end, status):
+    email_subject = f"Booking request for {venue.name} from {start} to {end} has been {status}"
+    email_body = """\
+            This is an auto-generated email to inform you that your booking has been {status}.
+            Please contact {exco_email} should you have any enquiries.
+            """.format(status=status, exco_email=exco_email)
+    send_email(email_subject, email_body, recipients=[email])
 
 def clash_exists(venue, date, start_time, end_time):
     bookings = Booking2.objects.filter(venue=venue, date=date)

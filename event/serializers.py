@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from event.models import Event, EventAdmin
+from event.models import Event, EventAdmin, EventOfficer, MatricCheckIn
 from sso.models import User
 
 class EventSerializer(serializers.ModelSerializer):
@@ -20,3 +20,17 @@ class EventAdminSerializer(serializers.ModelSerializer):
     class Meta:
         model = EventAdmin
         fields = '__all__'
+
+class EventOfficerSerializer(serializers.ModelSerializer):
+    events = EventSerializer(many=True, read_only=True)
+    class Meta:
+        model = EventOfficer
+        fields = ['event', 'name', 'is_active', 'token', 'added_date']
+        read_only_fields = ['token', 'added_date']
+
+class MatricCheckInSerializer(serializers.Modelserializer):
+    events = EventSerializer(many=True, read_only=True)
+    class Meta:
+        model = MatricCheckIn
+        fields = '__all__'
+

@@ -6,9 +6,11 @@ from rest_framework.response import Response
 from rest_framework import status
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema 
+from django.shortcuts import get_object_or_404
 
-from event.serializers import EventSerializer, EventAdminSerializer, UserSerializer
-from event.models import Event, EventAdmin
+
+from event.serializers import EventSerializer, EventAdminSerializer, UserSerializer, EventOfficerSerializer, MatricCheckInSerializer
+from event.models import Event, EventAdmin, EventOfficer, MatricCheckIn
 from event.permissions import IsEventAdmin, IsEventCreator, IsEventSuperAdmin
 from sso.models import User
 
@@ -61,3 +63,17 @@ class UserList(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsEventSuperAdmin]
+
+
+class AddEventOfficer(generics.CreateAPIView):
+    querySet = EventOfficer.objects.all()
+    serializer_class = EventOfficerSerializer
+
+class EventOfficerEdit(generics.ListAPIView):
+    queryset = EventAdmin.objects.all()
+    serializerClass = EventOfficerSerializer
+    
+class OfficerTokenView(APIView):
+    def get(request, officer_token):
+        event_officer = get_objects_or_404(EventOfficer, token=officer_token)
+        return JsonResponse(event_officer.event.id)

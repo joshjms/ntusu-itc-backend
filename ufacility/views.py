@@ -4,29 +4,64 @@ from rest_framework import status
 from django.forms.models import model_to_dict
 from django.utils.decorators import method_decorator
 from django.shortcuts import get_object_or_404
-from ufacility.models import Verification, Venue, UFacilityUser
+from ufacility.models import Verification, Venue, UFacilityUser, Booking2
 from ufacility.serializers import (
     VerificationSerializer,
     BookingSerializer,
     BookingReadSerializer,
     VenueSerializer,
-    UFacilityUserSerializer
+    UFacilityUserSerializer,
+    BookingPartialSerializer
 )
 from ufacility import decorators, utils
+from django.db.models import Q
+import datetime as dt
 
 
-# GET /check_status/
+# GET /check_user_status
 class CheckStatusView(APIView):
     def get(self, request):
-        pass
-    '''
-        TODO
-        Given the current request, identify whether:
-        - User is a ufacility admin OR
-        - User is a ufacility user OR
-        - User is a regular sso user OR
-        - Anonymous user
-    '''
+        requesting_user = request.user
+
+        # Check if requesting_user is Anonymous User
+        if requesting_user.is_anonymous:
+            return Response({"message": "User is Anonymous.", "type": "anonymous"}, status = status.HTTP_200_OK)
+
+        requesting_ufacilityuser = UFacilityUser.objects.filter(user=requesting_user).first()
+
+        # Check if requesting_user has a ufacility account
+        if requesting_ufacilityuser == None:
+            return Response({"message": "User does not have a UFacility account.", "type": "sso user"}, status = status.HTTP_200_OK)
+
+        # Check if requesting_user is a ufacility user
+        if requesting_ufacilityuser.is_admin == False:
+            return Response({"message": "User is a UFacility user.", "type": "ufacility user"}, status = status.HTTP_200_OK)
+
+        # Otherwise, user is admin
+        return Response({"message": "User is a UFacility admin.", "type": "ufacility admin"}, status = status.HTTP_200_OK)
+
+
+# POST /users
+class UserView(APIView):
+    def post(self, request):
+        requesting_user = request.user
+        requesting_ufacilityuser = UFacilityUser.objects.filter(user=requesting_user).first()
+
+        # Check if requesting_user has a ufacility account
+        if requesting_ufacilityuser == None:
+            return Response({"message": "User does not have a UFacility account."}, status = status.HTTP_401_UNAUTHORIZED)
+        
+        # Only admins can create ufacility users
+        if requesting_ufacilityuser.is_admin == False:
+            return Response({"message": "User is not a UFacility admin."}, status = status.HTTP_403_FORBIDDEN)
+
+        data = request.data
+        serializer = UFacilityUserSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status = status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
 
 # GET /users/<user_id>/
@@ -185,6 +220,9 @@ class BookingAcceptView(APIView):
         booking.save()
         utils.send_email_to_security(booking.venue, booking.start_time, booking.end_time)
         # TODO - send email to ufacilityuser that their booking has been accepted
+        ufacilityuser = booking.user
+        user = ufacilityuser.user
+        utils.send_booking_results_email(user.email, booking.venue, booking.start_time, booking.end_time, booking.status)
         return Response({'message': 'Booking accepted.'}, status=status.HTTP_200_OK)
 
 
@@ -196,6 +234,9 @@ class BookingRejectView(APIView):
         booking.status = 'declined'
         booking.save()
         # TODO - send email to ufacilityuser that their booking has been rejected
+        ufacilityuser = booking.user
+        user = ufacilityuser.user
+        utils.send_booking_results_email(user.email, booking.venue, booking.start_time, booking.end_time, booking.status)
         return Response({'message': 'Booking rejected.'}, status=status.HTTP_200_OK)
 
 
@@ -203,7 +244,11 @@ class BookingRejectView(APIView):
 class BookingHourlyView(APIView):
     @method_decorator(decorators.login_required)
     def get(self, request, venue_id, date):
-        pass
+        year, month, day = int(date[:4]), int(date[5:7]), int(date[8:])
+        venue = get_object_or_404(Venue, id=venue_id)
+        bookings = Booking2.objects.filter(Q(venue=venue), Q(date__year=year), Q(date__month=month), Q(date__day=day), Q(status='pending') | Q(status='accepted'))
+        serializer = BookingPartialSerializer(bookings, many=True)
+        return Response(serializer.data)
     '''
         TODO
 

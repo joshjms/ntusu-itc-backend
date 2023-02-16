@@ -15,26 +15,22 @@ from ufacility.serializers import (
     BookingPartialSerializer,
     BookingGroupSerializer,
 )
-from ufacility.permissions import IsUFacilityUser
+from ufacility.permissions import IsAuthenticated, IsUFacilityUser, IsUFacilityAdmin, IsBookingOwnerOrAdmin, IsPendingBookingOrAdmin
 from ufacility import decorators, utils
 
 
 class BookingGroupView(generics.ListCreateAPIView):
-    queryset = BookingGroup.objects.all()
     serializer_class = BookingGroupSerializer
-    permission_classes = [IsUFacilityUser]
+    permission_classes = [IsAuthenticated, IsUFacilityUser]
 
     def get_queryset(self):
         ufacility_user = UFacilityUser.objects.get(user=self.request.user)
-        if ufacility_user.is_admin == True:
-            return BookingGroup.objects.all()
-        else:
-            return BookingGroup.objects.filter(user=ufacility_user)
+        return BookingGroup.objects.filter(user=ufacility_user)
 
     def perform_create(self, serializer):
         ufacility_user = get_object_or_404(UFacilityUser, user=self.request.user)
         booking_group = serializer.save(user=ufacility_user)
-        for date in booking_group.get_dates:
+        for date in booking_group.dates:
             Booking2.objects.create(
                 **{
                     'user': booking_group.user,
@@ -48,6 +44,17 @@ class BookingGroupView(generics.ListCreateAPIView):
                     'booking_group': booking_group,
                 }
             )
+
+class BookingGroupAdminView(generics.ListAPIView):
+    queryset = BookingGroup.objects.all()
+    serializer_class = BookingGroupSerializer
+    permission_classes = [IsAuthenticated, IsUFacilityAdmin]
+
+class BookingGroupDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = BookingGroup.objects.all()
+    lookup_field = 'id'
+    serializer_class = BookingGroupSerializer
+    permission_classes = [IsAuthenticated, IsBookingOwnerOrAdmin, IsPendingBookingOrAdmin]
 
 class BookingGroupAcceptView(APIView):
     @method_decorator(decorators.ufacility_admin_required)

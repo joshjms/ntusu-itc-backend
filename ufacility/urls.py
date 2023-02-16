@@ -20,6 +20,8 @@ urlpatterns = [
     path('venues/<int:venue_id>/', views.VenueDetailView.as_view(), name='venue-detail'),
 
     path('booking_group/', views.BookingGroupView.as_view(), name='booking-group-create'),
+    path('booking_group/admin/', views.BookingGroupAdminView.as_view(), name='booking-group-admin'),
+    path('booking_group/<int:id>/', views.BookingGroupDetailView.as_view(), name='booking-group-detail'),
     path('booking_group/<int:bookinggroup_id>/accept/', views.BookingGroupAcceptView.as_view(), name='booking-group-accept'),
     path('booking_group/<int:bookinggroup_id>/reject/', views.BookingGroupRejectView.as_view(), name='booking-group-reject'),
 ]

@@ -85,7 +85,7 @@ class BookingGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = BookingGroup
         fields = '__all__'
-        extra_fields = ['dates', 'venue_name', 'user_email', 'bookings']
+        extra_fields = ['dates', 'venue_name', 'user_email', 'user_cca', 'bookings']
         read_only_fields = ['id', 'user', 'status', 'bookings']
     
     def get_field_names(self, declared_fields, info):

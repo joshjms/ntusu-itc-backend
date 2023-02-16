@@ -83,6 +83,10 @@ class BookingGroup(AbstractBooking):
     @property
     def venue_name(self):
         return self.venue.name
+
+    @property
+    def user_cca(self):
+        return self.user.cca
     
     @property
     def user_email(self):

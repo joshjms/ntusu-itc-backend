@@ -1,23 +1,96 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import generics, status
+from django.db.models import Q
 from django.forms.models import model_to_dict
 from django.utils.decorators import method_decorator
 from django.shortcuts import get_object_or_404
-from ufacility.models import Verification, Venue, UFacilityUser, Booking2
+from ufacility.models import Verification, Venue, UFacilityUser, Booking2, BookingGroup
 from ufacility.serializers import (
     VerificationSerializer,
     BookingSerializer,
     BookingReadSerializer,
     VenueSerializer,
     UFacilityUserSerializer,
-    BookingPartialSerializer
+    BookingPartialSerializer,
+    BookingGroupSerializer,
 )
+from ufacility.permissions import IsAuthenticated, IsUFacilityUser, IsUFacilityAdmin, IsBookingOwnerOrAdmin, IsPendingBookingOrAdmin
 from ufacility import decorators, utils
-from django.db.models import Q
-import datetime as dt
 
 
+class BookingGroupView(generics.ListCreateAPIView):
+    serializer_class = BookingGroupSerializer
+    permission_classes = [IsAuthenticated, IsUFacilityUser]
+
+    def get_queryset(self):
+        ufacility_user = UFacilityUser.objects.get(user=self.request.user)
+        return BookingGroup.objects.filter(user=ufacility_user)
+
+    def perform_create(self, serializer):
+        ufacility_user = get_object_or_404(UFacilityUser, user=self.request.user)
+        booking_group = serializer.save(user=ufacility_user)
+        for date in booking_group.dates:
+            Booking2.objects.create(
+                **{
+                    'user': booking_group.user,
+                    'venue': booking_group.venue,
+                    'start_time': booking_group.start_time,
+                    'end_time': booking_group.end_time,
+                    'purpose': booking_group.purpose,
+                    'pax': booking_group.pax,
+                    'status': 'pending',
+                    'date': date,
+                    'booking_group': booking_group,
+                }
+            )
+
+class BookingGroupAdminView(generics.ListAPIView):
+    queryset = BookingGroup.objects.all()
+    serializer_class = BookingGroupSerializer
+    permission_classes = [IsAuthenticated, IsUFacilityAdmin]
+
+class BookingGroupDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = BookingGroup.objects.all()
+    lookup_field = 'id'
+    serializer_class = BookingGroupSerializer
+    permission_classes = [IsAuthenticated, IsBookingOwnerOrAdmin, IsPendingBookingOrAdmin]
+
+class BookingGroupAcceptView(APIView):
+    @method_decorator(decorators.ufacility_admin_required)
+    def put(self, request, bookinggroup_id, **kwargs):
+        booking_group = get_object_or_404(BookingGroup, id=bookinggroup_id)
+        if booking_group.status == 'declined':
+            return Response({'error': 'you cannot accept declined booking(s)'}, status=status.HTTP_409_CONFLICT)
+        booking_group.status = 'accepted'
+        booking_group.save()
+        for booking in booking_group.bookings.all():
+            booking.status = 'accepted'
+            booking.save()
+        utils.send_email_to_security(booking_group.venue, booking_group.start_time, booking_group.end_time)
+        ufacilityuser = booking_group.user
+        user = ufacilityuser.user
+        utils.send_booking_results_email(user.email, booking_group.venue, booking_group.start_time, booking_group.end_time, booking_group.status)
+        return Response({'message': 'Booking(s) accepted.'}, status=status.HTTP_200_OK)
+
+class BookingGroupRejectView(APIView):
+    @method_decorator(decorators.ufacility_admin_required)
+    def put(self, request, bookinggroup_id, **kwargs):
+        booking_group = get_object_or_404(BookingGroup, id=bookinggroup_id)
+        if booking_group.status == 'accepted':
+            return Response({'error': 'you cannot accept declined booking(s)'}, status=status.HTTP_409_CONFLICT)
+        booking_group.status = 'declined'
+        booking_group.save()
+        for booking in booking_group.bookings.all():
+            booking.status = 'declined'
+            booking.save()
+        ufacilityuser = booking_group.user
+        user = ufacilityuser.user
+        utils.send_booking_results_email(user.email, booking_group.venue, booking_group.start_time, booking_group.end_time, booking_group.status)
+        return Response({'message': 'Booking(s) rejected.'}, status=status.HTTP_200_OK)
+
+
+################################################################
 # GET /check_user_status
 class CheckStatusView(APIView):
     def get(self, request):

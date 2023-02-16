@@ -1,6 +1,7 @@
 from rest_framework import serializers, status
+from django.utils import timezone as tz
 from sso.serializers import UserProfileSerializer
-from ufacility.models import Verification, Booking2, Venue, UFacilityUser
+from ufacility.models import Verification, Booking2, Venue, UFacilityUser, BookingGroup
 from ufacility.utils import clash_exists
 from ufacility import utils
 
@@ -77,3 +78,40 @@ class BookingPartialSerializer(serializers.ModelSerializer):
         fields = ['user', 'start_time', 'end_time', 'purpose', 'pax', 'status']
         read_only_fields = ['user', 'status']
 
+
+class BookingGroupSerializer(serializers.ModelSerializer):
+    created = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', read_only=True)
+
+    class Meta:
+        model = BookingGroup
+        fields = '__all__'
+        extra_fields = ['dates', 'venue_name', 'user_email', 'bookings']
+        read_only_fields = ['id', 'user', 'status', 'bookings']
+    
+    def get_field_names(self, declared_fields, info):
+        return super().get_field_names(declared_fields, info) + self.Meta.extra_fields
+    
+    def create(self, validated_data):
+        validated_data['status'] = 'pending'
+        return super().create(validated_data)
+    
+    def validate_start_time(self, value):
+        if value.minute != 0:
+            raise serializers.ValidationError('Start time minute should be 00')
+        return value
+    
+    def validate_end_time(self, value):
+        if value.minute != 0:
+            raise serializers.ValidationError('Start time minute should be 00')
+        return value
+    
+    def validate_start_date(self, value):
+        if value < tz.now().date():
+            raise serializers.ValidationError('Start date cannot be in the past')
+        return value
+    
+    def validate(self, attrs):
+        if attrs['start_date'] > attrs['end_date']:
+            raise serializers.ValidationError('Start date cannot be later than end date')
+        # TODO - validate clashing
+        return super().validate(attrs)

@@ -1,6 +1,7 @@
 from django.db import models
-from sso.models import User
 from django.core.validators import RegexValidator
+from datetime import timedelta
+from sso.models import User
 
 
 STATUSES = (
@@ -46,19 +47,81 @@ def get_booking_path(instance, filename):
     return f'ufacility2/booking_file/{instance.id}/{filename}'
 
 
-class Booking2(models.Model):
+class AbstractBooking(models.Model):
     user = models.ForeignKey(UFacilityUser, on_delete=models.CASCADE)
     venue = models.ForeignKey(Venue, on_delete=models.CASCADE)
-    date = models.DateField()
     start_time = models.TimeField()
     end_time = models.TimeField()
     purpose = models.CharField(max_length=200)
     pax = models.PositiveIntegerField()
     status = models.CharField(max_length=10, choices=STATUSES)
+    
+    class Meta:
+        abstract = True
+
+
+class BookingGroup(AbstractBooking):
+    class Frequency(models.TextChoices):
+        EVERYDAY = 'ALL', 'Everyday'
+        MONDAY = 'MON', 'Monday'
+        TUESDAY = 'TUE', 'Tuesday'
+        WEDNESDAY = 'WED', 'Wednesday'
+        THURSDAY = 'THU', 'Thursday'
+        FRIDAY = 'FRI', 'Friday'
+        SATURDAY = 'SAT', 'Saturday'
+        SUNDAY = 'SUN', 'Sunday'
+    
     attachment = models.FileField(
         upload_to=get_booking_path,
-        blank=True, null=True
+        null=True, blank=True
     )
+    created = models.DateTimeField(auto_now_add=True)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    recurring = models.CharField(max_length=3, choices=Frequency.choices)
+
+    @property
+    def venue_name(self):
+        return self.venue.name
+    
+    @property
+    def user_email(self):
+        return self.user.user.email
+    
+    @property
+    def bookings(self):
+        return [booking.id for booking in self.bookings.all()]
+
+    @property
+    def dates(self):
+        date_mapping = {
+            'MON': 0,
+            'TUE': 1,
+            'WED': 2,
+            'THU': 3,
+            'FRI': 4,
+            'SAT': 5,
+            'SUN': 6,
+        }
+        dates = []
+        if self.recurring != 'ALL':
+            target_day = date_mapping[self.recurring]
+            curr_date = self.start_date
+            while curr_date <= self.end_date:
+                if curr_date.weekday() == target_day:
+                    dates.append(curr_date)
+                curr_date += timedelta(days=1)
+        else:
+            curr_date = self.start_date
+            while curr_date <= self.end_date:
+                dates.append(curr_date)
+                curr_date += timedelta(days=1)
+        return dates
+
+
+class Booking2(AbstractBooking):
+    booking_group = models.ForeignKey(BookingGroup, on_delete=models.CASCADE, related_name='bookings', null=True)
+    date = models.DateField()
 
     @property
     def get_clashing_booking_id(self):

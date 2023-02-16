@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import UFacilityUser, Venue, Booking2, Verification
+from .models import UFacilityUser, Venue, Booking2, Verification, BookingGroup
 
 
 class VerificationAdmin(admin.ModelAdmin):
@@ -8,5 +8,6 @@ class VerificationAdmin(admin.ModelAdmin):
 
 admin.site.register(Verification, VerificationAdmin)
 admin.site.register(Booking2)
+admin.site.register(BookingGroup)
 admin.site.register(Venue)
 admin.site.register(UFacilityUser)

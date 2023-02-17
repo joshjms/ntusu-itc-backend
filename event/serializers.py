@@ -51,7 +51,7 @@ class EventOfficerSerializer(serializers.ModelSerializer):
         read_only_fields = ['token', 'added_date']
 
 
-class MatricCheckInSerializer(serializers.Modelserializer):
+class MatricCheckInSerializer(serializers.ModelSerializer):
     events = EventSerializer(many=True, read_only=True)
     class Meta:
         model = MatricCheckIn

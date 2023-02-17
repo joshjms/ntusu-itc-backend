@@ -1,7 +1,7 @@
 from rest_framework import permissions
 from event.models import EventAdmin
 
-class IsEventAdmin(permissions.IsAuthenticated):
+class IsEventAdmin(permissions.BasePermission):
     message = 'You are not an Event Admin.'
     def has_permission(self, request, view):
         try:
@@ -21,7 +21,7 @@ class IsEventCreator(permissions.IsAuthenticated):
         except:
             return False
 
-class IsEventSuperAdmin(permissions.IsAuthenticated):
+class IsEventSuperAdmin(permissions.BasePermission):
     message = 'You are not an Event SuperAdmin.'
     def has_permission(self, request, view):
         try:

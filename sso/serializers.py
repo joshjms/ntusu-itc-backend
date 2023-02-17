@@ -38,11 +38,10 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(read_only=True)
-    email = serializers.CharField(read_only=True)
     class Meta:
         model = User
-        fields = ['username', 'email', 'display_name', 'description',]
+        fields = ['id', 'username', 'email', 'display_name', 'description',]
+        read_only_fields = ['id', 'username', 'email',]
 
 
 class TokenSerializer(serializers.Serializer):

@@ -136,7 +136,6 @@ else:
     ALLOWED_HOSTS += ['0.0.0.0', 'localhost', '127.0.0.1']
 
 if PROD:
-    DEBUG = False
     if os.environ.get('LIVE_DEBUG', 0) == 1:
         DEBUG = True
 
@@ -250,8 +249,8 @@ SWAGGER_SETTINGS = {
 
 SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ["Bearer"],
-    "ACCESS_TOKEN_LIFETIME": datetime.timedelta(days=30),
-    "REFRESH_TOKEN_LIFETIME": datetime.timedelta(days=30),
+    "ACCESS_TOKEN_LIFETIME": datetime.timedelta(minutes=5),
+    "REFRESH_TOKEN_LIFETIME": datetime.timedelta(days=1),
 }
 
 MEDIA_URL_SUMMERNOTE = '/media/'

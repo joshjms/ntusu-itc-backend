@@ -1,5 +1,5 @@
 from rest_framework import permissions
-from event.models import EventAdmin
+from event.models import EventAdmin, EventOfficer
 
 class IsEventAdmin(permissions.BasePermission):
     message = 'You are not an Event Admin.'
@@ -27,5 +27,15 @@ class IsEventSuperAdmin(permissions.BasePermission):
         try:
             event_admin = EventAdmin.objects.get(user=request.user)
             return event_admin.is_superadmin
+        except:
+            return False
+
+class IsEventOfficer(permissions.BasePermission):
+    message = 'You are not an event officer.'
+
+    def has_object_permission(self, request, view, obj):
+        try:
+            event_officer = EventOfficer.objects.get(token=request.GET.get('token', None))
+            return event_officer == obj
         except:
             return False

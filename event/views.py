@@ -13,6 +13,7 @@ from event.permissions import (
     IsEventAdmin, IsEventCreator, IsEventSuperAdmin, IsEventOfficer
 )
 from datetime import date
+from datetime import timedelta
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema 
 from rest_framework import generics
@@ -24,6 +25,17 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth.mixins import LoginRequiredMixin
 from rest_framework.views import APIView
+from django.db.models import Count
+
+import random
+import string
+
+def generate_token(length=8):
+    """
+    Generate a random token of the specified length.
+    """
+    chars = string.ascii_uppercase + string.digits
+    return ''.join(random.choice(chars) for _ in range(length))
 
 class EventListAll(generics.ListAPIView):
     queryset = Event.objects.all()
@@ -113,21 +125,29 @@ class CheckAdminStatus(APIView):
           except EventAdmin.DoesNotExist:
                return Response('regular_user', status=status.HTTP_200_OK)
 
-
-class OfficerTokenView(APIView):
-    def get(self, request, officer_token):
-        event_officer = get_objects_or_404(EventOfficer, token=officer_token)
-        return JsonResponse(event_officer.event.id)
-
 #POST /event/<event_id>/create_officer/ (done)
 class AddEventOfficer(generics.CreateAPIView):
-    querySet = EventOfficer.objects.all()
     serializer_class = EventOfficerSerializer
 
+    def create(self, request, event_id):
+        try:
+            event = Event.objects.get(pk=event_id)
+        except Event.DoesNotExist:
+            return Response({"detail": "Invalid event id"}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.validated_data['token'] = generate_token()
+            serializer.validated_data['event'] = event
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 #GET /event/edit_officer/<officer_token> (done)
-class EventOfficerEdit(generics.ListAPIView):
-    queryset = EventAdmin.objects.all()
-    serializerClass = EventOfficerSerializer
+class EventOfficerEdit(generics.RetrieveUpdateAPIView):
+    queryset = EventOfficer.objects.all()
+    serializer_class = EventOfficerSerializer
+    permission_classes = [IsAuthenticated, IsEventAdmin]
     
 #POST /event/officer_login/  
 class EventOfficerLoginView(APIView):
@@ -150,19 +170,34 @@ class EventInputView(APIView):
             event = Event.objects.get(pk=event_id)
         except Event.DoesNotExist:
             return Response({"detail": "Invalid event id"}, status=status.HTTP_404_NOT_FOUND)
-        if not event.is_open:
+        
+        # Check if the event is open for check-in
+        if not event.is_active:
             return Response({"detail": "This event is not yet open for check in"}, status=status.HTTP_400_BAD_REQUEST)
-        if event.check_in_end_date < date.today():
-            return Response({"detail": "Check in for this event has already ended"}, status=status.HTTP_400_BAD_REQUEST)
+      
+        # Check if the current officer is assigned to an active counter
         event_officer = get_object_or_404(EventOfficer, user=request.user, event=event)
         if not event_officer.is_active:
             return Response({"detail": "You are not currently assigned to any active counter"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if the matric card is valid for the event
+        matric_prefix = matric_card[0]
+        if event.is_undergraduate_only and not matric_prefix == 'U':
+            return Response({"detail": "This event is only open to undergraduate students"}, status=status.HTTP_400_BAD_REQUEST)
+        elif not event.is_postgraduate_allowed and matric_prefix == 'P':
+            return Response({"detail": "This event is not open to postgraduate students"}, status=status.HTTP_400_BAD_REQUEST)
+        elif matric_prefix == 'N':
+            return Response({"detail": "Exchange students are not allowed for this event"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if the matric card has already checked in for the event
         try:
-            matric_check_in = MatricCheckIn.objects.get(event=event, matric_card=matric_card)
-            return Response({"detail": f"Matric card {matric_card} already checked in at counter {matric_check_in.counter}"}, status=status.HTTP_400_BAD_REQUEST)
+            matric_check_in = MatricCheckIn.objects.get(event=event, matric_number=matric_card)
+            return Response({"detail": f"Matric card {matric_card} already checked in at counter {matric_check_in.officer_name}"}, status=status.HTTP_400_BAD_REQUEST)
         except MatricCheckIn.DoesNotExist:
             pass
-        serializer = MatricCheckInSerializer(data={"matric_card": matric_card, "event": event.id, "counter": event_officer.counter})
+        
+        # Save the check-in record
+        serializer = MatricCheckInSerializer(data={"matric_number": matric_card, "event": event.id, "officer_name": event_officer.name})
         if serializer.is_valid():
             serializer.save()
             return Response({"detail": "Matric card successfully checked in"}, status=status.HTTP_201_CREATED)
@@ -172,8 +207,8 @@ class EventInputView(APIView):
 class EventStatistics(APIView):
     def get(self, request, event_id):
         event = Event.objects.get(id=event_id)
-        start_date = event.start_date
-        end_date = event.end_date
+        start_date = event.start_time
+        end_date = event.end_time
         num_days = (end_date - start_date).days + 1
 
         # Get total number of check-ins for the event
@@ -204,7 +239,7 @@ class EventStatistics(APIView):
             })
 
         response_data = {
-            'total_users': event.num_attendees,
+            'total_check_ins': total_check_ins,
             'analytics': analytics
         }
 

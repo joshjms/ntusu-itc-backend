@@ -172,7 +172,7 @@ class UserDetailView(APIView):
     @method_decorator(decorators.ufacility_user_required)
     def put(self, request, user_id, **kwargs):
         ufacilityuser = kwargs['ufacilityuser']
-        if ufacilityuser.user != request.user or not ufacilityuser.is_admin:
+        if ufacilityuser.user != request.user and not ufacilityuser.is_admin:
             return Response('You are not ufacility admin nor the owner of this instance',
                 status=status.HTTP_403_FORBIDDEN)
         serializer = UFacilityUserSerializer(ufacilityuser, data=request.data, partial=True)

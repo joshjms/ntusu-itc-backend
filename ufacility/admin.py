@@ -6,8 +6,12 @@ class VerificationAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'status',)
 
 
+class UFacilityUserAdmin(admin.ModelAdmin):
+    list_display = ('id', '__str__')
+
+
 admin.site.register(Verification, VerificationAdmin)
 admin.site.register(Booking2)
 admin.site.register(BookingGroup)
 admin.site.register(Venue)
-admin.site.register(UFacilityUser)
+admin.site.register(UFacilityUser, UFacilityUserAdmin)

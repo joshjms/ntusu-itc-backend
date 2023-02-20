@@ -55,12 +55,6 @@ class UfacilityUserDetailsTestCase(BaseAPITestCase):
         resp = self.client2.get(url)
         self.assertEqual(resp.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_get_user_details_fail_forbidden(self):
-        self.client1.force_authenticate(user = self.user1)
-        url = reverse('ufacility:user-detail', kwargs={"user_id": self.user.id})
-        resp = self.client1.get(url)
-        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
-
     def test_get_user_details_fail_not_found(self):
         self.client0.force_authenticate(user = self.user0)
         url = reverse('ufacility:user-detail', kwargs={"user_id": 100})

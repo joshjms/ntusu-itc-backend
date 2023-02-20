@@ -22,9 +22,27 @@ from ufacility.permissions import IsAuthenticated, IsUFacilityUser, IsUFacilityA
 from ufacility import decorators, utils
 
 
+class PaginationConfig(PageNumberPagination):
+    page_size = 1
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+
 class BookingGroupView(generics.ListCreateAPIView):
     serializer_class = BookingGroupSerializer
     permission_classes = [IsAuthenticated, IsUFacilityUser]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_fields = {
+        'start_time': ['lt', 'gt'],
+        'end_time': ['lt', 'gt'],
+        'start_date': ['lt', 'gt'],
+        'end_date': ['lt', 'gt'],
+        'venue': ['exact'],
+        'recurring': ['exact'],
+        'attachment': ['isnull'],
+    }
+    ordering_fields = '__all__'
+    pagination_class = PaginationConfig
 
     def get_queryset(self):
         ufacility_user = UFacilityUser.objects.get(user=self.request.user)
@@ -49,12 +67,6 @@ class BookingGroupView(generics.ListCreateAPIView):
             )
 
 
-class PaginationConfig(PageNumberPagination):
-    page_size = 1
-    page_size_query_param = 'page_size'
-    max_page_size = 100
-
-
 class BookingGroupAdminView(generics.ListAPIView):
     queryset = BookingGroup.objects.all()
     serializer_class = BookingGroupSerializer
@@ -67,6 +79,7 @@ class BookingGroupAdminView(generics.ListAPIView):
         'end_date': ['lt', 'gt'],
         'venue': ['exact'],
         'recurring': ['exact'],
+        'attachment': ['isnull'],
     }
     ordering_fields = '__all__'
     pagination_class = PaginationConfig

@@ -39,7 +39,6 @@ class BookingGroupView(generics.ListCreateAPIView):
         'end_date': ['lt', 'gt'],
         'venue': ['exact'],
         'recurring': ['exact'],
-        # 'attachment': ['isnull'],
     }
     ordering_fields = '__all__'
     pagination_class = PaginationConfig
@@ -79,7 +78,6 @@ class BookingGroupAdminView(generics.ListAPIView):
         'end_date': ['lt', 'gt'],
         'venue': ['exact'],
         'recurring': ['exact'],
-        'attachment': ['isnull'],
     }
     ordering_fields = '__all__'
     pagination_class = PaginationConfig

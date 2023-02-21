@@ -196,7 +196,7 @@ ufacility_admin_required = ufacility_user_required + [_ufacility_admin_required]
 ufacility_admin_or_booking_owner_required = ufacility_user_required + [_ufacility_admin_or_booking_owner_required]
 ufacilityuser_decorator = login_required + [
     _get_own_instance_when_id_0(UFacilityUser, UFacilityUserSerializer, 'user_id'),
-    _ufacility_user_required, _ufacility_admin_required]
+    _ufacility_user_required]
 verification_decorator = login_required + [
     _get_own_instance_when_id_0(Verification, VerificationSerializer, 'verification_id'),
     _ufacility_user_required, _ufacility_admin_required]

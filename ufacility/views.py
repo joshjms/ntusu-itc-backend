@@ -1,6 +1,9 @@
+from rest_framework.filters import OrderingFilter
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics, status
+from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Q
 from django.forms.models import model_to_dict
 from django.utils.decorators import method_decorator
@@ -19,9 +22,33 @@ from ufacility.permissions import IsAuthenticated, IsUFacilityUser, IsUFacilityA
 from ufacility import decorators, utils
 
 
+class PaginationConfig(PageNumberPagination):
+    page_size = 1
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+    def get_paginated_response(self, data):
+        return Response({
+            'count': self.page.paginator.count,
+            'total_pages': self.page.paginator.num_pages,
+            'results': data,
+        })
+
+
 class BookingGroupView(generics.ListCreateAPIView):
     serializer_class = BookingGroupSerializer
     permission_classes = [IsAuthenticated, IsUFacilityUser]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_fields = {
+        'start_time': ['lt', 'gt'],
+        'end_time': ['lt', 'gt'],
+        'start_date': ['lt', 'gt'],
+        'end_date': ['lt', 'gt'],
+        'venue': ['exact'],
+        'recurring': ['exact'],
+    }
+    ordering_fields = '__all__'
+    pagination_class = PaginationConfig
 
     def get_queryset(self):
         ufacility_user = UFacilityUser.objects.get(user=self.request.user)
@@ -45,16 +72,30 @@ class BookingGroupView(generics.ListCreateAPIView):
                 }
             )
 
+
 class BookingGroupAdminView(generics.ListAPIView):
     queryset = BookingGroup.objects.all()
     serializer_class = BookingGroupSerializer
     permission_classes = [IsAuthenticated, IsUFacilityAdmin]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_fields = {
+        'start_time': ['lt', 'gt'],
+        'end_time': ['lt', 'gt'],
+        'start_date': ['lt', 'gt'],
+        'end_date': ['lt', 'gt'],
+        'venue': ['exact'],
+        'recurring': ['exact'],
+    }
+    ordering_fields = '__all__'
+    pagination_class = PaginationConfig
+
 
 class BookingGroupDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = BookingGroup.objects.all()
     lookup_field = 'id'
     serializer_class = BookingGroupSerializer
     permission_classes = [IsAuthenticated, IsBookingOwnerOrAdmin, IsPendingBookingOrAdmin]
+
 
 class BookingGroupAcceptView(APIView):
     @method_decorator(decorators.ufacility_admin_required)
@@ -72,6 +113,7 @@ class BookingGroupAcceptView(APIView):
         user = ufacilityuser.user
         utils.send_booking_results_email(user.email, booking_group.venue, booking_group.start_time, booking_group.end_time, booking_group.status)
         return Response({'message': 'Booking(s) accepted.'}, status=status.HTTP_200_OK)
+
 
 class BookingGroupRejectView(APIView):
     @method_decorator(decorators.ufacility_admin_required)
@@ -148,7 +190,7 @@ class UserDetailView(APIView):
     @method_decorator(decorators.ufacility_user_required)
     def put(self, request, user_id, **kwargs):
         ufacilityuser = kwargs['ufacilityuser']
-        if ufacilityuser.user != request.user or not ufacilityuser.is_admin:
+        if ufacilityuser.user != request.user and not ufacilityuser.is_admin:
             return Response('You are not ufacility admin nor the owner of this instance',
                 status=status.HTTP_403_FORBIDDEN)
         serializer = UFacilityUserSerializer(ufacilityuser, data=request.data, partial=True)

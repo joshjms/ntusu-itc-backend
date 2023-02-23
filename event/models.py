@@ -40,17 +40,17 @@ class Event(models.Model):
 
 
 class EventOfficer(models.Model):
-    event = models.ForeignKey(Event, on_delete= models.CASCADE)
+    event = models.ForeignKey(Event, on_delete = models.CASCADE, related_name = "officers")
     added_date = models.DateTimeField(auto_now_add = True)
-    token =  models.CharField(max_length=1000)
+    token =  models.CharField(max_length=100)
     name = models.CharField(max_length=100)
     is_active = models.BooleanField(default=False)
     def __str__(self):
-        return self.name
+        return f"{self.name} - {self.token}"
 
 class MatricCheckIn(models.Model):
     matric_number = models.CharField(max_length=100)
-    event = models.ForeignKey(Event, on_delete = models.CASCADE)
+    event = models.ForeignKey(Event, on_delete = models.CASCADE, related_name ="matric_checked_in" )
     added_date = models.DateTimeField(auto_now_add = True)
     officer_name = models.CharField(max_length=100)
     def __str__(self):

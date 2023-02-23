@@ -7,13 +7,13 @@ from event.views import (EventListAll,
                          AddEventAdmin,
                          AdminUpdate,
                          UserList,
+                         CheckAdminStatus,
                          AddEventOfficer,
                          EventOfficerEdit,
                          EventOfficerLoginView,
                          EventInputView,
                          EventStatistics,
-                         MatricList,
-                         CheckAdminStatus)
+                         MatricList)
 
 app_name = 'event'
 
@@ -28,9 +28,9 @@ urlpatterns = [
     path('manage_admin/get_user_list/', UserList.as_view(), name='admin-get-user-list'),
     path('check_admin_status/', CheckAdminStatus.as_view(), name='check-admin-status'),
     path('event/<int:pk>/create_officer/', AddEventOfficer.as_view(), name="add-event-officer"),
-    path('event/edit_officer/<int:pk>/', EventOfficerEdit.as_view(), name="edit-officer"),
+    path('event/edit_officer/<str:token>/', EventOfficerEdit.as_view(), name="edit-officer"),
     path('event/officer_login/', EventOfficerLoginView.as_view(), name='event-officer-login'),
     path('event/<int:pk>/input/', EventInputView.as_view(), name="event-input-view"),
-    path('event/<int:pk>/statistics/', EventStatistics.as_view(), name="view-event-statistics"),
     path('event/<int:pk>/matric_list/', MatricList.as_view(), name = "event-list-matric"),
+    path('event/<int:pk>/statistics/', EventStatistics.as_view(), name="view-event-statistics"),
 ]

@@ -1,10 +1,6 @@
 from rest_framework import status
 from event.tests.base_test import BaseAPITestCase
 from rest_framework.reverse import reverse
-from sso.models import User
-from event.models import Event, EventAdmin
-from rest_framework.test import APIClient
-import datetime
 
 class AdminUpdateTestCase(BaseAPITestCase):
 

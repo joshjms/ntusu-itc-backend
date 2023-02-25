@@ -6,15 +6,17 @@ class IsAuthenticated(permissions.IsAuthenticated):
     pass
 
 
-class IsUFacilityUser(permissions.BasePermission):
+class IsUFacilityUser(IsAuthenticated):
     message = 'UFacility User Required'
 
     def has_permission(self, request, view):
-        try:
-            UFacilityUser.objects.get(user=request.user)
-            return True
-        except UFacilityUser.DoesNotExist:
-            return False
+        if super().has_permission(request, view):
+            try:
+                UFacilityUser.objects.get(user=request.user)
+                return True
+            except UFacilityUser.DoesNotExist:
+                return False
+        return False
 
 
 class IsUFacilityAdmin(IsUFacilityUser):

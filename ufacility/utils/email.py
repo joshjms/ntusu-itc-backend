@@ -1,6 +1,5 @@
-from datetime import timedelta
 from sso.utils import send_email
-from ufacility.models import UFacilityUser, Booking2
+from ufacility.models import UFacilityUser
 
 
 exco_email = ""
@@ -44,10 +43,3 @@ def send_booking_results_email(email, venue, start, end, status):
             Please contact {exco_email} should you have any enquiries.
             """.format(status=status, exco_email=exco_email)
     send_email(email_subject, email_body, recipients=[email])
-
-def clash_exists(venue, date, start_time, end_time):
-    bookings = Booking2.objects.filter(venue=venue, date=date)
-    for booking in bookings:
-        if start_time <= booking.end_time and end_time >= booking.start_time:
-            return True
-    return False

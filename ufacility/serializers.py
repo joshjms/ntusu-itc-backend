@@ -2,8 +2,8 @@ from rest_framework import serializers, status
 from django.utils import timezone as tz
 from sso.serializers import UserProfileSerializer
 from ufacility.models import Verification, Booking2, Venue, UFacilityUser, BookingGroup
-from ufacility.utils import clash_exists
-from ufacility import utils
+from ufacility.utils.algo import clash_exists
+from ufacility.utils import email
 
 
 class ConflictValidationError(serializers.ValidationError):
@@ -29,7 +29,7 @@ class VerificationSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         validated_data['status'] = 'pending'
-        utils.send_verification_email_to_admins()
+        email.send_verification_email_to_admins()
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
@@ -61,7 +61,7 @@ class BookingSerializer(serializers.ModelSerializer):
         return super().validate(attrs)
     
     def create(self, validated_data):
-        utils.send_booking_email_to_admins()
+        email.send_booking_email_to_admins()
         validated_data['status'] = 'pending'
         return super().create(validated_data)
 
@@ -91,6 +91,40 @@ class BookingGroupSerializer(serializers.ModelSerializer):
     def get_field_names(self, declared_fields, info):
         return super().get_field_names(declared_fields, info) + self.Meta.extra_fields
     
+    def serialize_to_booking(self, date):
+        return {
+            'user': UFacilityUser.objects.get(id=self.data['user']),
+            'venue': Venue.objects.get(id=self.data['venue']),
+            'start_time': self.data['start_time'],
+            'end_time': self.data['end_time'],
+            'purpose': self.data['purpose'],
+            'pax': self.data['pax'],
+            'status': 'pending',
+            'date': date,
+            'booking_group': self.instance,
+        }
+    
+    def accept_booking_group(self):
+        booking_group = self.instance
+        booking_group.status = 'accepted'
+        booking_group.save()
+        for booking in booking_group.bookings.all():
+            booking.status = 'accepted'
+            booking.save()
+        email.send_email_to_security(booking_group.venue, booking_group.start_time, booking_group.end_time)
+        user = booking_group.user.user
+        email.send_booking_results_email(user.email, booking_group.venue, booking_group.start_time, booking_group.end_time, booking_group.status)
+    
+    def reject_booking_group(self):
+        booking_group = self.instance
+        booking_group.status = 'declined'
+        booking_group.save()
+        for booking in booking_group.bookings.all():
+            booking.status = 'declined'
+            booking.save()
+        user = booking_group.user.user
+        email.send_booking_results_email(user.email, booking_group.venue, booking_group.start_time, booking_group.end_time, booking_group.status)
+
     def create(self, validated_data):
         validated_data['status'] = 'pending'
         return super().create(validated_data)

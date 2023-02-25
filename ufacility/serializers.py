@@ -1,4 +1,4 @@
-from rest_framework import serializers, status
+from rest_framework import serializers
 from django.utils import timezone as tz
 from sso.serializers import UserProfileSerializer
 from ufacility.models import Verification, Booking2, Venue, UFacilityUser, BookingGroup
@@ -36,11 +36,9 @@ class VenueSerializer(serializers.ModelSerializer):
 
 
 class BookingPartialSerializer(serializers.ModelSerializer):
-    user = UFacilityUserSerializer(many=False, read_only=True)
-
     class Meta:
         model = Booking2
-        fields = ['user', 'start_time', 'end_time', 'purpose', 'pax', 'status']
+        fields = ['user_email', 'user_cca', 'start_time', 'end_time', 'purpose', 'pax', 'status']
         read_only_fields = ['user', 'status']
 
 

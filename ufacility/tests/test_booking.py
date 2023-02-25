@@ -4,7 +4,7 @@
 # from json import loads
 # from ufacility.models import Booking2, Venue
 # from ufacility.tests.base_test import BaseAPITestCase
-
+# TODO - DELETE THIS
 
 # class UfacilityVerificationsTestCase(BaseAPITestCase):
 #     def setUp(self):

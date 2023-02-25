@@ -6,13 +6,13 @@ from rest_framework.reverse import reverse
 class UfacilityVenuesTestCase(BaseAPITestCase):
     def test_get_venues_success(self):
         self.client1.force_authenticate(user = self.user1)
-        resp = self.client1.get(reverse('ufacility:venues'))
+        resp = self.client1.get(reverse('ufacility:venue-list'))
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
     def test_post_venue_success(self):
         self.client0.force_authenticate(user = self.user0)
         resp = self.client0.post(
-            reverse('ufacility:venues'),
+            reverse('ufacility:venue-list'),
             {
                 'name': 'test venue',
                 'security_email': 'security@e.ntu.edu.sg',
@@ -24,7 +24,7 @@ class UfacilityVenuesTestCase(BaseAPITestCase):
     def test_post_venue_fail_unauthorized(self):
         self.client2.force_authenticate(user = self.user2)
         resp = self.client2.post(
-            reverse('ufacility:venues'),
+            reverse('ufacility:venue-list'),
             {
                 'name': 'test venue',
                 'security_email': 'someemail@e.ntu.edu.sg',
@@ -36,7 +36,7 @@ class UfacilityVenuesTestCase(BaseAPITestCase):
     def test_post_venue_fail_forbidden(self):
         self.client1.force_authenticate(user = self.user1)
         resp = self.client1.post(
-            reverse('ufacility:venues'),
+            reverse('ufacility:venue-list'),
             {
                 'name': 'test venue',
                 'security_email': 'someemail@e.ntu.edu.sg',
@@ -48,7 +48,7 @@ class UfacilityVenuesTestCase(BaseAPITestCase):
     def test_post_venue_fail_bad_request_1(self):
         self.client0.force_authenticate(user = self.user0)
         resp = self.client0.post(
-            reverse('ufacility:venues'),
+            reverse('ufacility:venue-list'),
             {
                 'security_email': 'security@e.ntu.edu.sg'
             },
@@ -59,7 +59,7 @@ class UfacilityVenuesTestCase(BaseAPITestCase):
     def test_post_venue_fail_bad_request_2(self):
         self.client0.force_authenticate(user = self.user0)
         resp = self.client0.post(
-            reverse('ufacility:venues'),
+            reverse('ufacility:venue-list'),
             {
                 'name': 'test venue',
                 'security_email': 'not an email',

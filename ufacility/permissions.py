@@ -1,4 +1,5 @@
 from rest_framework import permissions
+from django.db import models
 from ufacility.models import UFacilityUser
 
 
@@ -28,13 +29,24 @@ class IsUFacilityAdmin(IsUFacilityUser):
         return False
 
 
-class IsInstanceOwnerOrAdmin(IsAuthenticated):
-    message = 'Owner of this Instance or UFacility Admin Required'
+class IsUFacilityInstanceOwnerOrAdmin(IsAuthenticated):
+    message = 'Owner (UFacilityUser) of this Instance or UFacility Admin Required'
 
     def has_object_permission(self, request, view, obj):
         try:
             ufacility_user = UFacilityUser.objects.get(user=request.user)
             return ufacility_user.is_admin or obj.user == ufacility_user
+        except UFacilityUser.DoesNotExist:
+            return False
+
+
+class IsUserInstanceOwnerOrAdmin(IsAuthenticated):
+    message = 'Owner (UFacilityUser) of this Instance or UFacility Admin Required'
+
+    def has_object_permission(self, request, view, obj):
+        try:
+            ufacility_user = UFacilityUser.objects.get(user=request.user)
+            return ufacility_user.is_admin or obj.user == request.user
         except UFacilityUser.DoesNotExist:
             return False
 

@@ -13,12 +13,19 @@ from ufacility.serializers import (
     BookingPartialSerializer,
     BookingGroupSerializer,
 )
-from ufacility.permissions import IsAuthenticated, IsUFacilityUser, IsUFacilityAdmin, IsInstanceOwnerOrAdmin, IsPendingBookingOrAdmin
+from ufacility.permissions import (
+    IsAuthenticated,
+    IsUFacilityUser,
+    IsUFacilityAdmin,
+    IsUFacilityInstanceOwnerOrAdmin,
+    IsUserInstanceOwnerOrAdmin,
+    IsPendingBookingOrAdmin,
+)
 from ufacility.utils import decorators, generics as custom_generics, mixins as custom_mixins
 from sso.models import User
 
 
-# GET, POST /ufacility/booking_group/
+# GET, POST /ufacility/booking_group/ TODO
 class BookingGroupView(custom_mixins.BookingGroupUtilMixin, generics.ListCreateAPIView):
     serializer_class = BookingGroupSerializer
     permission_classes = [IsUFacilityUser]
@@ -35,20 +42,20 @@ class BookingGroupView(custom_mixins.BookingGroupUtilMixin, generics.ListCreateA
                 **serializer.serialize_to_booking(date)
             )
 
-# GET /ufacility/booking_group/admin/
+# GET /ufacility/booking_group/admin/ TODO
 class BookingGroupAdminView(custom_mixins.BookingGroupUtilMixin, generics.ListAPIView):
     queryset = BookingGroup.objects.all()
     serializer_class = BookingGroupSerializer
     permission_classes = [IsUFacilityAdmin]
 
-# PUT, DELETE /ufacility/booking_group/<bookinggroup_id>/
+# PUT, DELETE /ufacility/booking_group/<bookinggroup_id>/ TODO
 class BookingGroupDetailView(custom_generics.UpdateDestroyAPIView):
     queryset = BookingGroup.objects.all()
     serializer_class = BookingGroupSerializer
-    permission_classes = [IsInstanceOwnerOrAdmin, IsPendingBookingOrAdmin]
+    permission_classes = [IsUFacilityInstanceOwnerOrAdmin, IsPendingBookingOrAdmin]
     lookup_url_kwarg = 'bookinggroup_id'
 
-# PUT /ufacility/booking_group/<bookinggroup_id>/accept/
+# PUT /ufacility/booking_group/<bookinggroup_id>/accept/ TODO
 class BookingGroupAcceptView(APIView):
     permission_classes = [IsUFacilityAdmin]
 
@@ -57,7 +64,7 @@ class BookingGroupAcceptView(APIView):
         BookingGroupSerializer(kwargs['booking_group']).accept_booking_group()
         return Response({'message': 'Booking group accepted.'}, status=status.HTTP_200_OK)
 
-# PUT /ufacility/booking_group/<bookinggroup_id>/reject/
+# PUT /ufacility/booking_group/<bookinggroup_id>/reject/ TODO
 class BookingGroupRejectView(APIView):
     permission_classes = [IsUFacilityAdmin]
 
@@ -81,7 +88,7 @@ class CheckStatusView(APIView):
 class UFacilityUserDetailView(generics.RetrieveUpdateAPIView):
     queryset = UFacilityUser.objects.all()
     serializer_class = UFacilityUserSerializer
-    permission_classes = [IsInstanceOwnerOrAdmin]
+    permission_classes = [IsUserInstanceOwnerOrAdmin]
     lookup_url_kwarg = 'user_id'
 
     def get(self, request, *args, **kwargs):
@@ -92,7 +99,7 @@ class UFacilityUserDetailView(generics.RetrieveUpdateAPIView):
             return Response(sr.data)
         return super().get(request, *args, **kwargs)
 
-# GET, POST /verifications/
+# GET, POST /ufacility/verifications/
 class VerificationView(mixins.CreateModelMixin, generics.GenericAPIView):
     queryset = Verification.objects.all()
     serializer_class = VerificationSerializer
@@ -121,7 +128,7 @@ class VerificationDetailView(generics.RetrieveDestroyAPIView):
     lookup_url_kwarg = 'verification_id'
     
     def get_permissions(self):
-        return [IsInstanceOwnerOrAdmin() if self.request.method == 'GET' else IsUFacilityAdmin()]
+        return [IsUFacilityInstanceOwnerOrAdmin() if self.request.method == 'GET' else IsUFacilityAdmin()]
     
     def get(self, request, *args, **kwargs):
         if kwargs[self.lookup_url_kwarg] == 0:
@@ -171,31 +178,17 @@ class BookingHourlyView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, venue_id, date):
-        year, month, day = int(date[:4]), int(date[5:7]), int(date[8:])
         venue = get_object_or_404(Venue, id=venue_id)
-        bookings = Booking2.objects.filter(Q(venue=venue), Q(date__year=year), Q(date__month=month), Q(date__day=day), Q(status='pending') | Q(status='accepted'))
-        serializer = BookingPartialSerializer(bookings, many=True)
-        return Response(serializer.data)
+        try:
+            year, month, day = int(date[:4]), int(date[5:7]), int(date[8:])
+            bookings = Booking2.objects.filter(Q(venue=venue), Q(date__year=year), Q(date__month=month), Q(date__day=day), Q(status='pending') | Q(status='accepted'))
+            serializer = BookingPartialSerializer(bookings, many=True)
+            return Response(serializer.data)
+        except:
+            return Response({'error': 'please adhere to the date format YYYY-MM-DD'}, status=status.HTTP_400_BAD_REQUEST)
 
-# GET, POST /ufacility/venues/
-class VenueView(generics.ListCreateAPIView):
-    queryset = Venue.objects.all()
-    serializer_class = VenueSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_permissions(self):
-        return [IsAuthenticated() if self.request.method == 'GET' else IsUFacilityAdmin()]
-
-# GET, PUT, PATCH /ufacility/venues/<venue_id>/
-class VenueDetailView(generics.RetrieveUpdateAPIView):
-    queryset = Venue.objects.all()
-    serializer_class = VenueSerializer
-    lookup_url_kwarg = 'venue_id'
-
-    def get_permissions(self):
-        return [(IsAuthenticated() if self.request.method == 'GET' else IsUFacilityAdmin())]
-
-
+# GET, POST /ufacility/venue/ (venue-list)
+# GET, PUT, PATCH, DELETE /ufacility/venue/<pk>/ (venue-detail)
 class VenueViewSet(viewsets.ModelViewSet):
     queryset = Venue.objects.all()
     serializer_class = VenueSerializer

@@ -1,10 +1,8 @@
 from rest_framework.response import Response
 from rest_framework import status
-from django.db.models import Model
 from django.shortcuts import get_object_or_404
 from functools import wraps
 from ufacility.models import BookingGroup, UFacilityUser, Verification
-from sso.models import User
 
 
 def pending_booking_group_only(func: callable):
@@ -28,17 +26,3 @@ def no_verification_and_ufacility_account(func: callable):
                 status = status.HTTP_409_CONFLICT)
         return func(request, *args, **kwargs)
     return wrapper
-
-
-def get_own_instance_if_id_0(model: Model):
-    def decorator(func):
-        @wraps(func)
-        def wrapper(self, request, *args, **kwargs):
-            if kwargs[self.lookup_url_kwarg] == 0:
-                user = User.objects.get(id=request.user.id)
-                instance = get_object_or_404(model, user=user)
-                sr = self.get_serializer_class()(instance)
-                return Response(sr.data)
-            return func(self, request, *args, **kwargs)
-        return wrapper
-    return decorator

@@ -38,9 +38,14 @@ class UFacilityUser(AbstractUFacilityUser):
 class Venue(models.Model):
     name = models.CharField(max_length=30, unique=True)
     security_email = models.EmailField(max_length=50)
+    is_send_security_mail = models.BooleanField(default=True)
 
     def __str__(self) -> str:
         return self.name
+
+
+class SecurityEmail(models.Model):
+    email = models.EmailField(max_length=50, unique=True)
 
 
 def get_booking_path(instance, filename):

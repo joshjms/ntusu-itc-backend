@@ -20,7 +20,6 @@ urlpatterns = [
 ]
 
 router = routers.DefaultRouter()
-router.register(
-    'venue', views.VenueViewSet, basename='venue',
-)
+router.register('venue', views.VenueViewSet, basename='venue')
+router.register('email', views.EmailViewSet, basename='email')
 urlpatterns += router.urls

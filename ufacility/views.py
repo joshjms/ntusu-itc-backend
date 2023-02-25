@@ -5,13 +5,14 @@ from django.db.models import Q
 from django.forms.models import model_to_dict
 from django.utils.decorators import method_decorator
 from django.shortcuts import get_object_or_404
-from ufacility.models import Verification, Venue, UFacilityUser, Booking2, BookingGroup
+from ufacility.models import Verification, Venue, UFacilityUser, Booking2, BookingGroup, SecurityEmail
 from ufacility.serializers import (
-    VerificationSerializer,
-    VenueSerializer,
-    UFacilityUserSerializer,
-    BookingPartialSerializer,
     BookingGroupSerializer,
+    UFacilityUserSerializer,
+    VerificationSerializer,
+    BookingPartialSerializer,
+    VenueSerializer,
+    SecurityEmailSerializer,
 )
 from ufacility.permissions import (
     IsAuthenticated,
@@ -195,3 +196,10 @@ class VenueViewSet(viewsets.ModelViewSet):
     
     def get_permissions(self):
         return [(IsAuthenticated() if self.request.method == 'GET' else IsUFacilityAdmin())]
+
+# GET, POST /ufacility/email/ (email-list)
+# GET, PUT, PATCH, DELETE /ufacility/email/<pk>/ (email-detail)
+class EmailViewSet(viewsets.ModelViewSet):
+    queryset = SecurityEmail.objects.all()
+    serializer_class = SecurityEmailSerializer
+    permission_classes = [IsUFacilityAdmin]

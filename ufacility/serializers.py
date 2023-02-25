@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.utils import timezone as tz
 from sso.serializers import UserProfileSerializer
-from ufacility.models import Verification, Booking2, Venue, UFacilityUser, BookingGroup
+from ufacility.models import Verification, Booking2, Venue, UFacilityUser, BookingGroup, SecurityEmail
 from ufacility.utils.algo import clash_exists
 from ufacility.utils import email
 
@@ -32,6 +32,12 @@ class VerificationSerializer(serializers.ModelSerializer):
 class VenueSerializer(serializers.ModelSerializer):
     class Meta:
         model = Venue
+        fields = '__all__'
+
+
+class SecurityEmailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SecurityEmail
         fields = '__all__'
 
 

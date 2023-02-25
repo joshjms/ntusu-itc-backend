@@ -1,5 +1,4 @@
 from rest_framework.filters import OrderingFilter
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics, status
@@ -19,20 +18,7 @@ from ufacility.serializers import (
     BookingGroupSerializer,
 )
 from ufacility.permissions import IsAuthenticated, IsUFacilityUser, IsUFacilityAdmin, IsBookingOwnerOrAdmin, IsPendingBookingOrAdmin
-from ufacility import decorators, utils
-
-
-class PaginationConfig(PageNumberPagination):
-    page_size = 1
-    page_size_query_param = 'page_size'
-    max_page_size = 100
-
-    def get_paginated_response(self, data):
-        return Response({
-            'count': self.page.paginator.count,
-            'total_pages': self.page.paginator.num_pages,
-            'results': data,
-        })
+from ufacility import decorators, pagination, utils
 
 
 class BookingGroupView(generics.ListCreateAPIView):
@@ -48,7 +34,7 @@ class BookingGroupView(generics.ListCreateAPIView):
         'recurring': ['exact'],
     }
     ordering_fields = '__all__'
-    pagination_class = PaginationConfig
+    pagination_class = pagination.PaginationConfig
 
     def get_queryset(self):
         ufacility_user = UFacilityUser.objects.get(user=self.request.user)
@@ -87,7 +73,7 @@ class BookingGroupAdminView(generics.ListAPIView):
         'recurring': ['exact'],
     }
     ordering_fields = '__all__'
-    pagination_class = PaginationConfig
+    pagination_class = pagination.PaginationConfig
 
 
 class BookingGroupDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -334,7 +320,6 @@ class BookingAcceptView(APIView):
         booking.status = 'accepted'
         booking.save()
         utils.send_email_to_security(booking.venue, booking.start_time, booking.end_time)
-        # TODO - send email to ufacilityuser that their booking has been accepted
         ufacilityuser = booking.user
         user = ufacilityuser.user
         utils.send_booking_results_email(user.email, booking.venue, booking.start_time, booking.end_time, booking.status)
@@ -348,12 +333,10 @@ class BookingRejectView(APIView):
         booking = kwargs['booking']
         booking.status = 'declined'
         booking.save()
-        # TODO - send email to ufacilityuser that their booking has been rejected
         ufacilityuser = booking.user
         user = ufacilityuser.user
         utils.send_booking_results_email(user.email, booking.venue, booking.start_time, booking.end_time, booking.status)
         return Response({'message': 'Booking rejected.'}, status=status.HTTP_200_OK)
-
 
 # GET /bookings/<int:venue_id>/<str:date>/
 class BookingHourlyView(APIView):
@@ -364,40 +347,21 @@ class BookingHourlyView(APIView):
         bookings = Booking2.objects.filter(Q(venue=venue), Q(date__year=year), Q(date__month=month), Q(date__day=day), Q(status='pending') | Q(status='accepted'))
         serializer = BookingPartialSerializer(bookings, many=True)
         return Response(serializer.data)
-    '''
-        TODO
-
-        Given a venue id and a date,
-        return for each hour,
-        if that venue in that particular date (YYYY-MM-DD),
-        is booked / soft-chopped (someone created booking but not confirmed) / rejected,
-        and who booked / soft-chopped if there are any
-        (basically all bookings that are in that book that venue in this date and hour)
-    '''
-
 
 # GET, POST /venues/
-class VenueView(APIView):
-    @method_decorator(decorators.login_required)
-    def get(self, request, **kwargs):
-        venues = Venue.objects.all()
-        serializer = VenueSerializer(venues, many=True)
-        return Response(serializer.data)
+class VenueView(generics.ListCreateAPIView):
+    queryset = Venue.objects.all()
+    serializer_class = VenueSerializer
+    permission_classes = [IsAuthenticated]
 
-    @method_decorator(decorators.ufacility_admin_required)
-    def post(self, request, **kwargs):
-        serializer = VenueSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+    def get_permissions(self):
+        return [IsAuthenticated() if self.request.method == 'GET' else IsUFacilityAdmin()]
 
+# GET, PUT, PATCH /venues/<venue_id>/
+class VenueDetailView(generics.RetrieveUpdateAPIView):
+    queryset = Venue.objects.all()
+    serializer_class = VenueSerializer
+    lookup_url_kwarg = 'venue_id'
 
-# PUT /venues/<venue_id>/
-class VenueDetailView(APIView):
-    @method_decorator(decorators.ufacility_admin_required)
-    def put(self, request, venue_id, **kwargs):
-        venue = get_object_or_404(Venue, id=venue_id)
-        serializer = VenueSerializer(venue, data=request.data, partial=True)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data)
+    def get_permissions(self):
+        return [(IsAuthenticated() if self.request.method == 'GET' else IsUFacilityAdmin())]

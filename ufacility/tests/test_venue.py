@@ -25,15 +25,23 @@ class UfacilityVenuesTestCase(BaseAPITestCase):
         self.client2.force_authenticate(user = self.user2)
         resp = self.client2.post(
             reverse('ufacility:venues'),
-            {}
+            {
+                'name': 'test venue',
+                'security_email': 'someemail@e.ntu.edu.sg',
+            },
+            format = 'json'
         )
-        self.assertEqual(resp.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_post_venue_fail_forbidden(self):
         self.client1.force_authenticate(user = self.user1)
         resp = self.client1.post(
             reverse('ufacility:venues'),
-            {}
+            {
+                'name': 'test venue',
+                'security_email': 'someemail@e.ntu.edu.sg',
+            },
+            format = 'json'
         )
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 

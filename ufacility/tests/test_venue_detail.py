@@ -46,7 +46,7 @@ class UfacilityVerificationDetailsTestCase(BaseAPITestCase):
         self.client2.force_authenticate(user = self.user2)
         url = reverse('ufacility:venue-detail', kwargs={'venue_id': 1})
         response = self.client2.put(url)
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
     
     def test_put_venue_fail_forbidden(self):
         self.client1.force_authenticate(user = self.user1)

@@ -53,7 +53,7 @@ class UfacilityUserDetailsTestCase(BaseAPITestCase):
         self.client2.force_authenticate(user = self.user2)
         url = reverse('ufacility:user-detail', kwargs={"user_id": self.user.id})
         resp = self.client2.get(url)
-        self.assertEqual(resp.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_get_user_details_fail_not_found(self):
         self.client0.force_authenticate(user = self.user0)

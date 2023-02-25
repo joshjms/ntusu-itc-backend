@@ -28,8 +28,8 @@ class IsUFacilityAdmin(IsUFacilityUser):
         return False
 
 
-class IsBookingOwnerOrAdmin(permissions.BasePermission):
-    message = 'Creator of this Booking or UFacility Admin Required'
+class IsInstanceOwnerOrAdmin(IsAuthenticated):
+    message = 'Owner of this Instance or UFacility Admin Required'
 
     def has_object_permission(self, request, view, obj):
         try:

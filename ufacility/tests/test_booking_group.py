@@ -84,6 +84,9 @@ class UfacilityVerificationsTestCase(BaseAPITestCase):
         resp_json = loads(resp.content.decode('utf-8'))
         print(resp_json)
     
+    def test_get_bookings_groups_success_filter(self):
+        pass
+    
     # def test_get_booking_groups_all
     
     # def test_get_bookings_success_all(self):

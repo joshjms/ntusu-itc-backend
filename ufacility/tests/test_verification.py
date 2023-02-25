@@ -38,6 +38,7 @@ class UfacilityVerificationsTestCase(BaseAPITestCase):
             },
             format = 'json',
         )
+        # print(resp)
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         self.assertEqual(resp.data['cca'], 'su')
         self.assertEqual(resp.data['hongen_name'], 'bc')
@@ -171,10 +172,6 @@ class UfacilityVerificationsTestCase(BaseAPITestCase):
         self.assertEqual(len(resp_json), 0)
 
     def test_get_verifications_fail_unauthorized(self):
-        self.client2.force_authenticate(user = self.user2)
-        resp1 = self.client2.get(reverse('ufacility:verifications'))
-        self.assertEqual(resp1.status_code, status.HTTP_401_UNAUTHORIZED)
-
         resp2 = self.client3.get(reverse('ufacility:verifications'))
         self.assertEqual(resp2.status_code, status.HTTP_401_UNAUTHORIZED)
 
@@ -182,3 +179,7 @@ class UfacilityVerificationsTestCase(BaseAPITestCase):
         self.client1.force_authenticate(user = self.user1)
         resp = self.client1.get(reverse('ufacility:verifications'))
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+
+        self.client2.force_authenticate(user = self.user2)
+        resp1 = self.client2.get(reverse('ufacility:verifications'))
+        self.assertEqual(resp1.status_code, status.HTTP_403_FORBIDDEN)

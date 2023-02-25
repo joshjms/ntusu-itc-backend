@@ -6,10 +6,6 @@ from ufacility.utils.algo import clash_exists
 from ufacility.utils import email
 
 
-class ConflictValidationError(serializers.ValidationError):
-    status_code = status.HTTP_409_CONFLICT
-
-
 class UFacilityUserSerializer(serializers.ModelSerializer):
     user = UserProfileSerializer(many=False, read_only=True)
     
@@ -32,42 +28,11 @@ class VerificationSerializer(serializers.ModelSerializer):
         email.send_verification_email_to_admins()
         return super().create(validated_data)
 
-    def update(self, instance, validated_data):
-        instance.cca = validated_data.get("cca", instance.cca)
-        instance.hongen_name = validated_data.get("hongen_name", instance.hongen_name)
-        instance.hongen_phone_number = validated_data.get("hongen_phone_number", instance.hongen_phone_number)
-        instance.status = validated_data.get("status", instance.status)
-        instance.save()
-        return instance
-
 
 class VenueSerializer(serializers.ModelSerializer):
     class Meta:
         model = Venue
         fields = '__all__'
-
-
-class BookingSerializer(serializers.ModelSerializer):
-    user = UFacilityUserSerializer(many=False, read_only=True)
-
-    class Meta:
-        model = Booking2
-        fields = '__all__'
-        read_only_fields = ['id', 'user', 'status', 'get_clashing_booking_id']
-    
-    def validate(self, attrs):
-        if clash_exists(attrs['venue'].id, attrs['date'], attrs['start_time'], attrs['end_time']):
-            raise ConflictValidationError('Booking clashes with another accepted booking')
-        return super().validate(attrs)
-    
-    def create(self, validated_data):
-        email.send_booking_email_to_admins()
-        validated_data['status'] = 'pending'
-        return super().create(validated_data)
-
-
-class BookingReadSerializer(BookingSerializer):
-    venue = VenueSerializer(many=False, read_only=True)
 
 
 class BookingPartialSerializer(serializers.ModelSerializer):

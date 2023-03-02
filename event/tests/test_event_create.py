@@ -15,8 +15,15 @@ class EventCreateTestCase(BaseAPITestCase):
                 "name" : "test event",
                 "allow_non_undergraduate" : False,
                 "allow_exchange_student" : False,
+                "is_active": True,
                 "start_time" : datetime.datetime(2023, 1, 22, tzinfo=datetime.timezone.utc),
                 "end_time" : datetime.datetime(2023, 1, 23, tzinfo=datetime.timezone.utc),
+                "officers": [
+                    {
+                    "name": "Bob",
+                    "is_active": True
+                    }
+                ]
             },
             format = 'json',
         )
@@ -26,6 +33,8 @@ class EventCreateTestCase(BaseAPITestCase):
         self.assertEqual(resp.data["allow_exchange_student"], False)
         self.assertEqual(resp.data["start_time"], "2023-01-22 08:00:00")
         self.assertEqual(resp.data["end_time"], "2023-01-23 08:00:00")
+        self.assertEqual(resp.data["officers"][0]["name"], "Bob")
+        self.assertEqual(resp.data["officers"][0]["is_active"], True)
         self.assertEqual(EventAdmin.objects.filter(pk=resp.data["event_admin"])[0], self.eventadmin1)
 
     def test_create_event_fail(self):
@@ -37,6 +46,7 @@ class EventCreateTestCase(BaseAPITestCase):
                 "name" : "test event",
                 "allow_non_undergraduate" : False,
                 "allow_exchange_student" : False,
+                "is_active": True,
                 "start_time" : datetime.datetime(2023, 1, 22, tzinfo=datetime.timezone.utc),
                 "end_time" : datetime.datetime(2023, 1, 23, tzinfo=datetime.timezone.utc),
             },

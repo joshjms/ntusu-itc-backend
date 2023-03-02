@@ -11,7 +11,7 @@ class EventAdmin(models.Model):
 class Event(models.Model):
     name = models.CharField(max_length=100)
     added_date = models.DateTimeField(auto_now_add=True)
-    _is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
     allow_non_undergraduate = models.BooleanField(default=True)
     allow_exchange_student = models.BooleanField(default=True)
     event_admin = models.ForeignKey(EventAdmin, on_delete=models.CASCADE, related_name="events")
@@ -24,7 +24,7 @@ class Event(models.Model):
         return self.name
     
     @property
-    def is_active(self) -> bool:
+    def check_is_active(self) -> bool:
         current_time = tz.now()
 
         if self.start_time <= current_time and self.auto_start == True:

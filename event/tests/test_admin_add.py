@@ -26,8 +26,8 @@ class AddEventAdminTestCase(BaseAPITestCase):
             }
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-        assert(resp.data['user']['username']=='newtest1')
-        assert(resp.data['is_superadmin']==False)
+        self.assertEqual(resp.data['user']['username'], 'newtest1')
+        self.assertEqual(resp.data['is_superadmin'], False)
 
     def test_add_admins_fail(self):
         # Try adding the event admin as non event superadmin

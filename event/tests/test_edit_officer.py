@@ -60,8 +60,8 @@ class EditOfficerTestCase(BaseAPITestCase):
         # test get
         resp = self.newclient1.get(url)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        assert(resp.data['name']=='Bob')
-        assert(resp.data['is_active']==True)
+        self.assertEqual(resp.data['name'], 'Bob')
+        self.assertEqual(resp.data['is_active'], True)
 
         # test put
         resp = self.newclient1.put(url,
@@ -71,8 +71,8 @@ class EditOfficerTestCase(BaseAPITestCase):
             }
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        assert(resp.data['name']=='Alice')
-        assert(resp.data['is_active']==False)
+        self.assertEqual(resp.data['name'], 'Alice')
+        self.assertEqual(resp.data['is_active'], False)
 
         # test delete
         resp = self.newclient1.delete(url)

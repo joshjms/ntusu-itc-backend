@@ -12,8 +12,8 @@ class AdminUpdateTestCase(BaseAPITestCase):
         url = reverse('event:admin-update',args=(self.eventadmin1.pk,))
         resp = self.client0.get(url)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        assert(resp.data['user']['username']=='test1')
-        assert(resp.data['is_superadmin']==False)
+        self.assertEqual(resp.data['user']['username'], 'test1')
+        self.assertEqual(resp.data['is_superadmin'], False)
 
         # Try put event admin (test1)
         url = reverse('event:admin-update',args=(self.eventadmin1.pk,))
@@ -23,8 +23,8 @@ class AdminUpdateTestCase(BaseAPITestCase):
             }
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        assert(resp.data['user']['username']=='test1')
-        assert(resp.data['is_superadmin']==True)
+        self.assertEqual(resp.data['user']['username'], 'test1')
+        self.assertEqual(resp.data['is_superadmin'], True)
 
          # Try delete event admin (user1 becomes regular user)
         url = reverse('event:admin-update',args=(self.eventadmin1.pk,))

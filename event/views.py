@@ -181,7 +181,7 @@ class EventInputView(generics.CreateAPIView):
             token = serializer.validated_data["token"]
             event_officer = EventOfficer.objects.get(token=token)
             if not event_officer.is_active:
-                return Response({"detail": "You are not currently assigned to any active counter"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+                return Response({"detail": "You are not currently assigned to any active counter"}, status=status.HTTP_400_BAD_REQUEST)
         except EventOfficer.DoesNotExist:
             return Response({"detail": "Invalid token"}, status=status.HTTP_404_NOT_FOUND)
 

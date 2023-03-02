@@ -162,6 +162,6 @@ class EventInputViewTestCase(BaseAPITestCase):
                 "matric_number": "U1232312X",
             }
         )
-        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
         expected_error_msg = "You are not currently assigned to any active counter"
         self.assertEqual(resp.data['detail'], expected_error_msg)

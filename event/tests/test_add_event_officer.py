@@ -55,9 +55,9 @@ class AddEventOfficerTestCase(BaseAPITestCase):
             }
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-        assert(resp.data['name']=='Bob')
-        assert(resp.data['is_active']==True)
-        assert(resp.data['event']==self.event1.id)
+        self.assertEqual(resp.data['name'], 'Bob')
+        self.assertEqual(resp.data['is_active'], True)
+        self.assertEqual(resp.data['event'], self.event1.id)
 
     def test_add_officer_fail(self):
         # Try adding event admins as non event creator

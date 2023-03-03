@@ -10,10 +10,10 @@ class AdminListTestCase(BaseAPITestCase):
         url = reverse('event:admin-list')
         resp = self.client0.get(url)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        assert(resp.data[0]['user']['username']=='test0')
-        assert(resp.data[0]['is_superadmin']==True)
-        assert(resp.data[1]['user']['username']=='test1')
-        assert(resp.data[1]['is_superadmin']==False)
+        self.assertEqual(resp.data[0]['user']['username'], 'test0')
+        self.assertEqual(resp.data[0]['is_superadmin'], True)
+        self.assertEqual(resp.data[1]['user']['username'], 'test1')
+        self.assertEqual(resp.data[1]['is_superadmin'], False)
 
     def test_get_admins_fail(self):
         # Try viewing all the event admin as non event superadmin

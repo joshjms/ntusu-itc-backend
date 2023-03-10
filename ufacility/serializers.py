@@ -6,6 +6,11 @@ from ufacility.utils.algo import clash_exists
 from ufacility.utils import email
 
 
+class BookingSerializer(serializers.ModelSerializer): # TODO - delete this later
+    class Meta:
+        model = Booking2
+        fields = '__all__'
+
 class UFacilityUserSerializer(serializers.ModelSerializer):
     user = UserProfileSerializer(many=False, read_only=True)
     

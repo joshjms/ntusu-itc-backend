@@ -22,7 +22,7 @@ def no_verification_and_ufacility_account(func: callable):
         requesting_ufacilityuser = UFacilityUser.objects.filter(user=request.user).first()
         verification = Verification.objects.filter(user=request.user).first()
         if verification != None or requesting_ufacilityuser != None:
-            return Response({"message": "User already has a verification or a UFacility account."},
+            return Response({'error': 'User already has a verification or a UFacility account.'},
                 status = status.HTTP_409_CONFLICT)
         return func(request, *args, **kwargs)
     return wrapper

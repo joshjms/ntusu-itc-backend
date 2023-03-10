@@ -42,7 +42,7 @@ class MatricListSerializer(serializers.ModelSerializer):
 class EventSerializer(serializers.ModelSerializer):
     start_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S')
     end_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S')
-    officers = EventOfficerSerializer(many=True, read_only=True)
+    officers = EventOfficerSerializer(many=True)
     matric_checked_in = MatricListSerializer(many=True, read_only=True)
     class Meta:
         model = Event
@@ -61,6 +61,34 @@ class EventSerializer(serializers.ModelSerializer):
         read_only_fields = ['event_admin', 
                             'auto_start', 
                             'auto_end']
+
+    def create(self, validated_data):
+        curr_instance = super().create(validated_data)
+        for officer in validated_data.get('officers', []):
+            serializer = EventOfficerSerializer(data=officer)
+            serializer.is_valid(raise_exception=True)
+            serializer.save(event=curr_instance)
+        return curr_instance
+        
+
+        kwargs = {}
+        officer_list = None
+        for attr in validated_data.keys():
+            val = validated_data.get(attr)
+            if val != None:
+                if attr == 'officers':
+                    officer_list = val
+                else:
+                    kwargs[attr] = val
+        try:
+            event = Event.objects.create(**kwargs)
+        except: raise Exception("JSON Format is incorrect.")
+        if officer_list != None:
+            for officer in officer_list:
+                serializer = EventOfficerSerializer(data=officer)
+                serializer.is_valid(raise_exception=True)
+                serializer.save(event=event)
+        return event
 
 class MatricCheckInSerializer(serializers.Serializer):
     matric_number = serializers.CharField(required=True, allow_blank=False)

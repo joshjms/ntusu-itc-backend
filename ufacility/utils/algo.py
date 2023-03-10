@@ -1,4 +1,4 @@
-from ufacility.models import Booking2
+from ufacility.models import Booking2, BookingGroup
 
 
 def clash_exists(venue, date, start_time, end_time):
@@ -7,3 +7,11 @@ def clash_exists(venue, date, start_time, end_time):
         if start_time <= booking.end_time and end_time >= booking.start_time:
             return True
     return False
+
+
+def get_booking_group_clashes(BookingGroup: BookingGroup):
+    pass
+    '''
+        TODO
+        Given a BookingGroup instance, determine clash or not.
+    '''

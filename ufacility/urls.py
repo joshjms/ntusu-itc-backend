@@ -5,6 +5,9 @@ from . import views
 
 app_name = 'ufacility'
 urlpatterns = [
+    # TODO - deprecate this later
+    path('bookings/', views.BookingView.as_view(), name='booking'),
+
     path('booking_group/', views.BookingGroupView.as_view(), name='booking-group'),
     path('booking_group/admin/', views.BookingGroupAdminView.as_view(), name='booking-group-admin'),
     path('booking_group/<int:bookinggroup_id>/', views.BookingGroupDetailView.as_view(), name='booking-group-detail'),

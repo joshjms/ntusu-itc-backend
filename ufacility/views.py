@@ -13,6 +13,7 @@ from ufacility.serializers import (
     BookingPartialSerializer,
     VenueSerializer,
     SecurityEmailSerializer,
+    BookingSerializer,
 )
 from ufacility.permissions import (
     IsAuthenticated,
@@ -26,6 +27,10 @@ from ufacility.utils import decorators, generics as custom_generics, mixins as c
 from sso.models import User
 
 
+class BookingView(generics.ListAPIView): # TEMPORARY - delete this later
+    queryset = Booking2.objects.all()
+    serializer_class = BookingSerializer
+
 # GET, POST /ufacility/booking_group/ TODO
 class BookingGroupView(custom_mixins.BookingGroupUtilMixin, generics.ListCreateAPIView):
     serializer_class = BookingGroupSerializer
@@ -35,13 +40,11 @@ class BookingGroupView(custom_mixins.BookingGroupUtilMixin, generics.ListCreateA
         ufacility_user = UFacilityUser.objects.get(user=self.request.user)
         return BookingGroup.objects.filter(user=ufacility_user).order_by('id')
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer: BookingGroupSerializer):
         ufacility_user = get_object_or_404(UFacilityUser, user=self.request.user)
         booking_group = serializer.save(user=ufacility_user)
         for date in booking_group.dates:
-            Booking2.objects.create(
-                **serializer.serialize_to_booking(date)
-            )
+            Booking2.objects.create(**serializer.serialize_to_booking(date))
 
 # GET /ufacility/booking_group/admin/ TODO
 class BookingGroupAdminView(custom_mixins.BookingGroupUtilMixin, generics.ListAPIView):

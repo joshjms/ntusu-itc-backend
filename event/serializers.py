@@ -48,7 +48,8 @@ class EventSerializer(serializers.ModelSerializer):
         model = Event
         fields = ['id',
                   'name', 
-                  'is_active', 
+                  'is_active',
+                  'check_is_active',
                   'allow_non_undergraduate', 
                   'allow_exchange_student',
                   'event_admin',
@@ -58,19 +59,13 @@ class EventSerializer(serializers.ModelSerializer):
                   'auto_end',
                   'officers',
                   'matric_checked_in']
-        read_only_fields = ['event_admin', 
+        read_only_fields = ['id',
+                            'event_admin', 
                             'auto_start', 
-                            'auto_end']
+                            'auto_end',
+                            'check_is_active']
 
     def create(self, validated_data):
-        curr_instance = super().create(validated_data)
-        for officer in validated_data.get('officers', []):
-            serializer = EventOfficerSerializer(data=officer)
-            serializer.is_valid(raise_exception=True)
-            serializer.save(event=curr_instance)
-        return curr_instance
-        
-
         kwargs = {}
         officer_list = None
         for attr in validated_data.keys():

@@ -9,7 +9,7 @@ class UfacilityVerificationsTestCase(BaseAPITestCase):
     def test_post_verification_success(self):
         self.client2.force_authenticate(user = self.user2)
         resp = self.client2.post(
-            reverse('ufacility:verifications'), 
+            reverse('ufacility:verification'), 
             {
                 'cca': 'ntusu_itc',
                 'hongen_name': 'bc',
@@ -23,14 +23,13 @@ class UfacilityVerificationsTestCase(BaseAPITestCase):
         self.assertEqual(resp.data['hongen_phone_number'], '61235874')
         self.assertEqual(resp.data['status'], 'pending')
         self.assertEqual(resp.data['user']['id'], self.user2.id)
-        # self.assertEqual(resp.data['id'], 1) TODO
         self.assertEqual(Verification.objects.all().count(), 1)
 
     def test_post_verification_fail_duplicate_verification(self):
-        # First time success
+        # first time success
         self.client2.force_authenticate(user = self.user2)
         resp = self.client2.post(
-            reverse('ufacility:verifications'), 
+            reverse('ufacility:verification'), 
             {
                 'cca': 'su',
                 'hongen_name': 'bc',
@@ -44,9 +43,9 @@ class UfacilityVerificationsTestCase(BaseAPITestCase):
         self.assertEqual(resp.data['hongen_phone_number'], '91235874')
         self.assertEqual(resp.data['status'], 'pending')
 
-        # Second time fail
+        # second time fail
         resp = self.client2.post(
-            reverse('ufacility:verifications'), 
+            reverse('ufacility:verification'), 
             {
                 'cca': 'su',
                 'hongen_name': 'bc',
@@ -59,7 +58,7 @@ class UfacilityVerificationsTestCase(BaseAPITestCase):
     def test_post_verification_fail_existing_user(self):
         self.client1.force_authenticate(user = self.user1)
         resp = self.client1.post(
-            reverse('ufacility:verifications'),
+            reverse('ufacility:verification'),
             {
                 'cca': 'example_cca',
                 'hongen_name': 'example_hongen_name',
@@ -74,7 +73,7 @@ class UfacilityVerificationsTestCase(BaseAPITestCase):
 
         # missing fields
         resp1 = self.client2.post(
-            reverse('ufacility:verifications'), 
+            reverse('ufacility:verification'), 
             {
                 'cca': 'su',
             },
@@ -84,7 +83,7 @@ class UfacilityVerificationsTestCase(BaseAPITestCase):
 
         # invalid phone number (not sg phone num)
         resp2 = self.client2.post(
-            reverse('ufacility:verifications'), 
+            reverse('ufacility:verification'), 
             {
                 'cca': 'su',
                 'hongen_name': 'some name',
@@ -96,7 +95,7 @@ class UfacilityVerificationsTestCase(BaseAPITestCase):
 
         # name too long (name and cca only max 30 chars)
         resp3 = self.client2.post(
-            reverse('ufacility:verifications'), 
+            reverse('ufacility:verification'), 
             {
                 'cca': 'su',
                 'hongen_name': 'some string longer than 30 chars is unacceptable',
@@ -108,7 +107,7 @@ class UfacilityVerificationsTestCase(BaseAPITestCase):
     
     def test_post_fail_unauthorized(self):
         resp = self.client3.post(
-            reverse('ufacility:verifications'), 
+            reverse('ufacility:verification'), 
             {
                 'cca': 'su',
                 'hongen_name': 'joshua',
@@ -127,7 +126,7 @@ class UfacilityVerificationsTestCase(BaseAPITestCase):
             status='pending'
         )
         self.client0.force_authenticate(user = self.user0)
-        resp = self.client0.get(reverse('ufacility:verifications'))
+        resp = self.client0.get(reverse('ufacility:verification'))
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         resp_json = loads(resp.content.decode('utf-8'))
         self.assertEqual(len(resp_json), 1)
@@ -155,7 +154,7 @@ class UfacilityVerificationsTestCase(BaseAPITestCase):
             status='pending'
         )
         self.client0.force_authenticate(user = self.user0)
-        resp = self.client0.get(reverse('ufacility:verifications'), {
+        resp = self.client0.get(reverse('ufacility:verification'), {
             'status': 'declined-pending'
         })
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -163,7 +162,7 @@ class UfacilityVerificationsTestCase(BaseAPITestCase):
         self.assertEqual(len(resp_json), 2)
         self.assertEqual(resp_json[0]['id'], v1.id)
         self.assertEqual(resp_json[1]['id'], v3.id)
-        resp = self.client0.get(reverse('ufacility:verifications'), {
+        resp = self.client0.get(reverse('ufacility:verification'), {
             'status': 'declined'
         })
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -171,14 +170,14 @@ class UfacilityVerificationsTestCase(BaseAPITestCase):
         self.assertEqual(len(resp_json), 0)
 
     def test_get_verifications_fail_unauthorized(self):
-        self.client2.force_authenticate(user = self.user2)
-        resp1 = self.client2.get(reverse('ufacility:verifications'))
-        self.assertEqual(resp1.status_code, status.HTTP_401_UNAUTHORIZED)
-
-        resp2 = self.client3.get(reverse('ufacility:verifications'))
+        resp2 = self.client3.get(reverse('ufacility:verification'))
         self.assertEqual(resp2.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_get_verifications_fail_forbidden(self):
         self.client1.force_authenticate(user = self.user1)
-        resp = self.client1.get(reverse('ufacility:verifications'))
+        resp = self.client1.get(reverse('ufacility:verification'))
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+
+        self.client2.force_authenticate(user = self.user2)
+        resp1 = self.client2.get(reverse('ufacility:verification'))
+        self.assertEqual(resp1.status_code, status.HTTP_403_FORBIDDEN)

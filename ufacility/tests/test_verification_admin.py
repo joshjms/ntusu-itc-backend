@@ -8,8 +8,8 @@ class UfacilityVerificationAdminTestCase(BaseAPITestCase):
     def setUp(self):
         super().setUp()
         self.client2.force_authenticate(user = self.user2)
-        self.client2.post(
-            reverse('ufacility:verifications'), 
+        resp = self.client2.post(
+            reverse('ufacility:verification'), 
             {
                 'cca': 'ntusu_itc_trial',
                 'hongen_name': 'bc',
@@ -17,80 +17,72 @@ class UfacilityVerificationAdminTestCase(BaseAPITestCase):
             },
             format = 'json',
         )
+        self.verification_sample_id = resp.data['id']
     
     def test_put_verification_accept(self):
         # accept verification for first time
         self.client0.force_authenticate(user = self.user0)
         response = self.client0.put(
-            reverse('ufacility:verification-accept', args=(1,))
+            reverse('ufacility:verification-accept', args=(self.verification_sample_id,))
         )
-        # TODO
-        # self.assertEqual(response.status_code, 200) 
-        # self.assertEqual(response.data['message'], 'Verification accepted.')
+        self.assertEqual(response.status_code, 200) 
+        self.assertEqual(response.data['message'], 'Verification accepted.')
 
-        # TODO
         # ufacilityuser model should be created automatically, status becomes accepted
-        # verification = Verification.objects.get(id=1)
-        # self.assertEqual(verification.status, 'accepted')
-        # ufacilityuser = UFacilityUser.objects.get(user=verification.user)
-        # self.assertEqual(ufacilityuser.cca, 'ntusu_itc_trial')
-
-        # TODO
+        verification = Verification.objects.get(id=self.verification_sample_id)
+        self.assertEqual(verification.status, 'accepted')
+        ufacilityuser = UFacilityUser.objects.get(user=verification.user)
+        self.assertEqual(ufacilityuser.cca, 'ntusu_itc_trial')
+        
         # accept verification for second time: display conflict
-        # response = self.client0.put(
-        #     reverse('ufacility:verification-accept', args=(1,))
-        # )
-        # self.assertEqual(response.status_code, 409)
+        response = self.client0.put(
+            reverse('ufacility:verification-accept', args=(self.verification_sample_id,))
+        )
+        self.assertEqual(response.status_code, 409)
 
-        # TODO
         # revoke access
-        # response = self.client0.put(
-        #     reverse('ufacility:verification-reject', args=(1,))
-        # )
-        # self.assertEqual(response.status_code, 200)
-        # self.assertEqual(response.data['message'], 'Access revoked.')
+        response = self.client0.put(
+            reverse('ufacility:verification-reject', args=(self.verification_sample_id,))
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['message'], 'Access revoked.')
 
         # make sure no related ufacility user model
-        # ufacilityuser_count = UFacilityUser.objects.filter(user=verification.user).count()
-        # self.assertEqual(ufacilityuser_count, 0)
+        ufacilityuser_count = UFacilityUser.objects.filter(user=verification.user).count()
+        self.assertEqual(ufacilityuser_count, 0)
     
     def test_put_verification_reject(self):
         # reject verification
         self.client0.force_authenticate(user = self.user0)
         response = self.client0.put(
-            reverse('ufacility:verification-reject', args=(1,))
+            reverse('ufacility:verification-reject', args=(self.verification_sample_id,))
         )
-        # TODO
-        # self.assertEqual(response.status_code, 200)
-        # self.assertEqual(response.data['message'], 'Verification rejected.')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['message'], 'Verification rejected.')
 
-        # TODO
         # status should be rejected
-        # verification = Verification.objects.get(id=1)
-        # self.assertEqual(verification.status, 'declined')
+        verification = Verification.objects.get(id=self.verification_sample_id)
+        self.assertEqual(verification.status, 'declined')
         
-        # TODO
         # second time, display conflict
-        # response = self.client0.put(
-        #     reverse('ufacility:verification-reject', args=(1,))
-        # )
-        # self.assertEqual(response.status_code, 409)
+        response = self.client0.put(
+            reverse('ufacility:verification-reject', args=(self.verification_sample_id,))
+        )
+        self.assertEqual(response.status_code, 409)
 
-        # TODO
         # accept after rejection is possible
-        # self.client0.force_authenticate(user = self.user0)
-        # response = self.client0.put(
-        #     reverse('ufacility:verification-accept', args=(1,))
-        # )
-        # self.assertEqual(response.status_code, 200)
-        # self.assertEqual(response.data['message'], 'Verification accepted.')
+        self.client0.force_authenticate(user = self.user0)
+        response = self.client0.put(
+            reverse('ufacility:verification-accept', args=(self.verification_sample_id,))
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['message'], 'Verification accepted.')
 
-        # TODO
         # ufacilityuser model should be created automatically, status becomes accepted
-        # verification = Verification.objects.get(id=1)
-        # self.assertEqual(verification.status, 'accepted')
-        # ufacilityuser = UFacilityUser.objects.get(user=verification.user)
-        # self.assertEqual(ufacilityuser.cca, 'ntusu_itc_trial')
+        verification = Verification.objects.get(id=self.verification_sample_id)
+        self.assertEqual(verification.status, 'accepted')
+        ufacilityuser = UFacilityUser.objects.get(user=verification.user)
+        self.assertEqual(ufacilityuser.cca, 'ntusu_itc_trial')
 
     def test_put_verification_accept_reject_fail_forbidden(self):
         self.client1.force_authenticate(user = self.user1)

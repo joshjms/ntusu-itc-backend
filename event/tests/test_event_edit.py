@@ -53,8 +53,8 @@ class EventEditTestCase(BaseAPITestCase):
         resp = self.newclient1.get(url)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
-        # Try put
-        resp = self.newclient1.put(url,
+        # Try patch
+        resp = self.newclient1.patch(url,
             {
                 "name" : "test event",
                 "allow_non_undergraduate" : False,

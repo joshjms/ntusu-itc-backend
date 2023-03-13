@@ -71,7 +71,7 @@ MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     'corsheaders.middleware.CorsMiddleware',
     "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
+    # "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -131,6 +131,7 @@ PROD = bool(os.environ.get('PROD', 0))
 ALLOWED_HOSTS = []
 if PROD:
     ALLOWED_HOSTS += ['ntusu-itc-backend.ap-southeast-1.elasticbeanstalk.com']
+    ALLOWED_HOSTS += ['backend.ntusu.org']
     ALLOWED_HOSTS += [os.environ.get('PROD_HOST')]
 else:
     ALLOWED_HOSTS += ['0.0.0.0', 'localhost', '127.0.0.1']

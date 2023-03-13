@@ -1,4 +1,5 @@
 from rest_framework import permissions
+from django.db import models
 from ufacility.models import UFacilityUser
 
 
@@ -6,15 +7,17 @@ class IsAuthenticated(permissions.IsAuthenticated):
     pass
 
 
-class IsUFacilityUser(permissions.BasePermission):
+class IsUFacilityUser(IsAuthenticated):
     message = 'UFacility User Required'
 
     def has_permission(self, request, view):
-        try:
-            UFacilityUser.objects.get(user=request.user)
-            return True
-        except UFacilityUser.DoesNotExist:
-            return False
+        if super().has_permission(request, view):
+            try:
+                UFacilityUser.objects.get(user=request.user)
+                return True
+            except UFacilityUser.DoesNotExist:
+                return False
+        return False
 
 
 class IsUFacilityAdmin(IsUFacilityUser):
@@ -26,13 +29,24 @@ class IsUFacilityAdmin(IsUFacilityUser):
         return False
 
 
-class IsBookingOwnerOrAdmin(permissions.BasePermission):
-    message = 'Creator of this Booking or UFacility Admin Required'
+class IsUFacilityInstanceOwnerOrAdmin(IsAuthenticated):
+    message = 'Owner (UFacilityUser) of this Instance or UFacility Admin Required'
 
     def has_object_permission(self, request, view, obj):
         try:
             ufacility_user = UFacilityUser.objects.get(user=request.user)
             return ufacility_user.is_admin or obj.user == ufacility_user
+        except UFacilityUser.DoesNotExist:
+            return False
+
+
+class IsUserInstanceOwnerOrAdmin(IsAuthenticated):
+    message = 'Owner (UFacilityUser) of this Instance or UFacility Admin Required'
+
+    def has_object_permission(self, request, view, obj):
+        try:
+            ufacility_user = UFacilityUser.objects.get(user=request.user)
+            return ufacility_user.is_admin or obj.user == request.user
         except UFacilityUser.DoesNotExist:
             return False
 

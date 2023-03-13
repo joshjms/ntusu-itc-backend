@@ -31,4 +31,3 @@ class UfacilityCheckStatusTestCase(BaseAPITestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         resp_json = loads(resp.content.decode('utf-8'))
         self.assertEqual(resp_json["type"], "anonymous")
-

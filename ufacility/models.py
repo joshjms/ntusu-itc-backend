@@ -39,9 +39,14 @@ class UFacilityUser(AbstractUFacilityUser):
 class Venue(models.Model):
     name = models.CharField(max_length=30, unique=True)
     security_email = models.EmailField(max_length=50)
+    is_send_security_mail = models.BooleanField(default=True)
 
     def __str__(self) -> str:
         return self.name
+
+
+class SecurityEmail(models.Model):
+    email = models.EmailField(max_length=50, unique=True)
 
 
 def get_booking_path(instance, filename):
@@ -60,6 +65,18 @@ class AbstractBooking(models.Model):
     
     class Meta:
         abstract = True
+    
+    @property
+    def venue_name(self):
+        return self.venue.name
+    
+    @property
+    def user_cca(self):
+        return self.user.cca
+    
+    @property
+    def user_email(self):
+        return self.user.user.email
 
 
 class BookingGroup(AbstractBooking):
@@ -81,18 +98,6 @@ class BookingGroup(AbstractBooking):
     start_date = models.DateField()
     end_date = models.DateField()
     recurring = models.CharField(max_length=3, choices=Frequency.choices)
-
-    @property
-    def venue_name(self):
-        return self.venue.name
-
-    @property
-    def user_cca(self):
-        return self.user.cca
-    
-    @property
-    def user_email(self):
-        return self.user.user.email
     
     @property
     def bookings(self):

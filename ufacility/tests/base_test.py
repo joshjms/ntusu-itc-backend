@@ -24,7 +24,7 @@ class BaseAPITestCase(APITestCase):
             is_admin = True,
             cca = 'su',
             hongen_name = 'hongen',
-            hongen_phone_number = '12348754',
+            hongen_phone_number = '92348754',
         )
 
         self.client1 = APIClient()
@@ -39,7 +39,7 @@ class BaseAPITestCase(APITestCase):
             is_admin = False,
             cca = 'su',
             hongen_name = 'hongen2',
-            hongen_phone_number = '12348759',
+            hongen_phone_number = '82348759',
         )
 
         self.client2 = APIClient()

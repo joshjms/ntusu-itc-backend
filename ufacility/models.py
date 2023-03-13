@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import RegexValidator
+from django.utils.crypto import get_random_string
 from datetime import timedelta
 from sso.models import User
 
@@ -44,7 +45,8 @@ class Venue(models.Model):
 
 
 def get_booking_path(instance, filename):
-    return f'ufacility2/booking_file/{instance.id}/{filename}'
+    unique_identifier = get_random_string(12)
+    return f'ufacility2/booking_files/{unique_identifier}_{filename}'
 
 
 class AbstractBooking(models.Model):

@@ -5,7 +5,7 @@
 # from ufacility.tests.base_test import BaseAPITestCase
 # from sso.models import User
 # import datetime as dt
-
+# TODO - DELETE THIS
 
 # class UfacilityUserBookingsTestCase(BaseAPITestCase):
 #     @classmethod

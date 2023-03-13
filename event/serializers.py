@@ -7,7 +7,7 @@ import string
 
 def generate_token(length=6):
     """
-    Generate a random token [A-Z and 0-9] of the specified length.
+    Generate a random unique token [A-Z and 0-9] of the specified length.
     """
     chars = string.ascii_uppercase + string.ascii_lowercase + string.digits
     token_list = [token[0] for token in EventOfficer.objects.values_list('token')]

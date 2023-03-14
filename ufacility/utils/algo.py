@@ -22,7 +22,7 @@ def is_booking_group_clashes(BookingGroup: BookingGroup):
     return False
 
 
-def get_pending_calendar_blocks(start_date: date, pending_bookings: QuerySet, accepted_bookings: QuerySet) -> list[dict]:
+def get_pending_calendar_blocks(start_date: date, pending_bookings: QuerySet, accepted_bookings: QuerySet):
     pending_dict = {}
     pending_ret_list = []
     for i in range(7):

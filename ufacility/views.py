@@ -5,6 +5,7 @@ from django.db.models import Q
 from django.forms.models import model_to_dict
 from django.utils.decorators import method_decorator
 from django.shortcuts import get_object_or_404
+from datetime import timedelta as td, datetime as dt
 from ufacility.models import Verification, Venue, UFacilityUser, Booking2, BookingGroup, SecurityEmail
 from ufacility.serializers import (
     BookingGroupSerializer,
@@ -23,7 +24,7 @@ from ufacility.permissions import (
     IsUserInstanceOwnerOrAdmin,
     IsPendingBookingOrAdmin,
 )
-from ufacility.utils import decorators, generics as custom_generics, mixins as custom_mixins
+from ufacility.utils import decorators, generics as custom_generics, mixins as custom_mixins, algo
 from sso.models import User
 
 
@@ -59,12 +60,23 @@ class BookingGroupDetailView(custom_generics.UpdateDestroyAPIView):
     permission_classes = [IsUFacilityInstanceOwnerOrAdmin, IsPendingBookingOrAdmin]
     lookup_url_kwarg = 'bookinggroup_id'
 
+    def perform_update(self, serializer):
+        instance = serializer.save()
+        Booking2.objects.filter(booking_group=instance.id).delete()
+        for date in instance.dates:
+            Booking2.objects.create(**serializer.serialize_to_booking(date))
+
+    def perform_delete(self, instance):
+        Booking2.objects.filter(booking_group=instance.id).delete()
+        instance.delete()
+
 # PUT /ufacility/booking_group/<bookinggroup_id>/accept/ TODO
 class BookingGroupAcceptView(APIView):
     permission_classes = [IsUFacilityAdmin]
 
     @decorators.pending_booking_group_only
     def put(self, request, *args, **kwargs):
+        # TODO - check if clashes or not
         BookingGroupSerializer(kwargs['booking_group']).accept_booking_group()
         return Response({'message': 'Booking group accepted.'}, status=status.HTTP_200_OK)
 
@@ -184,12 +196,17 @@ class BookingHourlyView(APIView):
     def get(self, request, venue_id, date):
         venue = get_object_or_404(Venue, id=venue_id)
         try:
-            year, month, day = int(date[:4]), int(date[5:7]), int(date[8:])
-            bookings = Booking2.objects.filter(Q(venue=venue), Q(date__year=year), Q(date__month=month), Q(date__day=day), Q(status='pending') | Q(status='accepted'))
-            serializer = BookingPartialSerializer(bookings, many=True)
-            return Response(serializer.data)
+            start_date = dt.strptime(date, '%Y-%m-%d').date()
         except:
             return Response({'error': 'please adhere to the date format YYYY-MM-DD'}, status=status.HTTP_400_BAD_REQUEST)
+        end_date = start_date + td(days=6)
+        accepted_bookings = Booking2.objects.filter(Q(venue=venue), Q(date__range=[start_date, end_date]), Q(status='accepted'))
+        pending_bookings = Booking2.objects.filter(Q(venue=venue), Q(date__range=[start_date, end_date]), Q(status='pending'))
+        serializer_accepted = BookingPartialSerializer(accepted_bookings, many=True)
+        return Response({
+            'accepted_bookings': serializer_accepted.data,
+            'pending_bookings': algo.get_pending_calendar_blocks(start_date, pending_bookings, accepted_bookings),
+        })
 
 # GET, POST /ufacility/venue/ (venue-list)
 # GET, PUT, PATCH, DELETE /ufacility/venue/<pk>/ (venue-detail)

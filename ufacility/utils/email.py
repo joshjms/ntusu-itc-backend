@@ -2,10 +2,10 @@ from sso.utils import send_email
 from ufacility.models import UFacilityUser, Venue, SecurityEmail
 
 
-exco_email = ""
+exco_email = "su-ope@e.ntu.edu.sg"
 
 def send_email_to_security(venue: Venue, start, end):
-    if venue.is_send_security_mail:
+    if venue.is_send_security_mail and SecurityEmail.objects.exists():
         email_subject = f"Booking request for {venue.name} from {start} to {end}"
         email_body = """\
                 This is an auto-generated email to inform you that a booking has been placed for {venue} from {start_time} to {end_time}.

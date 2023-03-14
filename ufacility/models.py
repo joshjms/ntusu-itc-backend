@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import RegexValidator
+from django.utils.crypto import get_random_string
 from datetime import timedelta
 from sso.models import User
 
@@ -47,9 +48,13 @@ class Venue(models.Model):
 class SecurityEmail(models.Model):
     email = models.EmailField(max_length=50, unique=True)
 
+    def __str__(self) -> str:
+        return f'<Security Email ID {self.id}>: {self.email}'
+
 
 def get_booking_path(instance, filename):
-    return f'ufacility2/booking_file/{instance.id}/{filename}'
+    unique_identifier = get_random_string(12)
+    return f'ufacility2/booking_files/{unique_identifier}_{filename}'
 
 
 class AbstractBooking(models.Model):
@@ -100,9 +105,9 @@ class BookingGroup(AbstractBooking):
     @property
     def bookings(self):
         return [booking.id for booking in self.bookings.all()]
-
-    @property
-    def dates(self):
+    
+    @classmethod
+    def get_dates(self, recurring, start_date, end_date):
         date_mapping = {
             'MON': 0,
             'TUE': 1,
@@ -113,19 +118,32 @@ class BookingGroup(AbstractBooking):
             'SUN': 6,
         }
         dates = []
-        if self.recurring != 'ALL':
-            target_day = date_mapping[self.recurring]
-            curr_date = self.start_date
-            while curr_date <= self.end_date:
+        if recurring != 'ALL':
+            target_day = date_mapping[recurring]
+            curr_date = start_date
+            while curr_date <= end_date:
                 if curr_date.weekday() == target_day:
                     dates.append(curr_date)
                 curr_date += timedelta(days=1)
         else:
-            curr_date = self.start_date
-            while curr_date <= self.end_date:
+            curr_date = start_date
+            while curr_date <= end_date:
                 dates.append(curr_date)
                 curr_date += timedelta(days=1)
         return dates
+
+    @property
+    def dates(self):
+        return BookingGroup.get_dates(self.recurring, self.start_date, self.end_date)
+    
+    @property
+    def clashes(self):
+        '''
+            TODO
+            Returns a list of booking group id that clashes with this instance.
+            Only consider accepted / pending bookings.
+        '''
+        return [1, 2, 3] # sample return val
 
 
 class Booking2(AbstractBooking):

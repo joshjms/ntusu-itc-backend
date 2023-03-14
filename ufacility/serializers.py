@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.utils import timezone as tz
 from sso.serializers import UserProfileSerializer
 from ufacility.models import Verification, Booking2, Venue, UFacilityUser, BookingGroup, SecurityEmail
-from datetime import timedelta
+from datetime import timedelta, time
 from ufacility.utils.algo import is_booking_group_clashes
 from ufacility.utils import email
 
@@ -127,7 +127,7 @@ class BookingGroupSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         if attrs['start_date'] > attrs['end_date']:
             raise serializers.ValidationError('Start date cannot be later than end date')
-        if attrs['start_time'] >= attrs['end_time']:
+        if attrs['start_time'] >= attrs['end_time'] and attrs['end_time'] != time(0, 0):
             raise serializers.ValidationError('Start time cannot be the same or later than end time')
         if len(BookingGroup.get_dates(attrs['recurring'], attrs['start_date'], attrs['end_date'])) == 0:
             raise serializers.ValidationError('At least one date is needed')

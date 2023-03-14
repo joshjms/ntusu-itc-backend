@@ -28,10 +28,12 @@ def get_pending_calendar_blocks(start_date: date, pending_bookings: QuerySet, ac
     for i in range(7):
         pending_dict[str(start_date + td(days=i))] = [False for _ in range(24)]
     for booking in pending_bookings:
-        for i in range(booking.start_time.hour, booking.end_time.hour):
+        end_hour = (booking.end_time.hour if booking.end_time.hour != 0 else 24)
+        for i in range(booking.start_time.hour, end_hour):
             pending_dict[str(booking.date)][i] = True
     for booking in accepted_bookings:
-        for i in range(booking.start_time.hour, booking.end_time.hour):
+        end_hour = (booking.end_time.hour if booking.end_time.hour != 0 else 24)
+        for i in range(booking.start_time.hour, end_hour):
             pending_dict[str(booking.date)][i] = False
     for date, val in pending_dict.items():
         start_time = None

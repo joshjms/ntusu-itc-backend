@@ -48,6 +48,9 @@ class Venue(models.Model):
 class SecurityEmail(models.Model):
     email = models.EmailField(max_length=50, unique=True)
 
+    def __str__(self) -> str:
+        return f'<Security Email ID {self.id}>: {self.email}'
+
 
 def get_booking_path(instance, filename):
     unique_identifier = get_random_string(12)

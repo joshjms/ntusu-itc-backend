@@ -50,7 +50,7 @@ class SecurityEmailSerializer(serializers.ModelSerializer):
 class BookingPartialSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking2
-        fields = ['user_email', 'user_cca', 'start_time', 'end_time', 'purpose', 'pax', 'status']
+        fields = ['user_email', 'user_cca', 'date', 'start_time', 'end_time', 'purpose', 'pax', 'status']
         read_only_fields = ['user', 'status']
 
 

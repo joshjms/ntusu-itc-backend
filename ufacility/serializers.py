@@ -2,7 +2,8 @@ from rest_framework import serializers
 from django.utils import timezone as tz
 from sso.serializers import UserProfileSerializer
 from ufacility.models import Verification, Booking2, Venue, UFacilityUser, BookingGroup, SecurityEmail
-from ufacility.utils.algo import clash_exists
+from datetime import timedelta, time
+from ufacility.utils.algo import is_booking_group_clashes
 from ufacility.utils import email
 
 
@@ -49,7 +50,7 @@ class SecurityEmailSerializer(serializers.ModelSerializer):
 class BookingPartialSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking2
-        fields = ['user_email', 'user_cca', 'start_time', 'end_time', 'purpose', 'pax', 'status']
+        fields = ['user_email', 'user_cca', 'date', 'start_time', 'end_time', 'purpose', 'pax', 'status']
         read_only_fields = ['user', 'status']
 
 
@@ -59,7 +60,7 @@ class BookingGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = BookingGroup
         fields = '__all__'
-        extra_fields = ['dates', 'venue_name', 'user_email', 'user_cca', 'bookings']
+        extra_fields = ['dates', 'venue_name', 'user_email', 'user_cca', 'bookings', 'clashes']
         read_only_fields = ['id', 'user', 'status', 'bookings']
     
     def get_field_names(self, declared_fields, info):
@@ -117,9 +118,20 @@ class BookingGroupSerializer(serializers.ModelSerializer):
         if value < tz.now().date():
             raise serializers.ValidationError('Start date cannot be in the past')
         return value
+
+    def validate_end_date(self, value):
+        if value > tz.now().date() + timedelta(days=180):
+            raise serializers.ValidationError('You can only book up to 180 days ahead of today')
+        return value
     
     def validate(self, attrs):
         if attrs['start_date'] > attrs['end_date']:
             raise serializers.ValidationError('Start date cannot be later than end date')
-        # TODO - validate clashing
+        if attrs['start_time'] >= attrs['end_time'] and attrs['end_time'] != time(0, 0):
+            raise serializers.ValidationError('Start time cannot be the same or later than end time')
+        if len(BookingGroup.get_dates(attrs['recurring'], attrs['start_date'], attrs['end_date'])) == 0:
+            raise serializers.ValidationError('At least one date is needed')
+        # TODO - add validation
+        # if is_booking_group_clashes(...):
+        #     raise serializers.ValidationError(...)
         return super().validate(attrs)

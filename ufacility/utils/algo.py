@@ -11,12 +11,15 @@ def clash_exists(venue, date, start_time, end_time):
     return False
 
 
-def get_booking_group_clashes(BookingGroup: BookingGroup):
+def is_booking_group_clashes(BookingGroup: BookingGroup):
     pass
     '''
         TODO
-        Given a BookingGroup instance, determine clash or not.
+        Determine clash or not with existing accepted bookings.
+        To be called in BookingGroup serializer in validate method.
+        Feel free to change the argument of the function as needed.
     '''
+    return False
 
 
 def get_pending_calendar_blocks(start_date: date, pending_bookings: QuerySet, accepted_bookings: QuerySet) -> list[dict]:

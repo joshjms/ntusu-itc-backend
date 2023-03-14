@@ -60,12 +60,23 @@ class BookingGroupDetailView(custom_generics.UpdateDestroyAPIView):
     permission_classes = [IsUFacilityInstanceOwnerOrAdmin, IsPendingBookingOrAdmin]
     lookup_url_kwarg = 'bookinggroup_id'
 
+    def perform_update(self, serializer):
+        instance = serializer.save()
+        Booking2.objects.filter(booking_group=instance.id).delete()
+        for date in instance.dates:
+            Booking2.objects.create(**serializer.serialize_to_booking(date))
+
+    def perform_delete(self, instance):
+        Booking2.objects.filter(booking_group=instance.id).delete()
+        instance.delete()
+
 # PUT /ufacility/booking_group/<bookinggroup_id>/accept/ TODO
 class BookingGroupAcceptView(APIView):
     permission_classes = [IsUFacilityAdmin]
 
     @decorators.pending_booking_group_only
     def put(self, request, *args, **kwargs):
+        # TODO - check if clashes or not
         BookingGroupSerializer(kwargs['booking_group']).accept_booking_group()
         return Response({'message': 'Booking group accepted.'}, status=status.HTTP_200_OK)
 

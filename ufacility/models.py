@@ -135,6 +135,15 @@ class BookingGroup(AbstractBooking):
     @property
     def dates(self):
         return BookingGroup.get_dates(self.recurring, self.start_date, self.end_date)
+    
+    @property
+    def clashes(self):
+        '''
+            TODO
+            Returns a list of booking group id that clashes with this instance.
+            Only consider accepted / pending bookings.
+        '''
+        return [1, 2, 3] # sample return val
 
 
 class Booking2(AbstractBooking):

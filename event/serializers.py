@@ -5,12 +5,16 @@ from sso.models import User
 import random
 import string
 
-def generate_token(length=8):
+def generate_token(length=6):
     """
-    Generate a random token [A-Z and 0-9] of the specified length.
+    Generate a random unique token [A-Z and 0-9] of the specified length.
     """
-    chars = string.ascii_uppercase + string.digits
-    return ''.join(random.choice(chars) for _ in range(length))
+    chars = string.ascii_uppercase + string.ascii_lowercase + string.digits
+    token_list = [token[0] for token in EventOfficer.objects.values_list('token')]
+    new_token = ''.join(random.choice(chars) for _ in range(length))
+    while new_token in token_list:
+        new_token = ''.join(random.choice(chars) for _ in range(length))
+    return new_token
         
 class EventOfficerSerializer(serializers.ModelSerializer):
     added_date = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', read_only=True)

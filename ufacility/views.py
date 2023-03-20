@@ -25,6 +25,7 @@ from ufacility.permissions import (
     IsPendingBookingOrAdmin,
 )
 from ufacility.utils import decorators, generics as custom_generics, mixins as custom_mixins, algo
+from ufacility.utils.algo import booking_group_clashes_exists
 from sso.models import User
 
 
@@ -76,7 +77,9 @@ class BookingGroupAcceptView(APIView):
 
     @decorators.pending_booking_group_only
     def put(self, request, *args, **kwargs):
-        # TODO - check if clashes or not
+        booking_group = kwargs['booking_group']
+        if booking_group_clashes_exists(booking_group.start_date, booking_group.end_date, booking_group.start_time, booking_group.end_time, booking_group.recurring, booking_group.venue):
+            return Response({'message': 'Booking group clashes with other bookings.'}, status=status.HTTP_409_CONFLICT)
         BookingGroupSerializer(kwargs['booking_group']).accept_booking_group()
         return Response({'message': 'Booking group accepted.'}, status=status.HTTP_200_OK)
 

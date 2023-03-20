@@ -1,6 +1,6 @@
 from django.db.models import QuerySet
 from ufacility.models import Booking2, BookingGroup
-from datetime import timedelta as td, date
+from datetime import timedelta as td, date, time
 
 
 def clash_exists(venue, date, start_time, end_time):
@@ -11,14 +11,22 @@ def clash_exists(venue, date, start_time, end_time):
     return False
 
 
-def is_booking_group_clashes(BookingGroup: BookingGroup):
-    pass
-    '''
-        TODO
-        Determine clash or not with existing accepted bookings.
-        To be called in BookingGroup serializer in validate method.
-        Feel free to change the argument of the function as needed.
-    '''
+def booking_group_clashes_exists(start_date: date, end_date: date, start_time: time, end_time: time, recurring: str, venue: int) -> bool:
+    clashes = BookingGroup.objects.filter(
+            venue=venue,
+            start_date__lte=end_date,
+            end_date__gte=start_date,
+            end_time__gt=start_time,
+            start_time__lt=end_time,
+            status='accepted',
+        )
+    if recurring == 'ALL':
+        return clashes.exists()
+    # If recurring is not ALL, then we need to check if there is a clash on the recurring day
+    print(clashes)
+    for clash in clashes:
+        if clash.recurring == recurring or clash.recurring == 'ALL':
+            return True
     return False
 
 

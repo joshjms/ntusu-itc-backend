@@ -138,12 +138,27 @@ class BookingGroup(AbstractBooking):
     
     @property
     def clashes(self):
-        '''
-            TODO
-            Returns a list of booking group id that clashes with this instance.
-            Only consider accepted / pending bookings.
-        '''
-        return [1, 2, 3] # sample return val
+        if self.recurring == 'ALL':
+            clashes = BookingGroup.objects.filter(
+                venue=self.venue,
+                start_date__lte=self.end_date,
+                end_date__gte=self.start_date,
+                start_time__lt=self.end_time,
+                end_time__gte=self.start_time,
+                status__in=['accepted', 'pending']
+            ).exclude(id=self.id).values_list("id", flat=True)
+        else:
+            clashes = BookingGroup.objects.filter(
+                venue=self.venue,
+                start_date__lte=self.end_date,
+                end_date__gte=self.start_date,
+                start_time__lt=self.end_time,
+                end_time__gte=self.start_time,
+                status__in=['accepted', 'pending'],
+                recurring__in=['ALL', self.recurring]
+            ).exclude(id=self.id).values_list("id", flat=True)
+
+        return clashes
 
 
 class Booking2(AbstractBooking):

@@ -23,7 +23,6 @@ def booking_group_clashes_exists(start_date: date, end_date: date, start_time: t
     if recurring == 'ALL':
         return clashes.exists()
     # If recurring is not ALL, then we need to check if there is a clash on the recurring day
-    print(clashes)
     for clash in clashes:
         if clash.recurring == recurring or clash.recurring == 'ALL':
             return True

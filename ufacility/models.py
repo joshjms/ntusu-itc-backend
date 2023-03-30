@@ -38,7 +38,7 @@ class UFacilityUser(AbstractUFacilityUser):
 
 class Venue(models.Model):
     name = models.CharField(max_length=30, unique=True)
-    security_email = models.EmailField(max_length=50)
+    security_email = models.EmailField(max_length=50, blank=True)
     is_send_security_mail = models.BooleanField(default=True)
 
     def __str__(self) -> str:

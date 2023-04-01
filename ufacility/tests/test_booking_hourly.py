@@ -11,11 +11,11 @@ class UfacilityBookingHourlyTestCase(BaseAPITestCase):
         super().setUp()
         self.venue1 = Venue.objects.create(
             name='minerva',
-            security_email='security@mail.com',
+            is_send_security_mail=True,
         )
         self.venue2 = Venue.objects.create(
             name='athena',
-            security_email='other_security@mail.com',
+            is_send_security_mail=True,
         )
         self.booking1 = Booking2.objects.create(
             user=self.ufacilityuser1,

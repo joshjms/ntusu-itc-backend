@@ -15,7 +15,7 @@ class UfacilityVenuesTestCase(BaseAPITestCase):
             reverse('ufacility:venue-list'),
             {
                 'name': 'test venue',
-                'security_email': 'security@e.ntu.edu.sg',
+                'is_send_security_mail': True,
             },
             format = 'json',
         )
@@ -27,7 +27,7 @@ class UfacilityVenuesTestCase(BaseAPITestCase):
             reverse('ufacility:venue-list'),
             {
                 'name': 'test venue',
-                'security_email': 'someemail@e.ntu.edu.sg',
+                'is_send_security_mail': True,
             },
             format = 'json'
         )
@@ -39,7 +39,7 @@ class UfacilityVenuesTestCase(BaseAPITestCase):
             reverse('ufacility:venue-list'),
             {
                 'name': 'test venue',
-                'security_email': 'someemail@e.ntu.edu.sg',
+                'is_send_security_mail': True,
             },
             format = 'json'
         )
@@ -50,19 +50,7 @@ class UfacilityVenuesTestCase(BaseAPITestCase):
         resp = self.client0.post(
             reverse('ufacility:venue-list'),
             {
-                'security_email': 'security@e.ntu.edu.sg'
-            },
-            format = 'json'
-        )
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_post_venue_fail_bad_request_2(self):
-        self.client0.force_authenticate(user = self.user0)
-        resp = self.client0.post(
-            reverse('ufacility:venue-list'),
-            {
-                'name': 'test venue',
-                'security_email': 'not an email',
+                'is_send_security_mail': 'abcde',
             },
             format = 'json'
         )

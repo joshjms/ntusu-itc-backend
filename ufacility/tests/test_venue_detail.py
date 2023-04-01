@@ -9,7 +9,7 @@ class UfacilityVerificationDetailsTestCase(BaseAPITestCase):
     def setUpTestData(self):
         self.venue1 = Venue.objects.create(
             name='Minerva',
-            security_email='security@mail.com',
+            is_send_security_mail=True,
         )
     
     def test_put_venue_success(self):
@@ -17,11 +17,11 @@ class UfacilityVerificationDetailsTestCase(BaseAPITestCase):
         url = reverse('ufacility:venue-detail', kwargs={'pk': 1})
         response = self.client0.put(url, {
             'name': 'Minerva_edit',
-            'security_email': 'security@mail.com',
+            'is_send_security_mail': False,
         })
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['name'], 'Minerva_edit')
-        self.assertEqual(response.data['security_email'], 'security@mail.com')
+        self.assertEqual(response.data['is_send_security_mail'], False)
     
     def test_put_venue_fail_bad_request_1(self):
         self.client0.force_authenticate(user = self.user0)
@@ -36,7 +36,7 @@ class UfacilityVerificationDetailsTestCase(BaseAPITestCase):
         url = reverse('ufacility:venue-detail', kwargs={'pk': self.venue1.id})
         response = self.client0.put(url, {
             'name': 'Minerva_edit',
-            'security_email': 'notanemail',
+            'is_send_security_mail': 'someothervaluenotbool',
         })
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 

@@ -15,12 +15,12 @@ class UfacilityVerificationsTestCase(BaseAPITestCase):
         self.venue1 = Venue.objects.create(
             id='1',
             name='minerva',
-            security_email='security@mail.com',
+            is_send_security_mail=True,
         )
         self.venue2 = Venue.objects.create(
             id='2',
             name='athena',
-            security_email='other_security@mail.com',
+            is_send_security_mail=True,
         )
         self.client1.post(
             reverse('ufacility:booking-group'),

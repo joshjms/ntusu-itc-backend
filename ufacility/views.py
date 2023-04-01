@@ -14,7 +14,6 @@ from ufacility.serializers import (
     BookingPartialSerializer,
     VenueSerializer,
     SecurityEmailSerializer,
-    BookingSerializer,
 )
 from ufacility.permissions import (
     IsAuthenticated,
@@ -28,10 +27,6 @@ from ufacility.utils import decorators, generics as custom_generics, mixins as c
 from ufacility.utils.algo import booking_group_clashes_exists
 from sso.models import User
 
-
-class BookingView(generics.ListAPIView): # TEMPORARY - delete this later
-    queryset = Booking2.objects.all()
-    serializer_class = BookingSerializer
 
 # GET, POST /ufacility/booking_group/ TODO
 class BookingGroupView(custom_mixins.BookingGroupUtilMixin, generics.ListCreateAPIView):

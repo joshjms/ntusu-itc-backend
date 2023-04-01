@@ -43,7 +43,7 @@ class PortalUpdate(BaseAPITestCase):
         resp1 = self.client3.post(
             reverse('portal:feedback'),
             {
-                'type': 'BR',
+                'type': 'Bug Report',
                 'title': '',
                 'details': 'some detail',
             }
@@ -70,7 +70,7 @@ class PortalUpdate(BaseAPITestCase):
         resp = self.client3.post(
             reverse('portal:feedback'),
             {
-                'type': 'IR',
+                'type': 'ITC Recruitment',
                 'title': 'some title',
                 'details': 'some detail',
                 'email': '',

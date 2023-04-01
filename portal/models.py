@@ -15,14 +15,14 @@ class UpdateNote(models.Model):
 
 class FeedbackForm(models.Model):
     class Type(models.TextChoices):
-        BUG_REPORT = 'BR', 'Bug Report'
-        FEATURE_REQUEST = 'FR', 'Feature Request'
-        IMPROVEMENT_SUGGESTION = 'IS', 'Improvement Suggestion'
-        REQUEST_ASSISTANCE = 'RA', 'Request Assistance'
-        ITC_RECRUITMENT = 'IR', 'ITC Recruitment'
-        OTHERS = 'OT', 'Others'
+        BUG_REPORT = 'Bug Report', 'Bug Report'
+        FEATURE_REQUEST = 'Feature Request', 'Feature Request'
+        IMPROVEMENT_SUGGESTION = 'Improvement Suggestion', 'Improvement Suggestion'
+        REQUEST_ASSISTANCE = 'Request Assistance', 'Request Assistance'
+        ITC_RECRUITMENT = 'ITC Recruitment', 'ITC Recruitment'
+        OTHERS = 'Others', 'Others'
 
-    type = models.CharField(max_length=2, choices=Type.choices)
+    type = models.CharField(max_length=30, choices=Type.choices)
     title = models.CharField(max_length=100)
     details = models.TextField()
     email = models.EmailField(max_length=100, blank=True)

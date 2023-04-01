@@ -105,8 +105,8 @@ class BookingGroupSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
     
     def validate_start_time(self, value):
-        if value.minute != 0:
-            raise serializers.ValidationError('Start time minute should be 00')
+        if value.minute != 0 and value.minute != 30:
+            raise serializers.ValidationError('Start time minute should be 00 or 30')
         return value
     
     def validate_end_time(self, value):

@@ -38,17 +38,13 @@ def send_booking_results_accepted_email(booking_group: BookingGroup):
     booking_group.user_email
     email_subject = f'Accepted: UFacility Booking #{booking_group.id}'
     dates = [str(date) for date in booking_group.dates]
-    dates_list = f'\n'.join(dates)
+    dates_list = f'<br>'.join(dates)
     email_body = f'''
-Your request to book {booking_group.venue_name} is {booking_group.status}.
-
-
-Dates: \n{dates_list}\n
-Start Time: {booking_group.start_time}
-End Time: {booking_group.end_time}
-Purpose: {booking_group.purpose}
-
-
+Your request to book {booking_group.venue_name} is {booking_group.status}.<br><br>
+Dates: <br>{dates_list}<br>
+Start Time: {booking_group.start_time}<br>
+End Time: {booking_group.end_time}<br>
+Purpose: {booking_group.purpose}<br><br>
 {DO_NOT_REPLY_MESSAGE}
             '''
     send_email(email_subject, email_body, recipients=[booking_group.user_email])
@@ -57,22 +53,16 @@ def send_booking_results_rejected_email(booking_group: BookingGroup): # TODO
     booking_group.user_email
     email_subject = f'Rejected: UFacility Booking #{booking_group.id}'
     dates = [str(date) for date in booking_group.dates]
-    dates_list = f'\n'.join(dates)
+    dates_list = f'<br>'.join(dates)
     email_body = f'''
-Your request to book {booking_group.venue_name} is {booking_group.status}.
-
-
-This booking has been rejected due to either not booking three days in advance, a scheduling conflict with other bookings, or the venue being temporarily unavailable due to unforeseen circumstances.
-
-Any enquiries please email {exco_email}
-
-Booking Details
-Dates: \n{dates_list}\n
-Start Time: {booking_group.start_time}
-End Time: {booking_group.end_time}
-Purpose: {booking_group.purpose}
-
-
+Your request to book {booking_group.venue_name} is {booking_group.status}.<br><br>
+This booking has been rejected due to either not booking three days in advance, a scheduling conflict with other bookings, or the venue being temporarily unavailable due to unforeseen circumstances.<br><br>
+Any enquiries please email {exco_email}<br><br>
+Booking Details<br>
+Dates: <br>{dates_list}<br>
+Start Time: {booking_group.start_time}<br>
+End Time: {booking_group.end_time}<br>
+Purpose: {booking_group.purpose}<br><br>
 {DO_NOT_REPLY_MESSAGE}
             '''
     send_email(email_subject, email_body, recipients=[booking_group.user_email])

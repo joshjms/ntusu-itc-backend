@@ -64,6 +64,10 @@ class AbstractBooking(models.Model):
     purpose = models.CharField(max_length=200)
     pax = models.PositiveIntegerField()
     status = models.CharField(max_length=10, choices=STATUSES)
+
+    @property
+    def id(self):
+        return self.id
     
     class Meta:
         abstract = True

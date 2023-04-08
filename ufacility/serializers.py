@@ -87,8 +87,7 @@ class BookingGroupSerializer(serializers.ModelSerializer):
             booking.status = 'accepted'
             booking.save()
         email.send_email_to_security(booking_group.venue, booking_group.start_time, booking_group.end_time)
-        user = booking_group.user.user
-        email.send_booking_results_email(user.email, booking_group.venue, booking_group.start_time, booking_group.end_time, booking_group.status)
+        email.send_booking_results_accepted_email(booking_group)
     
     def reject_booking_group(self):
         booking_group = self.instance
@@ -97,8 +96,7 @@ class BookingGroupSerializer(serializers.ModelSerializer):
         for booking in booking_group.bookings.all():
             booking.status = 'declined'
             booking.save()
-        user = booking_group.user.user
-        email.send_booking_results_email(user.email, booking_group.venue, booking_group.start_time, booking_group.end_time, booking_group.status)
+        email.send_booking_results_rejected_email(booking_group)
 
     def create(self, validated_data):
         validated_data['status'] = 'pending'

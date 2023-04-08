@@ -3,33 +3,34 @@ from ufacility.models import UFacilityUser, Venue, SecurityEmail, BookingGroup
 
 
 exco_email = 'su-ope@e.ntu.edu.sg'
+FE_MANAGE_VERIFICATION_LINK = 'https://ntusu-itc-frontend-michac789.vercel.app/ufacility/admin/verifications'
 
-def send_email_to_security(venue: Venue, start, end):
-    if venue.is_send_security_mail and SecurityEmail.objects.exists():
-        email_subject = f'Booking request for {venue.name} from {start} to {end}'
-        email_body = '''\
-                This is an auto-generated email to inform you that a booking has been placed for {venue} from {start_time} to {end_time}.
-                Please contact {exco_email} should you have any enquiries.
-                '''.format(venue=venue.name, start_time=start, end_time=end, exco_email=exco_email)
+def send_email_to_security(booking_group: BookingGroup):
+    if booking_group.venue.is_send_security_mail and SecurityEmail.objects.exists():
+        email_subject = f'Booking of {booking_group.venue} by {booking_group.user_cca}'
+        dates = [str(date) for date in booking_group.dates]
+        dates_list = f'<br>'.join(dates)
+        email_body = f'''
+{booking_group.user_cca} is booking {booking_group.venue} for {booking_group.pax} pax.<br><br>
+Dates: <br>{dates_list}<br>
+Purpose: {booking_group.purpose}<br>
+Start Time: {booking_group.start_time}<br>
+End Time: {booking_group.end_time}<br><br>
+Please program the room to open accordingly.<br><br>
+Thank you.<br><br>
+Best Regards,<br>
+NTUSU Operations Executive<br><br>
+{DO_NOT_REPLY_MESSAGE}
+                '''
         security_emails = [security_email.email for security_email in SecurityEmail.objects.all()]
         send_email(email_subject, email_body, recipients=security_emails)
 
 def send_verification_email_to_admins():
-    email_subject = 'New User Registration'
-    email_body = '''\
-            This is an auto-generated email to inform you that a new user has registered for the SSO website.
-            Please contact {exco_email} should you have any enquiries.
-            '''.format(exco_email=exco_email)
-    admins = UFacilityUser.objects.filter(is_admin=True)
-    admin_emails = [admin.user.email for admin in admins]
-    send_email(email_subject, email_body, recipients=admin_emails)
-
-def send_booking_email_to_admins():
-    email_subject = 'New Booking Request'
-    email_body = '''\
-            This is an auto-generated email to inform you that a new booking has been placed for the SSO website.
-            Please contact {exco_email} should you have any enquiries.
-            '''.format(exco_email=exco_email)
+    email_subject = 'UFacility New User Registration'
+    email_body = f'''\
+This is an auto-generated email to inform you that a new user has request access for UFacility.
+Click <a href="{FE_MANAGE_VERIFICATION_LINK}">here</a> to view.
+            '''
     admins = UFacilityUser.objects.filter(is_admin=True)
     admin_emails = [admin.user.email for admin in admins]
     send_email(email_subject, email_body, recipients=admin_emails)

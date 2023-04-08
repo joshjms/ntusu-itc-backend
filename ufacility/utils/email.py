@@ -37,7 +37,8 @@ def send_booking_email_to_admins():
 def send_booking_results_accepted_email(booking_group: BookingGroup):
     booking_group.user_email
     email_subject = f'Accepted: UFacility Booking #{booking_group.id}'
-    dates_list = f'\n'.join(booking_group.dates)
+    dates = [str(date) for date in booking_group.dates]
+    dates_list = f'\n'.join(dates)
     email_body = f'''
 Your request to book {booking_group.venue_name} is {booking_group.status}.
 
@@ -55,7 +56,8 @@ Purpose: {booking_group.purpose}
 def send_booking_results_rejected_email(booking_group: BookingGroup): # TODO
     booking_group.user_email
     email_subject = f'Rejected: UFacility Booking #{booking_group.id}'
-    dates_list = f'\n'.join(booking_group.dates)
+    dates = [str(date) for date in booking_group.dates]
+    dates_list = f'\n'.join(dates)
     email_body = f'''
 Your request to book {booking_group.venue_name} is {booking_group.status}.
 

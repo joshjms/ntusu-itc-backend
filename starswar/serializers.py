@@ -3,13 +3,13 @@ from collections import defaultdict
 from starswar.models import XCourseIndex as CourseIndex, XSwapRequest as SwapRequest
 
 
-class CourseIndexPartialSerializer(serializers.ModelSerializer):
+class XCourseIndexPartialSerializer(serializers.ModelSerializer):
     class Meta:
         model = CourseIndex
         fields = ('id', 'code', 'name', 'index', 'pending_count',)
 
 
-class CourseIndexCompleteSerializer(serializers.ModelSerializer):
+class XCourseIndexCompleteSerializer(serializers.ModelSerializer):
     datetime_added = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', read_only=True)
     information = serializers.CharField(write_only=True)
     information_data = serializers.SerializerMethodField(read_only=True)
@@ -37,7 +37,7 @@ class CourseIndexCompleteSerializer(serializers.ModelSerializer):
         return resp_dict
 
 
-class SwapRequestSerializer(serializers.ModelSerializer):
+class XSwapRequestSerializer(serializers.ModelSerializer):
     current_index = serializers.CharField(max_length=5)
 
     class Meta:

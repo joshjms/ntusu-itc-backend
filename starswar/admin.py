@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import IndexSwapperConfig, CourseIndex, SwapRequest
+from .models import IndexSwapperConfig, XCourseIndex as CourseIndex, XSwapRequest as SwapRequest
 
 
 class IndexSwapperConfigAdmin(admin.ModelAdmin):

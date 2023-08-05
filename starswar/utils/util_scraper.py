@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 from urllib import request
 import re
-from starswar.models import CourseIndex, IndexSwapperConfig
+from starswar.models import XCourseIndex as CourseIndex, IndexSwapperConfig
 
 '''
     TODO - web scraper here

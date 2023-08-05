@@ -41,6 +41,7 @@ urlpatterns = [
     path('inventory/', include('inventory.urls')),
     path('event/', include('event.urls')),
     path('starswar/', include('starswar.urls')),
+    path('indexswapper/', include('indexswapper.urls')),
 ]
 
 if settings.DEBUG:

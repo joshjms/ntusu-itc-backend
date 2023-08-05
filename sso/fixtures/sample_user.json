@@ -4,7 +4,7 @@
         "pk": 1,
         "fields": {
             "username": "superuser",
-            "email": "superuser@someemail.com",
+            "email": "superuser@mail.com",
             "password": "pbkdf2_sha256$390000$jNGuKW2q0YnDal94Qqv9c3$xtLogB9SNuXhZVYnu1hatPzydj2m/MF2OtYT6LIbGFU=",
             "is_superuser": true,
             "is_staff": true,
@@ -15,18 +15,50 @@
         "model": "sso.user",
         "pk": 2,
         "fields": {
-            "username": "Sample User 1",
-            "email": "sampleemail1@gmail.com",
-            "password": "pbkdf2_sha256$390000$9KQn0Cf22Bri7OxhUAcusO$EKA0lZuQsV4oLuwLc/qvW5bcyNi/pPdjgJQEo8GH3xg="
+            "display_name": "user1x display",
+            "username": "user1x",
+            "email": "user1x@e.ntu.edu.sg",
+            "password": "pbkdf2_sha256$390000$jNGuKW2q0YnDal94Qqv9c3$xtLogB9SNuXhZVYnu1hatPzydj2m/MF2OtYT6LIbGFU="
         }
     },
     {
         "model": "sso.user",
         "pk": 3,
         "fields": {
-            "username": "Sample User 2",
-            "email": "sampleemail2@gmail.com",
-            "password": "pbkdf2_sha256$390000$9KQn0Cf22Bri7OxhUAcusO$EKA0lZuQsV4oLuwLc/qvW5bcyNi/pPdjgJQEo8GH3xg="
+            "display_name": "user2x display",
+            "username": "user2x",
+            "email": "user2x@e.ntu.edu.sg",
+            "password": "pbkdf2_sha256$390000$jNGuKW2q0YnDal94Qqv9c3$xtLogB9SNuXhZVYnu1hatPzydj2m/MF2OtYT6LIbGFU="
+        }
+    },
+    {
+        "model": "sso.user",
+        "pk": 4,
+        "fields": {
+            "display_name": "user3x display",
+            "username": "user3x",
+            "email": "user3x@e.ntu.edu.sg",
+            "password": "pbkdf2_sha256$390000$jNGuKW2q0YnDal94Qqv9c3$xtLogB9SNuXhZVYnu1hatPzydj2m/MF2OtYT6LIbGFU="
+        }
+    },
+    {
+        "model": "sso.user",
+        "pk": 5,
+        "fields": {
+            "display_name": "user4x display",
+            "username": "user4x",
+            "email": "user4x@e.ntu.edu.sg",
+            "password": "pbkdf2_sha256$390000$jNGuKW2q0YnDal94Qqv9c3$xtLogB9SNuXhZVYnu1hatPzydj2m/MF2OtYT6LIbGFU="
+        }
+    },
+    {
+        "model": "sso.user",
+        "pk": 6,
+        "fields": {
+            "display_name": "user5x display",
+            "username": "user5x",
+            "email": "user5x@e.ntu.edu.sg",
+            "password": "pbkdf2_sha256$390000$jNGuKW2q0YnDal94Qqv9c3$xtLogB9SNuXhZVYnu1hatPzydj2m/MF2OtYT6LIbGFU="
         }
     }
 ]

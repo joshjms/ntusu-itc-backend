@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'inventory',
     'event',
     'starswar',
+    'indexswapper',
 ]
 
 MIDDLEWARE = [

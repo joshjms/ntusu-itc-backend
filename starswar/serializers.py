@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from collections import defaultdict
-from starswar.models import CourseIndex, SwapRequest
+from starswar.models import XCourseIndex as CourseIndex, XSwapRequest as SwapRequest
 
 
 class CourseIndexPartialSerializer(serializers.ModelSerializer):

@@ -1,0 +1,146 @@
+[
+{
+    "model": "indexswapper.swaprequest",
+    "pk": 1,
+    "fields": {
+        "user": 2,
+        "contact_info": "@user1zzz",
+        "contact_type": "T",
+        "status": "W",
+        "datetime_added": "2023-07-02T07:29:49.731Z",
+        "datetime_found": "2023-07-02T07:49:15.311Z",
+        "current_index": 1,
+        "wanted_indexes": "['70182', '70183', '70184']",
+        "pair": 3,
+        "index_gained": "70184"
+    }
+},
+{
+    "model": "indexswapper.swaprequest",
+    "pk": 2,
+    "fields": {
+        "user": 2,
+        "contact_info": "@user1zzz",
+        "contact_type": "T",
+        "status": "S",
+        "datetime_added": "2023-07-02T07:30:26.445Z",
+        "datetime_found": null,
+        "current_index": 33,
+        "wanted_indexes": "['70220']",
+        "pair": null,
+        "index_gained": ""
+    }
+},
+{
+    "model": "indexswapper.swaprequest",
+    "pk": 3,
+    "fields": {
+        "user": 3,
+        "contact_info": "user2@mail.com",
+        "contact_type": "E",
+        "status": "W",
+        "datetime_added": "2023-07-02T07:49:12.223Z",
+        "datetime_found": "2023-07-02T07:49:15.311Z",
+        "current_index": 4,
+        "wanted_indexes": "['70185', '70181']",
+        "pair": 1,
+        "index_gained": "70181"
+    }
+},
+{
+    "model": "indexswapper.swaprequest",
+    "pk": 4,
+    "fields": {
+        "user": 4,
+        "contact_info": "user3@mail.com",
+        "contact_type": "E",
+        "status": "S",
+        "datetime_added": "2023-07-02T07:50:45.610Z",
+        "datetime_found": null,
+        "current_index": 13,
+        "wanted_indexes": "['70201', '70203', '70204']",
+        "pair": null,
+        "index_gained": ""
+    }
+},
+{
+    "model": "indexswapper.swaprequest",
+    "pk": 5,
+    "fields": {
+        "user": 4,
+        "contact_info": "user3@mail.com",
+        "contact_type": "E",
+        "status": "C",
+        "datetime_added": "2023-07-02T07:52:32.368Z",
+        "datetime_found": "2023-07-02T07:55:59.170Z",
+        "current_index": 28,
+        "wanted_indexes": "['70212', '70211']",
+        "pair": 6,
+        "index_gained": "70211"
+    }
+},
+{
+    "model": "indexswapper.swaprequest",
+    "pk": 6,
+    "fields": {
+        "user": 5,
+        "contact_info": "@user4abc",
+        "contact_type": "T",
+        "status": "C",
+        "datetime_added": "2023-07-02T07:55:57.820Z",
+        "datetime_found": "2023-07-02T07:55:59.170Z",
+        "current_index": 23,
+        "wanted_indexes": "['70216', '70217']",
+        "pair": 5,
+        "index_gained": "70216"
+    }
+},
+{
+    "model": "indexswapper.swaprequest",
+    "pk": 7,
+    "fields": {
+        "user": 6,
+        "contact_info": "87654321",
+        "contact_type": "P",
+        "status": "S",
+        "datetime_added": "2023-07-02T08:04:48.200Z",
+        "datetime_found": null,
+        "current_index": 33,
+        "wanted_indexes": "['70218', '70220']",
+        "pair": null,
+        "index_gained": ""
+    }
+},
+{
+    "model": "indexswapper.swaprequest",
+    "pk": 8,
+    "fields": {
+        "user": 6,
+        "contact_info": "87654321",
+        "contact_type": "P",
+        "status": "S",
+        "datetime_added": "2023-07-02T08:05:38.638Z",
+        "datetime_found": null,
+        "current_index": 11,
+        "wanted_indexes": "['70181', '70186', '70190']",
+        "pair": null,
+        "index_gained": ""
+    }
+},
+{
+    "model": "indexswapper.swaprequest",
+    "pk": 9,
+    "fields": {
+        "user": 3,
+        "contact_info": "user2@mail.com",
+        "contact_type": "E",
+        "status": "S",
+        "datetime_added": "2023-07-02T09:52:04.803Z",
+        "datetime_found": null,
+        "current_index": 27,
+        "wanted_indexes": "['70218', '70220']",
+        "pair": null,
+        "index_gained": ""
+    }
+}
+]

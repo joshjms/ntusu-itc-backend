@@ -2,7 +2,7 @@ from rest_framework.viewsets import ViewSet, ModelViewSet
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
-from starswar.models import CourseIndex, SwapRequest
+from starswar.models import XCourseIndex as CourseIndex, XSwapRequest as SwapRequest
 from starswar.serializers import (
     CourseIndexPartialSerializer,
     CourseIndexCompleteSerializer,

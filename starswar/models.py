@@ -27,7 +27,7 @@ class IndexSwapperConfig(models.Model):
         return super().save(*args, **kwargs)
 
 
-class CourseIndex(models.Model):
+class XCourseIndex(models.Model):
     code = models.CharField(max_length=6)
     name = models.CharField(max_length=100)
     academic_units = models.IntegerField(
@@ -56,7 +56,7 @@ class CourseIndex(models.Model):
         return f'<Course Code {self.code}, Index {self.index}>'
 
 
-class SwapRequest(models.Model):
+class XSwapRequest(models.Model):
     class Status(models.TextChoices):
         SEARCHING = 'S', 'Searching'
         WAITING = 'W', 'Waiting'
@@ -64,7 +64,7 @@ class SwapRequest(models.Model):
     
     user = models.ForeignKey(
         User, on_delete=models.CASCADE,
-        related_name='swap_requests'
+        related_name='Xswap_requests'
     )
     contact_info = models.CharField(max_length=100)
     status = models.CharField(
@@ -75,8 +75,8 @@ class SwapRequest(models.Model):
     datetime_added = models.DateTimeField(auto_now_add=True)
     datetime_found = models.DateTimeField(blank=True, null=True)
     current_index = models.ForeignKey(
-        CourseIndex, on_delete=models.SET_NULL,
-        related_name='available_swap', null=True
+        XCourseIndex, on_delete=models.SET_NULL,
+        related_name='Xavailable_swap', null=True
     )
     wanted_indexes = models.CharField(max_length=100)
 

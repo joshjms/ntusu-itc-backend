@@ -4,9 +4,9 @@ from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
 from starswar.models import XCourseIndex as CourseIndex, XSwapRequest as SwapRequest
 from starswar.serializers import (
-    CourseIndexPartialSerializer,
-    CourseIndexCompleteSerializer,
-    SwapRequestSerializer,
+    XCourseIndexPartialSerializer as CourseIndexPartialSerializer,
+    XCourseIndexCompleteSerializer as CourseIndexCompleteSerializer,
+    XSwapRequestSerializer as SwapRequestSerializer,
 )
 from starswar.utils import util_algo, util_email, util_scraper
 from starswar.utils.decorator import verify_cooldown, get_swap_request_with_id_verify

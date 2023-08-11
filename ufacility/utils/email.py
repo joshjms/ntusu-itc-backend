@@ -3,7 +3,7 @@ from ufacility.models import UFacilityUser, Venue, SecurityEmail, BookingGroup
 
 
 exco_email = 'su-ope@e.ntu.edu.sg'
-FE_MANAGE_VERIFICATION_LINK = 'https://ntusu-itc-frontend-michac789.vercel.app/ufacility/admin/verifications'
+FE_MANAGE_VERIFICATION_LINK = 'https://app.ntusu.org/ufacility/admin/verifications'
 
 def send_email_to_security(booking_group: BookingGroup):
     if booking_group.venue.is_send_security_mail and SecurityEmail.objects.exists():

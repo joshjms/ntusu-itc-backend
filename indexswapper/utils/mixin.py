@@ -2,6 +2,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import BaseFilterBackend, OrderingFilter
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
+from indexswapper.models import CourseIndex
 
 
 class PaginationConfig(PageNumberPagination):
@@ -22,8 +23,11 @@ class CustomCodeAndNameSearch(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         search_qp = request.query_params.get('search__icontains', None)
         if search_qp:
-            queryset = queryset.filter(
-                code__icontains=search_qp) | queryset.filter(name__icontains=search_qp)
+            ret_queryset = CourseIndex.objects.none()
+            for search_term in search_qp.split():
+                ret_queryset |= queryset.filter(
+                    code__icontains=search_term) | queryset.filter(name__icontains=search_term)
+            return ret_queryset
         return queryset
 
 

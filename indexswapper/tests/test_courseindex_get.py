@@ -273,6 +273,39 @@ class CourseIndexGetCoursesTestCase(IndexSwapperBaseTestCase):
         self.assertEqual(len(resp_json['results']), 1)
         self.assertEqual(resp_json['results'][0]['code'], 'MH1300')
 
+    def test_success_qp_search_custom_3(self):
+        resp = self.client3.get(self.ENDPOINT, {
+            'search__icontains': 'MH1200 Linear Algebra',
+        })
+        resp_json = loads(resp.content.decode('utf-8'))
+        self.assertEqual(resp_json['count'], 1)
+        self.assertEqual(resp_json['total_pages'], 1)
+        self.assertEqual(len(resp_json['results']), 1)
+        self.assertEqual(resp_json['results'][0]['code'], 'MH1200')
+
+    def test_success_qp_search_custom_4(self):
+        resp = self.client3.get(self.ENDPOINT, {
+            'search__icontains': 'algebra calcu',
+        })
+        resp_json = loads(resp.content.decode('utf-8'))
+        self.assertEqual(resp_json['count'], 2)
+        self.assertEqual(resp_json['total_pages'], 1)
+        self.assertEqual(len(resp_json['results']), 2)
+        self.assertEqual(resp_json['results'][0]['code'], 'MH1100')
+        self.assertEqual(resp_json['results'][1]['code'], 'MH1200')
+
+    def test_success_qp_search_custom_5(self):
+        resp = self.client3.get(self.ENDPOINT, {
+            'search__icontains': '',
+        })
+        resp_json = loads(resp.content.decode('utf-8'))
+        self.assertEqual(resp_json['count'], 3)
+        self.assertEqual(resp_json['total_pages'], 1)
+        self.assertEqual(len(resp_json['results']), 3)
+        self.assertEqual(resp_json['results'][0]['code'], 'MH1100')
+        self.assertEqual(resp_json['results'][1]['code'], 'MH1200')
+        self.assertEqual(resp_json['results'][2]['code'], 'MH1300')
+
 
 class CourseIndexGetIndexesTestCase(IndexSwapperBaseTestCase):
     ENDPOINT = (

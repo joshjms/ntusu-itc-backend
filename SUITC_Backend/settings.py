@@ -23,6 +23,9 @@ import boto3
 import datetime
 import os
 
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -268,6 +271,15 @@ REST_FRAMEWORK = {
         'django_filters.rest_framework.DjangoFilterBackend'
     ],
 }
+
+# Sentry
+if PROD:
+    sentry_sdk.init(
+        dsn=os.environ.get('SENTRY_DSN', ''),
+        integrations=[DjangoIntegration()],
+        traces_sample_rate=1.0,
+        send_default_pii=True
+    )
 
 # DEPLOYMENT SETTINGS
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')

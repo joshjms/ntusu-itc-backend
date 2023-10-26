@@ -1,4 +1,5 @@
 from SUITC_Backend.settings import ses_client
+import os
 
 
 DO_NOT_REPLY_MESSAGE = f'''
@@ -12,6 +13,9 @@ DO_NOT_REPLY_MESSAGE = f'''
 
 
 def send_email(subject, body, recipients: list, sender='do-not-reply'):
+    if (os.environ.get('PROD', 0) != 1):
+        print(f'Email with subject {subject} sent to [{",".join(recipients)}]')
+        return 0
     email_from = sender + '@ntusu.org'
     return ses_client.send_email(
         Source = email_from,

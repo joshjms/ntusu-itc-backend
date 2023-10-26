@@ -1,4 +1,5 @@
 from SUITC_Backend.settings import ses_client
+import os
 
 
 DO_NOT_REPLY_MESSAGE = f'''

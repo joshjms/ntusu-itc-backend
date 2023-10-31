@@ -1,70 +1,50 @@
-# Django
 asgiref==3.5.2
-Django==4.1.10
-sqlparse==0.4.4
-tzdata==2022.5
-pytz==2022.5
-
-# Django REST Framework; dependent to Django
-djangorestframework==3.14.0
-
-# Django Cors Headers; dependent to Django
-django-cors-headers==3.13.0
-
-# DRF JWT; dependent to DRF
-djangorestframework-simplejwt==5.2.2
-PyJWT==2.6.0
-
-# Django Filter; dependent to DRF
-django-filter==22.1
-
-# Database
-psycopg2-binary==2.9.3
-mysqlclient==2.1.1
-
-# Unittest library
-mock==4.0.3
-
-# Boto3 1.9
+beautifulsoup4==4.11.1
+bleach==6.1.0
 boto3==1.24.72
 botocore==1.27.72
-jmespath==1.0.1
-python-dateutil==2.8.2
-s3transfer==0.6.0
-six==1.16.0
-urllib3==1.26.18
-
-# DRF-YASG (Swagger UI Docs); dependent to DRF
+bs4==0.0.1
 certifi==2023.7.22
 charset-normalizer==2.1.1
 coreapi==2.3.3
 coreschema==0.0.4
+Django==4.1.10
+django-cors-headers==3.13.0
+django-filter==22.1
+django-storages==1.13.2
+django-summernote==0.8.20.0
+djangorestframework==3.14.0
+djangorestframework-simplejwt==5.2.2
 drf-yasg==1.21.4
+et-xmlfile==1.1.0
+gunicorn==20.1.0
 idna==3.4
 inflection==0.5.1
 itypes==1.2.0
 Jinja2==3.1.2
+jmespath==1.0.1
+lxml==4.9.2
+markdown2==2.4.6
 MarkupSafe==2.1.1
+mock==4.0.3
+mysqlclient==2.1.1
+numpy==1.26.1
+openpyxl==3.1.2
 packaging==22.0
+pandas==2.1.1
+psycopg2-binary==2.9.3
+PyJWT==2.6.0
+python-dateutil==2.8.2
+pytz==2022.5
 requests==2.31.0
 ruamel.yaml==0.17.21
+s3transfer==0.6.0
+six==1.16.0
+soupsieve==2.3.2.post1
+sqlparse==0.4.4
+tzdata==2022.5
 uritemplate==4.1.1
-
-# Markdown
-django-summernote==0.8.20.0
-markdown2==2.4.6
-
-# Web Scraper (BS4 0.0.1)
-bs4==0.0.1
-beautifulsoup4==4.11.1
-soupsieve==2.3.2post1
-lxml==4.9.2
-
-# WSGI (Gunicorn)
-gunicorn==20.1.0
-
-# Static file serving (WhiteNoise)
+urllib3==1.26.18
+webencodings==0.5.1
 whitenoise==6.3.0
-
-# AWS S3 bucket static file storages
-django-storages==1.13.2
+XlsxWriter==3.1.9

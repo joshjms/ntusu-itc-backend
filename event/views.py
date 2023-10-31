@@ -2,6 +2,11 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics
 from rest_framework.views import APIView
+import pandas as pd
+import boto3
+from botocore.exceptions import NoCredentialsError
+import io
+from SUITC_Backend.settings import ses_client
 
 from sso.models import User
 from event.models import Event, EventAdmin, EventOfficer, MatricCheckIn
@@ -262,3 +267,48 @@ class EventStatistics(generics.ListAPIView):
             "accumulated_check_ins": accumulated_check_ins,
         }
         return Response(data, status=status.HTTP_200_OK)
+    
+#GET <int:pk/export_csv/
+class ExportMatricCheckInsView(APIView):
+    permission_classes = [IsEventSuperAdmin]
+
+    def get(self, request, event_id):
+        try:
+            # Get query parameters for filtering and parse it
+            start_date_str = request.query_params.get('start_date')
+            end_date_str = request.query_params.get('end_date')
+            start_date = datetime.strptime(start_date_str, "%Y-%m-%d") if start_date_str else None
+            end_date = datetime.strptime(end_date_str, "%Y-%m-%d") if end_date_str else None
+
+            # get all the matric of an event
+            matric_check_ins = MatricCheckIn.objects.filter(event__id=event_id)   
+            
+            # Apply date range filtering if query parameters are provided
+            if start_date:
+                matric_check_ins = matric_check_ins.filter(added_date__gte=start_date)
+            if end_date:
+                matric_check_ins = matric_check_ins.filter(added_date__lte=end_date)
+
+            serializer = MatricListSerializer(matric_check_ins, many=True)
+            data = serializer.data
+
+            # Convert the data to Excel in memory
+            df = pd.DataFrame(data)
+            in_memory_fp = io.BytesIO()
+            df.to_excel(in_memory_fp, index=False)
+            in_memory_fp.seek(0)
+
+            # Generate a unique filename with event ID and current timestamp
+            timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+            file_name = f'event_{event_id}_matric_check_ins_{timestamp}.xlsx'
+
+            # Upload the Excel file to AWS S3
+            bucket_name = ''
+            ses_client.upload_fileobj(in_memory_fp, bucket_name, file_name)
+            s3_link = f'https://{bucket_name}.s3.amazonaws.com/{file_name}'
+
+            return Response({'matric_checkins_link': s3_link}, status=status.HTTP_200_OK)
+        except NoCredentialsError:
+            return Response({"detail": "AWS credentials are not configured correctly."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception as e:
+            return Response({"detail": f"An unexpected error occurred: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

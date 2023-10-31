@@ -13,7 +13,8 @@ from event.views import (EventListAll,
                          EventOfficerLoginView,
                          EventInputView,
                          EventStatistics,
-                         MatricList)
+                         MatricList, 
+                         ExportMatricCheckInsView)
 
 app_name = 'event'
 
@@ -30,7 +31,8 @@ urlpatterns = [
     path('<int:pk>/create_officer/', AddEventOfficer.as_view(), name="add-event-officer"),
     path('edit_officer/<str:token>/', EventOfficerEdit.as_view(), name="edit-officer"),
     path('officer_login/', EventOfficerLoginView.as_view(), name='event-officer-login'),
-    path('<int:pk>/input/', EventInputView.as_view(), name="event-input-view"),
+    path('<int:pk>/input/', EventInputView.as_view(), name="event-input-view"), 
     path('<int:pk>/matric_list/', MatricList.as_view(), name = "event-list-matric"),
     path('<int:pk>/statistics/', EventStatistics.as_view(), name="view-event-statistics"),
+    path('<int:event_id>/export_csv/', ExportMatricCheckInsView.as_view(), name='export-csv')
 ]

@@ -241,13 +241,13 @@ ses_client = boto3.client(
     aws_access_key_id=os.environ.get('SES_ACCESS_KEY_ID'),
     aws_secret_access_key=os.environ.get('SES_SECRET_ACCESS_KEY'),
 )
-
 s3_client = boto3.client(
     's3',
     region_name='ap-southeast-1',
     aws_access_key_id=os.environ.get('S3_ACCESS_KEY_ID'),
     aws_secret_access_key=os.environ.get('S3_SECRET_ACCESS_KEY'),
 )
+EVENTS_CSV_BUCKET_NAME = os.environ.get('EVENTS_CSV_BUCKET_NAME')
 
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {

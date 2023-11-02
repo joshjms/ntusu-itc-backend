@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 import pandas as pd
 from botocore.exceptions import NoCredentialsError
 import io
-from SUITC_Backend.settings import s3_client
+from SUITC_Backend.settings import s3_client, EVENTS_CSV_BUCKET_NAME
 
 from sso.models import User
 from event.models import Event, EventAdmin, EventOfficer, MatricCheckIn
@@ -302,7 +302,7 @@ class ExportMatricCheckInsView(APIView):
             file_name = f'event_{event_id}_matric_check_ins_{timestamp}.xlsx'
 
             # Upload the Excel file to AWS S3
-            bucket_name = 'event-matric-csv-exports'
+            bucket_name = EVENTS_CSV_BUCKET_NAME
             s3_client.upload_fileobj(in_memory_fp, bucket_name, file_name)
             s3_link = f'https://{bucket_name}.s3.amazonaws.com/{file_name}'
 

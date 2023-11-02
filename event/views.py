@@ -3,10 +3,9 @@ from rest_framework import status
 from rest_framework import generics
 from rest_framework.views import APIView
 import pandas as pd
-import boto3
 from botocore.exceptions import NoCredentialsError
 import io
-from SUITC_Backend.settings import ses_client
+from SUITC_Backend.settings import s3_client
 
 from sso.models import User
 from event.models import Event, EventAdmin, EventOfficer, MatricCheckIn
@@ -270,7 +269,7 @@ class EventStatistics(generics.ListAPIView):
     
 #GET <int:pk/export_csv/
 class ExportMatricCheckInsView(APIView):
-    permission_classes = [IsEventSuperAdmin]
+    permission_classes = [IsEventCreator]
 
     def get(self, request, event_id):
         try:
@@ -291,7 +290,7 @@ class ExportMatricCheckInsView(APIView):
 
             serializer = MatricListSerializer(matric_check_ins, many=True)
             data = serializer.data
-
+            
             # Convert the data to Excel in memory
             df = pd.DataFrame(data)
             in_memory_fp = io.BytesIO()
@@ -303,8 +302,8 @@ class ExportMatricCheckInsView(APIView):
             file_name = f'event_{event_id}_matric_check_ins_{timestamp}.xlsx'
 
             # Upload the Excel file to AWS S3
-            bucket_name = ''
-            ses_client.upload_fileobj(in_memory_fp, bucket_name, file_name)
+            bucket_name = 'event-matric-csv-exports'
+            s3_client.upload_fileobj(in_memory_fp, bucket_name, file_name)
             s3_link = f'https://{bucket_name}.s3.amazonaws.com/{file_name}'
 
             return Response({'matric_checkins_link': s3_link}, status=status.HTTP_200_OK)

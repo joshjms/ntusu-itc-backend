@@ -16,12 +16,15 @@ import django
 from django.utils.encoding import force_str
 django.utils.encoding.force_text = force_str
 
-
-
 from pathlib import Path
 import boto3
 import datetime
 import os
+
+from dotenv import load_dotenv
+
+# Load the environment variables from the .env file
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -235,9 +238,16 @@ AUTH_USER_MODEL = 'sso.User'
 ses_client = boto3.client(
     'ses',
     region_name='ap-southeast-1',
-    aws_access_key_id='AKIASDA4XJS4KLMM4RV7',
-    aws_secret_access_key=os.environ.get('SES_SECRET_ACCESS_KEY', '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'),
+    aws_access_key_id=os.environ.get('SES_ACCESS_KEY_ID'),
+    aws_secret_access_key=os.environ.get('SES_SECRET_ACCESS_KEY'),
 )
+s3_client = boto3.client(
+    's3',
+    region_name='ap-southeast-1',
+    aws_access_key_id=os.environ.get('S3_ACCESS_KEY_ID'),
+    aws_secret_access_key=os.environ.get('S3_SECRET_ACCESS_KEY'),
+)
+EVENTS_CSV_BUCKET_NAME = os.environ.get('EVENTS_CSV_BUCKET_NAME')
 
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {

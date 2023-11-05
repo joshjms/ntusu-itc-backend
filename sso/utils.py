@@ -13,7 +13,7 @@ DO_NOT_REPLY_MESSAGE = f'''
 
 
 def send_email(subject, body, recipients: list, sender='do-not-reply'):
-    if (os.environ.get('PROD', 0) != 1):
+    if (os.environ.get('PROD', 0) != '1'):
         print(f'Email with subject {subject} sent to [{",".join(recipients)}]')
         return 0
     email_from = sender + '@ntusu.org'

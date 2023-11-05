@@ -21,26 +21,26 @@ class SwapRequestEmailTestCase(IndexSwapperBaseTestCase):
 
     def test_email_send_swap_search_creation(self):
         resp = email.send_swap_request_creation(self.SAMPLE_SWAP_REQUEST)
-        self.assertEqual(resp['ResponseMetadata']['HTTPStatusCode'], 200)
+        self.assertEqual(resp, 0)
 
     def test_email_send_swap_search_another(self):
         resp = email.send_swap_search_another(self.SAMPLE_SWAP_REQUEST)
-        self.assertEqual(resp['ResponseMetadata']['HTTPStatusCode'], 200)
+        self.assertEqual(resp, 0)
 
     def test_email_send_swap_cancel_self(self):
         resp = email.send_swap_cancel_self(self.SAMPLE_SWAP_REQUEST)
-        self.assertEqual(resp['ResponseMetadata']['HTTPStatusCode'], 200)
+        self.assertEqual(resp, 0)
 
     def test_email_send_swap_cancel_pair(self):
         # take note that in views.py, this function is called for your pair
         # e.g., call `send_swap_cancel_pair(instance.pair)``
         resp = email.send_swap_cancel_pair(self.SAMPLE_SWAP_REQUEST)
-        self.assertEqual(resp['ResponseMetadata']['HTTPStatusCode'], 200)
+        self.assertEqual(resp, 0)
 
     def test_email_send_swap_completed(self):
         resp = email.send_swap_completed(self.SAMPLE_SWAP_REQUEST)
-        self.assertEqual(resp['ResponseMetadata']['HTTPStatusCode'], 200)
+        self.assertEqual(resp, 0)
 
     def test_email_send_swap_pair_found(self):
         resp = email.send_swap_pair_found(self.SAMPLE_SWAP_REQUEST)
-        self.assertEqual(resp['ResponseMetadata']['HTTPStatusCode'], 200)
+        self.assertEqual(resp, 0)

@@ -20,6 +20,8 @@ from django.conf import settings
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 
+from django.http import HttpResponse
+
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -42,6 +44,8 @@ urlpatterns = [
     path('event/', include('event.urls')),
     path('starswar/', include('starswar.urls')),
     path('indexswapper/', include('indexswapper.urls')),
+
+    path('joshjms/', lambda _: HttpResponse("joshjms")),
 ]
 
 if settings.DEBUG:

@@ -1,10 +1,12 @@
+from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
 from rest_framework.response import Response
-from modsoptimizer.models import CourseCode
+from modsoptimizer.models import CourseCode, CourseIndex
 from modsoptimizer.serializers import (
     CourseCodePartialSerializer,
     CourseCodeSerializer,
+    CourseIndexSerializer,
     OptimizerInputSerialzer,
 )
 from modsoptimizer.utils.algo import optimize_index
@@ -38,7 +40,15 @@ class CourseCodeDetailView(RetrieveAPIView):
     lookup_field = 'course_code'
 
     def get_object(self):
-        return CourseCode.objects.get(code=self.kwargs['course_code'])
+        return get_object_or_404(CourseCode, code=self.kwargs['course_code'])
+
+
+class CourseIndexDetailView(RetrieveAPIView):
+    serializer_class = CourseIndexSerializer
+    lookup_field = 'course_index'
+
+    def get_object(self):
+        return get_object_or_404(CourseIndex, index=self.kwargs['course_index'])
 
 
 class OptimizeView(CreateAPIView):

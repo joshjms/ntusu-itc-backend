@@ -1,0 +1,146 @@
+[
+    {
+        "model": "modsoptimizer.coursecode",
+        "pk": 1,
+        "fields": {
+            "code": "MH1101",
+            "name": "CALCULUS II",
+            "academic_units": 4,
+            "datetime_added": "2023-12-10T05:15:38.820Z",
+            "exam_schedule": "2024-04-2909:00-11:00OOXXXXOOOOOOOOOOOOOOOOOOOOOOOOOO",
+            "common_schedule": "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOXXOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOXXXXOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"
+        }
+    },
+    {
+        "model": "modsoptimizer.coursecode",
+        "pk": 2,
+        "fields": {
+            "code": "MH1201",
+            "name": "LINEAR ALGEBRA II",
+            "academic_units": 4,
+            "datetime_added": "2023-12-10T05:15:39.044Z",
+            "exam_schedule": "2024-04-3009:00-11:00OOXXXXOOOOOOOOOOOOOOOOOOOOOOOOOO",
+            "common_schedule": "OOOOOOOOOOOOOXXOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOXXXXOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"
+        }
+    },
+    {
+        "model": "modsoptimizer.coursecode",
+        "pk": 3,
+        "fields": {
+            "code": "MH1301",
+            "name": "DISCRETE MATHEMATICS",
+            "academic_units": 3,
+            "datetime_added": "2023-12-10T05:15:39.283Z",
+            "exam_schedule": "2024-05-0909:00-11:00OOXXXXOOOOOOOOOOOOOOOOOOOOOOOOOO",
+            "common_schedule": "OOOOOOOOOOOOOOOXXXXOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"
+        }
+    },
+    {
+        "model": "modsoptimizer.coursecode",
+        "pk": 4,
+        "fields": {
+            "code": "MH1403",
+            "name": "ALGORITHMS & COMPUTING",
+            "academic_units": 3,
+            "datetime_added": "2023-12-10T05:15:39.503Z",
+            "exam_schedule": "2024-05-0709:00-11:00OOXXXXOOOOOOOOOOOOOOOOOOOOOOOOOO",
+            "common_schedule": "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOXXXXOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"
+        }
+    },
+    {
+        "model": "modsoptimizer.coursecode",
+        "pk": 5,
+        "fields": {
+            "code": "MH1803",
+            "name": "CALCULUS FOR PHYSICS",
+            "academic_units": 4,
+            "datetime_added": "2023-12-10T05:15:39.571Z",
+            "exam_schedule": "2024-04-3013:00-15:00OOOOOOOOOOXXXXOOOOOOOOOOOOOOOOOO",
+            "common_schedule": "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOXXXXOOOOOOOOOOOOOOOOOOOOOOOOOOOOXXOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"
+        }
+    },
+    {
+        "model": "modsoptimizer.coursecode",
+        "pk": 6,
+        "fields": {
+            "code": "MH1810",
+            "name": "MATHEMATICS 1",
+            "academic_units": 3,
+            "datetime_added": "2023-12-10T05:15:39.667Z",
+            "exam_schedule": "2024-05-0713:00-15:00OOOOOOOOOOXXXXOOOOOOOOOOOOOOOOOO",
+            "common_schedule": "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOXXXXOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"
+        }
+    },
+    {
+        "model": "modsoptimizer.coursecode",
+        "pk": 7,
+        "fields": {
+            "code": "MH1811",
+            "name": "MATHEMATICS 2",
+            "academic_units": 3,
+            "datetime_added": "2023-12-10T05:15:39.758Z",
+            "exam_schedule": "2024-04-2909:00-11:00OOXXXXOOOOOOOOOOOOOOOOOOOOOOOOOO",
+            "common_schedule": "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOXXXXOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"
+        }
+    },
+    {
+        "model": "modsoptimizer.coursecode",
+        "pk": 8,
+        "fields": {
+            "code": "MH1812",
+            "name": "DISCRETE MATHEMATICS",
+            "academic_units": 3,
+            "datetime_added": "2023-12-10T05:15:40.448Z",
+            "exam_schedule": "2024-05-0913:00-15:00OOOOOOOOOOXXXXOOOOOOOOOOOOOOOOOO",
+            "common_schedule": "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOXXOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"
+        }
+    },
+    {
+        "model": "modsoptimizer.coursecode",
+        "pk": 9,
+        "fields": {
+            "code": "MH1820",
+            "name": "INTRODUCTION TO PROBABILITY & STATISTICAL METHODS",
+            "academic_units": 3,
+            "datetime_added": "2023-12-10T05:15:40.827Z",
+            "exam_schedule": "2024-05-0813:00-15:00OOOOOOOOOOXXXXOOOOOOOOOOOOOOOOOO",
+            "common_schedule": "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOXXXXOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"
+        }
+    },
+    {
+        "model": "modsoptimizer.coursecode",
+        "pk": 10,
+        "fields": {
+            "code": "MH2220",
+            "name": "ALGEBRA I",
+            "academic_units": 3,
+            "datetime_added": "2023-12-10T05:15:41.006Z",
+            "exam_schedule": "2024-05-0809:00-11:00OOXXXXOOOOOOOOOOOOOOOOOOOOOOOOOO",
+            "common_schedule": "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOXXXXOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOXXOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"
+        }
+    },
+    {
+        "model": "modsoptimizer.coursecode",
+        "pk": 11,
+        "fields": {
+            "code": "MH2801",
+            "name": "COMPLEX METHODS FOR THE SCIENCES",
+            "academic_units": 3,
+            "datetime_added": "2023-12-10T05:15:41.053Z",
+            "exam_schedule": "2024-05-0713:00-15:00OOOOOOOOOOXXXXOOOOOOOOOOOOOOOOOO",
+            "common_schedule": "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOXXXXOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"
+        }
+    },
+    {
+        "model": "modsoptimizer.coursecode",
+        "pk": 12,
+        "fields": {
+            "code": "MH2811",
+            "name": "MATHEMATICS II",
+            "academic_units": 3,
+            "datetime_added": "2023-12-10T05:15:41.144Z",
+            "exam_schedule": "2024-05-0209:00-11:00OOXXXXOOOOOOOOOOOOOOOOOOOOOOOOOO",
+            "common_schedule": "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOXXXXOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"
+        }
+    }
+]

@@ -37,7 +37,7 @@ class CourseCodeSerializer(serializers.ModelSerializer):
             'academic_units',
             'datetime_added',
             'get_exam_schedule',
-            'get_common_schedule',
+            'get_common_information',
             'common_schedule',
             'indexes',
         ]

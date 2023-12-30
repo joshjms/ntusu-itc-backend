@@ -29,6 +29,23 @@ class CourseCode(models.Model):
         Each (S) represents a day of the week, from Monday to Saturday.
         Common schedule are the occupied time slots that are common in all indexes of the course.
     '''
+    # information that is common across all indexes of this course
+    common_information = models.TextField(null=True, blank=True)
+
+    def serialize_info(self, info):
+        single_infos = info.split('^')
+        return {
+            'type': single_infos[0],
+            'group': single_infos[1],
+            'day': single_infos[2],
+            'time': single_infos[3],
+            'venue': single_infos[4],
+            'remark': single_infos[5],
+        }
+
+    @property
+    def get_common_information(self):
+        return [self.serialize_info(info_group) for info_group in self.common_information.split(';')]
 
     @property
     def get_exam_schedule(self):
@@ -55,19 +72,27 @@ class CourseIndex(models.Model):
     information = models.TextField() # TODO - add validation
     schedule = models.CharField(max_length=192, validators=[validate_weekly_schedule])
 
+    # only contains information that is not common across all indexes of the course that the index belongs to
+    filtered_information = models.TextField(null=True, blank=True)
+
+    def serialize_info(self, info):
+        single_infos = info.split('^')
+        return {
+            'type': single_infos[0],
+            'group': single_infos[1],
+            'day': single_infos[2],
+            'time': single_infos[3],
+            'venue': single_infos[4],
+            'remark': single_infos[5],
+        }
+
     @property
     def get_information(self):
-        def serialize(msg):
-            single_infos = msg.split('^')
-            return {
-                'type': single_infos[0],
-                'group': single_infos[1],
-                'day': single_infos[2],
-                'time': single_infos[3],
-                'venue': single_infos[4],
-                'remark': single_infos[5],
-            }
-        return [serialize(info_group) for info_group in self.information.split(';')]
+        return [self.serialize_info(info_group) for info_group in self.information.split(';')]
+
+    @property
+    def get_filtered_information(self):
+        return [self.serialize_info(info_group) for info_group in self.filtered_information.split(';')]
 
     class Meta:
         verbose_name_plural = 'Course Indexes'

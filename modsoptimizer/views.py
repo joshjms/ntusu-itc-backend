@@ -12,6 +12,7 @@ from modsoptimizer.serializers import (
 from modsoptimizer.utils.algo import optimize_index
 from modsoptimizer.utils.course_scraper import perform_course_scraping
 from modsoptimizer.utils.exam_scraper import perform_exam_schedule_scraping
+from modsoptimizer.utils.info_scraper import perform_info_update
 from modsoptimizer.utils.mixin import CourseCodeQueryParamsMixin
 from portal.permissions import IsSuperUser
 
@@ -28,6 +29,13 @@ def get_course_data(_):
 def get_exam_data(_):
     perform_exam_schedule_scraping()
     return Response('Exam Scraping Completed')
+
+
+@api_view(['GET'])
+@permission_classes([IsSuperUser])
+def get_info_data(_):
+    perform_info_update()
+    return Response('Info Update Completed')
 
 
 class CourseCodeListView(CourseCodeQueryParamsMixin, ListAPIView):

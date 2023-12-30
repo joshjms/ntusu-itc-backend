@@ -20,7 +20,8 @@ class CourseIndexSerializer(serializers.ModelSerializer):
             'id',
             'index',
             'get_information',
-            'schedule'
+            'get_filtered_information',
+            'schedule',
         ]
 
 
@@ -36,6 +37,7 @@ class CourseCodeSerializer(serializers.ModelSerializer):
             'academic_units',
             'datetime_added',
             'get_exam_schedule',
+            'get_common_schedule',
             'common_schedule',
             'indexes',
         ]

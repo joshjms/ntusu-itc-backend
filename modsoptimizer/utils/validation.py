@@ -10,7 +10,7 @@ def validate_weekly_schedule(value):
             params={'value': value},
             code='invalid_length',
         )
-    if not all(char in ('X', '0') for char in value):
+    if not all(char in ('X', 'O') for char in value):
         raise ValidationError(
             _(f'`{value}` must only contain X and O'),
             params={'value': value},
@@ -29,7 +29,7 @@ def validate_exam_schedule(value):
     year, month, date = date.split('-')
     try:
         year, month, date = int(year), int(month), int(date)
-        if not (1 <= date <= 31 and 1 <= month <= 12 and year[:2] == '20' and 0 <= year[2:] <= 99):
+        if not (1 <= date <= 31 and 1 <= month <= 12 and str(year)[:2] == '20' and 0 <= int(str(year)[2:]) <= 99):
             raise ValidationError(
                 _(f'`{value[:10]}` (first 10 chars) must be valid YYYY-MM-DD format'),
                 params={'value': value},
@@ -56,12 +56,24 @@ def validate_exam_schedule(value):
             params={'value': value},
             code='invalid_format'
         )
-    if not all(char in ('X', '0') for char in timecode):
+    if not all(char in ('X', 'O') for char in timecode):
         raise ValidationError(
             _(f'`{value}` (last 32 chars) must only contain X and O'),
             params={'value': value},
             code='invalid_value',
         )
+
+
+def validate_information(value):
+    info_group = value.split(';')
+    for info in info_group:
+        single_info = info.split('^')
+        if len(single_info) != 6:
+            raise ValidationError(
+                _(f'`{value}` must be in format of `type^group^day^time^venue^remark`'),
+                params={'value': value},
+                code='invalid_format'
+            )
 
 
 validate_index = RegexValidator(

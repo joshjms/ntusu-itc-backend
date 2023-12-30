@@ -3,6 +3,7 @@ import os
 from modsoptimizer.models import CourseCode, CourseIndex
 from modsoptimizer.utils.course_scraper import get_raw_data, process_data, save_course_data
 from modsoptimizer.utils.exam_scraper import get_soup_from_html_file
+from sso.tests.base_test import BaseAPITestCase
 
 
 class TestCourseScraper(APITestCase):
@@ -1037,3 +1038,19 @@ class TestCourseScraper(APITestCase):
                 "common_schedule": self.get_schedule_str(68, 69),
             }
         ])
+
+
+class ExamScraperAPITestCase(BaseAPITestCase):
+    ENDPOINT_COURSE_SCRAPER = '/modsoptimizer/scrape_course/'
+
+    def test_api_fail_wrong_method(self):
+        resp = self.client1.post(self.ENDPOINT_COURSE_SCRAPER)
+        self.assertEqual(resp.status_code, 405)
+
+    def test_api_fail_unauthorized(self):
+        resp = self.client3.get(self.ENDPOINT_COURSE_SCRAPER)
+        self.assertEqual(resp.status_code, 401)
+
+    def test_api_fail_forbidden(self):
+        resp = self.client2.get(self.ENDPOINT_COURSE_SCRAPER)
+        self.assertEqual(resp.status_code, 403)

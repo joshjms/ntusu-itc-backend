@@ -1,4 +1,4 @@
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
 from rest_framework.response import Response
 from modsoptimizer.models import CourseCode
@@ -11,15 +11,18 @@ from modsoptimizer.utils.algo import optimize_index
 from modsoptimizer.utils.course_scraper import perform_course_scraping
 from modsoptimizer.utils.exam_scraper import perform_exam_schedule_scraping
 from modsoptimizer.utils.mixin import CourseCodeQueryParamsMixin
+from portal.permissions import IsSuperUser
 
 
 @api_view(['GET'])
+@permission_classes([IsSuperUser])
 def get_course_data(_):
     perform_course_scraping()
     return Response('Course Scraping Completed')
 
 
 @api_view(['GET'])
+@permission_classes([IsSuperUser])
 def get_exam_data(_):
     perform_exam_schedule_scraping()
     return Response('Exam Scraping Completed')

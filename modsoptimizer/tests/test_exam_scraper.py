@@ -2,9 +2,10 @@ from rest_framework.test import APITestCase
 import os
 from modsoptimizer.models import CourseCode
 from modsoptimizer.utils.exam_scraper import get_soup_from_html_file, get_raw_data, process_data, save_exam_schedule
+from sso.tests.base_test import BaseAPITestCase
 
 
-class TestCourseScraper(APITestCase):
+class TestExamScraper(APITestCase):
     '''
     Given soup of exam schedule page, test these functions from `test_exam_scraper`:
     - get_raw_data
@@ -195,3 +196,19 @@ class TestCourseScraper(APITestCase):
                 'time': '17:00-19:00',
                 'timecode': self.get_exam_schedule_str('', '', 19, 20, 21, 22)
             })
+
+
+class ExamScraperAPITestCase(BaseAPITestCase):
+    ENDPOINT_EXAM_SCRAPER = '/modsoptimizer/scrape_exam/'
+
+    def test_api_fail_wrong_method(self):
+        resp = self.client1.post(self.ENDPOINT_EXAM_SCRAPER)
+        self.assertEqual(resp.status_code, 405)
+
+    def test_api_fail_unauthorized(self):
+        resp = self.client3.get(self.ENDPOINT_EXAM_SCRAPER)
+        self.assertEqual(resp.status_code, 401)
+
+    def test_api_fail_forbidden(self):
+        resp = self.client2.get(self.ENDPOINT_EXAM_SCRAPER)
+        self.assertEqual(resp.status_code, 403)

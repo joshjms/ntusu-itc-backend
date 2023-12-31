@@ -42,6 +42,7 @@ urlpatterns = [
     path('event/', include('event.urls')),
     path('starswar/', include('starswar.urls')),
     path('indexswapper/', include('indexswapper.urls')),
+    path('modsoptimizer/', include('modsoptimizer.urls')),
 ]
 
 if settings.DEBUG:

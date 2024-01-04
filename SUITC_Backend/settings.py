@@ -19,6 +19,7 @@ django.utils.encoding.force_text = force_str
 from pathlib import Path
 import boto3
 import datetime
+import logging
 import os
 
 from dotenv import load_dotenv
@@ -67,6 +68,7 @@ INSTALLED_APPS = [
     'event',
     'starswar',
     'indexswapper',
+    'modsoptimizer',
 ]
 
 MIDDLEWARE = [
@@ -281,3 +283,14 @@ REST_FRAMEWORK = {
 
 # DEPLOYMENT SETTINGS
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+# logging settings
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s %(levelname)s %(message)s',
+    handlers=[
+        logging.StreamHandler(),
+        logging.FileHandler("ntusu_backend_logs.log"),
+    ]
+)
+logger = logging.getLogger(__name__)

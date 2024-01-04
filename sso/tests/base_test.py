@@ -1,6 +1,7 @@
 from rest_framework.test import APIClient, APITestCase
 from rest_framework.reverse import reverse
 from json import loads
+import logging
 from sso.models import User
 
 
@@ -16,6 +17,10 @@ class BaseAPITestCase(APITestCase):
     '''
     @classmethod
     def setUpTestData(self):
+        logger = logging.getLogger('django')
+        logger.propagate = False
+
+        # create sample users and clients
         self.user1 = User.objects.create_superuser(
             display_name='User1',
             email='user1@e.ntu.edu.sg',

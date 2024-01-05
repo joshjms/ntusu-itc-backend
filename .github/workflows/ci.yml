@@ -1,6 +1,8 @@
 name: SU ITC Backend CI
 
 on:
+  workflow_dispatch:
+    branches: [ 'main' ]
   push:
     branches: [ 'main' ]
   pull_request:
@@ -8,6 +10,7 @@ on:
 
 jobs:
   build:
+    name: Build
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
@@ -26,3 +29,26 @@ jobs:
     - name: Run Tests
       run: |
         python manage.py test
+
+  deploy:
+    needs: build
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2 
+      - name: Deploy
+        env:
+          PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          USERNAME: ${{ secrets.SSH_USERNAME }}
+          HOSTNAME: ${{ secrets.SSH_HOSTNAME }}
+      
+        run: |
+          echo "Starting deployment"
+          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
+          ssh -o StrictHostKeyChecking=no -i private_key $USERNAME@$HOSTNAME "
+            whoami &&
+            cd ~/ntusu-itc-backend &&
+            git pull -v &&
+            sudo docker-compose up -d --build
+            "
+

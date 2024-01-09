@@ -58,8 +58,12 @@ class CourseOptimizerInputSerializer(serializers.Serializer):
         # include and exclude list should contain indexes that exist for the course code
         for li in [data.get('include', []), data.get('exclude', [])]:
             for index in li:
-                if index not in data['code'].indexes.values_list('index', flat=True):
+                course = CourseCode.objects.get(code=data['code'])
+                if index not in course.indexes.values_list('index', flat=True):
                     raise serializers.ValidationError(f'Index `{index}` does not exist for course `{data["code"]}`.')
+        if len(data.get('include', [])) != 0 and len(data.get('exclude', [])) != 0:
+            raise serializers.ValidationError('Cannot have both include and exclude list.')
+    
         return data
 
 

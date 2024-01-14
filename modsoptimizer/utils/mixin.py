@@ -25,6 +25,7 @@ class CustomCodeAndNameSearch(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         search_qp = request.query_params.get('search__icontains', None)
         if search_qp:
+            search_qp = search_qp.replace('+', ' ')
             queryset = queryset.annotate(course_code_and_name=Concat('code', Value(' '), 'name'))
             return queryset.filter(course_code_and_name__icontains=search_qp)
         return queryset

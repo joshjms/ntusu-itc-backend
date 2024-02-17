@@ -69,6 +69,7 @@ INSTALLED_APPS = [
     'starswar',
     'indexswapper',
     'modsoptimizer',
+    'ulocker'
 ]
 
 MIDDLEWARE = [

@@ -16,3 +16,9 @@ class BookingStatusSerializer(serializers.ModelSerializer):
         model = Booking
         fields = ['status']
         extra_fields = ['booking_id']
+
+class PaymentStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Booking
+        fields = ['payment_status']
+        extra_fields = ['booking_id']

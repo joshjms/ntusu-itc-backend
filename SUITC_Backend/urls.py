@@ -43,6 +43,7 @@ urlpatterns = [
     path('starswar/', include('starswar.urls')),
     path('indexswapper/', include('indexswapper.urls')),
     path('modsoptimizer/', include('modsoptimizer.urls')),
+    path('ulocker/', include('ulocker.urls'))
 ]
 
 if settings.DEBUG:

@@ -1,7 +1,7 @@
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from .models import Booking
+from .models import Booking, Location, Locker
 from rest_framework import status
-from .serializers import BookingPartialSerializer, BookingCompleteSerializer, BookingStatusSerializer, PaymentStatusSerializer
+from .serializers import BookingPartialSerializer, BookingCompleteSerializer, BookingStatusSerializer, PaymentStatusSerializer, LocationListSerializer, LockerListSerializer, isBookedListSerializer, isBookingCompleteSerializer, isBookingStatusSerialization
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework import generics
 from rest_framework.response import Response
@@ -75,3 +75,59 @@ class ChangePaymentStatusView(generics.UpdateAPIView):
         serializer.save()
 
         return Response(status=status.HTTP_200_OK)
+    
+# GET /ulocker/location/
+class LocationListView(generics.ListAPIView):
+    serializer_class = LocationListSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = Location.objects.all()
+
+        for key, value in self.request.query_params.items():
+            if key in ['id']:
+                queryset = queryset.filter(**{key: value})
+
+        return queryset
+    
+# Get /ulocker/locker/<int: location_id>/
+class LocationListView(generics.ListAPIView):
+    serializer_class = LockerListSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = Locker.objects.all()
+
+        location_id = self.request.query_params.get('location_id', None)
+        if location_id is not None:
+            queryset.filter(location_id=location_id)  
+
+        return queryset
+
+    
+#GET /ulocker/locker/?location_id=<int>&start_month=<int>&duration=<int> 
+class isBookedListView(generics.ListAPIView):
+    serializer_class = BookingPartialSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = Locker.object.all()
+
+        location_id = self.request.query_params.get('location_id', None)
+        if location_id is not None:
+            queryset.filter(location_id=location_id) 
+
+        bookings_allocated = Booking.objects.filter(status='allocated')
+        bookings_pending = Booking.objects.filter(status='pending')
+        lockers_allocated = set([booking.locker for booking in bookings_allocated])
+        lockers_pending = set([booking.locker for booking in bookings_pending])
+        lockers_used = lockers_allocated.union(lockers_pending)
+        lockers_unused = Locker.objects.exclude(id__in=[locker.id for locker in lockers_used])
+        
+        print(lockers_allocated)
+        print(lockers_pending)
+        print(lockers_unused)
+        
+        return queryset
+
+

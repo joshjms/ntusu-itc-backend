@@ -32,3 +32,9 @@ class LockerListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Locker
         fields = '__all__'
+
+class LockerStatusListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Locker
+        fields = '__all__'
+        extra_fields = ['status']

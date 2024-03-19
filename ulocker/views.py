@@ -1,7 +1,7 @@
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .models import Booking, Location, Locker
 from rest_framework import status
-from .serializers import BookingPartialSerializer, BookingCompleteSerializer, BookingStatusSerializer, PaymentStatusSerializer, LocationListSerializer, LockerListSerializer
+from .serializers import BookingPartialSerializer, BookingCompleteSerializer, BookingStatusSerializer, PaymentStatusSerializer, LocationListSerializer, LockerListSerializer, LockerStatusListSerializer
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework import generics
 from rest_framework.response import Response
@@ -98,24 +98,24 @@ class LockerListView(generics.ListAPIView):
     def get_queryset(self):
         queryset = Locker.objects.all()
 
-        location_id = self.request.query_params.get('location_id', None)
+        location_id = self.kwargs.get('location_id')
         if location_id is not None:
-            queryset.filter(location_id=location_id)  
+            return queryset.filter(location_id=location_id)  
 
         return queryset
 
     
 #GET /ulocker/locker/?location_id=<int>&start_month=<int>&duration=<int> 
 class isBookedListView(generics.ListAPIView):
-    serializer_class = BookingPartialSerializer
+    serializer_class = LockerStatusListSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        queryset = Locker.object.all()
+        queryset = Locker.objects.all()
 
-        location_id = self.request.query_params.get('location_id', None)
+        location_id = self.kwargs.get('location_id', None)
         if location_id is not None:
-            queryset.filter(location_id=location_id) 
+            queryset = queryset.filter(location_id=location_id) 
 
         bookings_allocated = Booking.objects.filter(status='allocated')
         bookings_pending = Booking.objects.filter(status='pending')

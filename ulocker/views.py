@@ -8,6 +8,10 @@ from rest_framework.response import Response
 from .permission import IsULockerAdmin
 from rest_framework.response import Response
 
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+from .models import validate_date_format
+
 # GET and POST /ulocker/booking/
 class UserBookingListView(generics.ListCreateAPIView):
     serializer_class = BookingPartialSerializer
@@ -103,15 +107,6 @@ class LockerListView(generics.ListAPIView):
             return queryset.filter(location_id=location_id)  
 
         return queryset
-
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
-from django.core.validators import RegexValidator
-
-validate_date_format = RegexValidator(
-    regex=r'^(0[1-9]|1[0-2])/\d{4}$',
-    message="Invalid date format. Date must be MM/YYYY format"
-)
 
 #GET /ulocker/locker/?location_id=<int>&start_month=<int>&duration=<int> 
 class isBookedListView(generics.ListAPIView):

@@ -1,7 +1,7 @@
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .models import Booking, Location, Locker
 from rest_framework import status
-from .serializers import BookingPartialSerializer, BookingCompleteSerializer, BookingStatusSerializer, PaymentStatusSerializer, LocationListSerializer, LockerListSerializer, isBookedListSerializer, isBookingCompleteSerializer, isBookingStatusSerialization
+from .serializers import BookingPartialSerializer, BookingCompleteSerializer, BookingStatusSerializer, PaymentStatusSerializer, LocationListSerializer, LockerListSerializer
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework import generics
 from rest_framework.response import Response
@@ -91,7 +91,7 @@ class LocationListView(generics.ListAPIView):
         return queryset
     
 # Get /ulocker/locker/<int: location_id>/
-class LocationListView(generics.ListAPIView):
+class LockerListView(generics.ListAPIView):
     serializer_class = LockerListSerializer
     permission_classes = [IsAuthenticated]
 

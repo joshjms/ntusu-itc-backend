@@ -19,6 +19,7 @@ from django.conf.urls.static import static
 from django.conf import settings
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
+from rest_framework.response import Response
 
 
 schema_view = get_schema_view(
@@ -35,6 +36,7 @@ urlpatterns = [
     path('summernote/', include('django_summernote.urls')),
 
     path('', include('docs.urls')),
+    path('ping/', lambda _: Response('pong')),
     path('portal/', include('portal.urls')),
     path('sso/', include('sso.urls')),
     path('ufacility/', include('ufacility.urls')),

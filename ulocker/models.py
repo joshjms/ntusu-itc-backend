@@ -24,7 +24,7 @@ class Locker(models.Model):
     location = models.ForeignKey(Location, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.location.location_name} #{self.number}"
+        return f"{self.location.location_name} #{self.name}"
 
 class Booking(models.Model): 
     class PaymentStatus(models.TextChoices):

@@ -119,7 +119,28 @@ class isBookedListView(generics.ListAPIView):
         openapi.Parameter('duration', openapi.IN_QUERY, description="Duration", type=openapi.TYPE_INTEGER),
     ])
     def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
+        bookings = Booking.objects.all()
+        location_id = self.request.query_params.get('location_id', None)
+        start_month = self.request.query_params.get('start_month', None)
+        duration = self.request.query_params.get('duration', None)
+        if location_id is None or start_month is None or duration is None:
+            return Response({"error": "location_id, start_month and duration are required."}, status=status.HTTP_400_BAD_REQUEST)
+        validate_date_format(start_month)
+
+        # filter by location
+        queryset = Locker.objects.filter(location_id=location_id)
+
+        # add status to each locker
+        for locker in queryset:
+            locker.status = 'unused'
+            
+            # filter the bookings for this locker within the start_month and duration
+            for booking in bookings:
+                if booking.locker == locker and self.check_overlap(booking.start_month, booking.duration, start_month, duration):
+                    locker.status = booking.status
+                    break
+                
+        return Response(LockerStatusListSerializer(queryset, many=True).data)
 
     def calculate_end_month(self, start_month, duration):
         start_month = start_month.split('/')
@@ -141,27 +162,3 @@ class isBookedListView(generics.ListAPIView):
             return end_month1 >= start_month2
         else:
             return end_month2 >= start_month1
-
-    def get_queryset(self):
-        bookings = Booking.objects.all()
-        location_id = self.request.query_params.get('location_id', None)
-        start_month = self.request.query_params.get('start_month', None)
-        duration = self.request.query_params.get('duration', None)
-        if location_id is None or start_month is None or duration is None:
-            return Response({"error": "location_id, start_month and duration are required."}, status=status.HTTP_400_BAD_REQUEST)
-        validate_date_format(start_month)
-
-        # filter by location
-        queryset = Locker.objects.filter(location_id=location_id)
-
-        # add status to each locker
-        for locker in queryset:
-            locker.status = 'unused'
-            
-            # filter the bookings for this locker within the start_month and duration
-            for booking in bookings:
-                if booking.locker == locker and self.check_overlap(booking.start_month, booking.duration, start_month, duration):
-                    locker.status = booking.status
-                    break
-
-        return queryset

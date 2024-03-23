@@ -8,4 +8,7 @@ urlpatterns = [
     path('booking/admin/', views.AdminBookingListView.as_view(), name='admin_booking_list'),
     path('change_booking_status/', views.ChangeBookingStatusView.as_view(), name='change_booking_status'),
     path('change_payment_status/', views.ChangePaymentStatusView.as_view(), name='change_payment_status'),
+    path("location/", views.LocationListView.as_view(), name='location'),
+    path("locker/", views.isBookedListView.as_view(), name='locker_is_booked_list'),
+    path("locker/<int:location_id>/", views.LockerListView.as_view(), name='locker_list'),
 ]

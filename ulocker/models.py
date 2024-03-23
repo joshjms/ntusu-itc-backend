@@ -16,9 +16,15 @@ validate_date_format = RegexValidator(
 class Location(models.Model):
     location_name = models.CharField(max_length=50)
 
+    def __str__(self):
+        return self.location_name
+
 class Locker(models.Model):
     number = models.IntegerField() 
     location = models.ForeignKey(Location, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.location.location_name} #{self.number}"
 
 class Booking(models.Model): 
     class PaymentStatus(models.TextChoices):
@@ -45,6 +51,11 @@ class Booking(models.Model):
     duration = models.IntegerField()
     end_month = models.CharField(max_length=7, validators=[validate_date_format]) 
 
+    def __str__(self):
+        return f"{self.applicant_name} -> {self.locker} ({self.start_month} - {self.end_month})"
+
 class ULockerAdmin(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-
+    
+    def __str__(self):
+        return self.user.username

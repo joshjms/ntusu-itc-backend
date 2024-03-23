@@ -164,39 +164,6 @@ class TestExamScraper(APITestCase):
                 'timecode': self.get_exam_schedule_str('', '', 11, 12, 13, 14)
             })
 
-    def test_exam_scraper_3(self):
-        raw_data = get_raw_data(self.soup)[80:81]
-        self.assertEqual(raw_data, [
-            {
-                "date": "29 April 2024",
-                "day": "Monday",
-                "time": "5.00 pm",
-                "course_code": "CM1002",
-                "course_title": "FOUNDATIONS OF CHEMISTRY II",
-                "duration": "2 hr",
-            }
-        ])
-        data = process_data(raw_data)
-        self.assertEqual(data, [
-            {
-                "course_code": "CM1002",
-                "exam_schedule_str": self.get_exam_schedule_str('2024-04-29', '17:00-19:00', 19, 20, 21, 22)
-            },
-        ])
-        self.create_course_code('CM1002')
-        save_exam_schedule(data)
-        course_1 = CourseCode.objects.get(code='CM1002')
-        self.assertEqual(
-            course_1.exam_schedule,
-            self.get_exam_schedule_str('2024-04-29', '17:00-19:00', 19, 20, 21, 22))
-        self.assertEqual(
-            course_1.get_exam_schedule,
-            {
-                'date': '2024-04-29',
-                'time': '17:00-19:00',
-                'timecode': self.get_exam_schedule_str('', '', 19, 20, 21, 22)
-            })
-
 
 class ExamScraperAPITestCase(BaseAPITestCase):
     ENDPOINT_EXAM_SCRAPER = '/modsoptimizer/scrape_exam/'

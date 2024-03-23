@@ -20,7 +20,7 @@ class Location(models.Model):
         return self.location_name
 
 class Locker(models.Model):
-    number = models.IntegerField() 
+    name = models.CharField(max_length=10)
     location = models.ForeignKey(Location, on_delete=models.CASCADE)
 
     def __str__(self):

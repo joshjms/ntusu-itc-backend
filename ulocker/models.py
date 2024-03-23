@@ -17,7 +17,7 @@ class Location(models.Model):
     location_name = models.CharField(max_length=50)
 
 class Locker(models.Model):
-    number = models.IntegerField() # TODO: unique for each location validation
+    number = models.IntegerField() 
     location = models.ForeignKey(Location, on_delete=models.CASCADE)
 
 class Booking(models.Model): 
@@ -43,7 +43,7 @@ class Booking(models.Model):
     creation_date = models.DateTimeField(auto_now_add=True)
     start_month = models.CharField(max_length=7, validators=[validate_date_format])
     duration = models.IntegerField()
-    end_month = models.CharField(max_length=7, validators=[validate_date_format]) # TODO: validation
+    end_month = models.CharField(max_length=7, validators=[validate_date_format]) 
 
 class ULockerAdmin(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)

@@ -17,7 +17,7 @@ class Location(models.Model):
     location_name = models.CharField(max_length=50)
 
     def __str__(self):
-        return self.location_name
+        return f"(ID: {self.id}) {self.location_name}"
 
 class Locker(models.Model):
     name = models.CharField(max_length=10)

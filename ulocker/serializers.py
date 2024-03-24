@@ -2,9 +2,13 @@ from rest_framework import serializers
 from .models import Booking, Location, Locker
 
 class BookingCompleteSerializer(serializers.ModelSerializer):
+    locker_name = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = Booking
         fields = '__all__'
+        
+    def get_locker_name(self, obj):
+        return obj.locker.name
 
 class BookingPartialSerializer(serializers.ModelSerializer):
     class Meta:

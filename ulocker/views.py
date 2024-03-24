@@ -14,7 +14,6 @@ from .models import validate_date_format
 
 # GET and POST /ulocker/booking/
 class UserBookingListView(generics.ListCreateAPIView):
-    serializer_class = BookingPartialSerializer
     permission_classes = [IsAuthenticated]
     
     def perform_create(self, serializer):
@@ -22,6 +21,9 @@ class UserBookingListView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         return Booking.objects.filter(user=self.request.user)
+    
+    def get_serializer_class(self):
+        return BookingPartialSerializer if self.request.method == 'POST' else BookingCompleteSerializer
     
 # GET /ulocker/booking/admin/ for admin only
 class AdminBookingListView(generics.ListAPIView):

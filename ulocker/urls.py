@@ -11,4 +11,5 @@ urlpatterns = [
     path("location/", views.LocationListView.as_view(), name='location'),
     path("locker/", views.isBookedListView.as_view(), name='locker_is_booked_list'),
     path("locker/<int:location_id>/", views.LockerListView.as_view(), name='locker_list'),
+    path("locker/check_admin", views.CheckAdminView.as_view(), name='check_admin'),
 ]

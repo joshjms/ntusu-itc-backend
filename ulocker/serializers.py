@@ -13,6 +13,9 @@ class BookingCompleteSerializer(serializers.ModelSerializer):
     
     def get_locker_location(self, obj):
         return obj.locker.location.location_name
+    
+    def get_email(self, obj):
+        return obj.user.email
 
 class BookingPartialSerializer(serializers.ModelSerializer):
     class Meta:

@@ -50,10 +50,6 @@ class Booking(models.Model):
     start_month = models.CharField(max_length=7, validators=[validate_date_format])
     duration = models.IntegerField()
     end_month = models.CharField(max_length=7, validators=[validate_date_format]) 
-    
-    @property
-    def locker_name(self):
-        return self.locker.name
 
     def __str__(self):
         return f"{self.applicant_name} -> {self.locker} ({self.start_month} - {self.end_month})"

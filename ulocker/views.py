@@ -1,5 +1,5 @@
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from .models import Booking, Location, Locker
+from .models import Booking, Location, Locker, ULockerAdmin
 from rest_framework import status
 from .serializers import BookingPartialSerializer, BookingCompleteSerializer, BookingStatusSerializer, PaymentStatusSerializer, LocationListSerializer, LockerListSerializer, LockerStatusListSerializer
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -31,13 +31,13 @@ class AdminBookingListView(generics.ListAPIView):
     permission_classes = [IsULockerAdmin]
     filter_backends = [SearchFilter, OrderingFilter]
     search_fields = ['applicant_name', 'matric_no', 'organization_name']
-    ordering_fields = ['creation_date', 'start_month', 'end_month', 'duration', 'organization_name', 'applicant_name']
+    ordering_fields = ['creation_date', 'start_month', 'duration', 'organization_name', 'applicant_name']
 
     def get_queryset(self):
         queryset = Booking.objects.all()
 
         for key, value in self.request.query_params.items():
-            if key in ['creation_date', 'start_month', 'end_month', 'duration', 'organization_name', 'applicant_name']:
+            if key in ['creation_date', 'start_month', 'duration', 'organization_name', 'applicant_name']:
                 queryset = queryset.filter(**{key: value})
 
         return queryset
@@ -164,3 +164,14 @@ class isBookedListView(generics.ListAPIView):
             return end_month1 >= start_month2
         else:
             return end_month2 >= start_month1
+
+# GET /ulocker/check_admin/
+class CheckAdminView(generics.RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        try:
+            ULockerAdmin.objects.get(user=request.user)
+            return Response({"is_admin": True})
+        except:
+            return Response({"is_admin": False})

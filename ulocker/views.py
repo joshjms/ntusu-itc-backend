@@ -147,7 +147,7 @@ class isBookedListView(generics.ListAPIView):
         month = int(start_month[0])
         year = int(start_month[1])
         duration = int(duration)
-        month += duration
+        month += duration - 1
         while month > 12:
             month -= 12
             year += 1

@@ -2,14 +2,16 @@ from django.urls import path
 from . import views
 
 
-app_name="ulocker"
+app_name='ulocker'
 
 urlpatterns = [
     path('booking/', views.UserBookingListView.as_view(), name='user_booking_list'),
-    path("locker/", views.isBookedListView.as_view(), name='locker_is_booked_list'),
+    path('locker/', views.isBookedListView.as_view(), name='locker_is_booked_list'),
+    # path('booking/cancel/')
+    # path('booking/verify/)
     
     path('booking/admin/', views.AdminBookingListView.as_view(), name='admin_booking_list'),
     path('change_booking_status/', views.ChangeBookingStatusView.as_view(), name='change_booking_status'),
-    path("location/", views.LocationListView.as_view(), name='location'),
-    path("locker/<int:location_id>/", views.LockerListView.as_view(), name='locker_list'),
+    path('location/', views.LocationListView.as_view(), name='location'),
+    path('locker/<int:location_id>/', views.LockerListView.as_view(), name='locker_list'),
 ]

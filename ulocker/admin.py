@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.db.models import Count
-from ulocker.models import Location, Booking, ULockerAdmin, Locker
-from ulocker.utils import LockerStatusUtils as LSU, ULockerEmailService
+from ulocker.models import Booking, Location, Locker, ULockerAdmin, ULockerConfig
+from ulocker.utils import LockerStatusUtils, ULockerEmailService
 
 
 class LocationAdmin(admin.ModelAdmin):
@@ -31,7 +31,7 @@ class LockerAdmin(admin.ModelAdmin):
     ordering = ['id']
 
     def status(self, obj):
-        queryset = LSU.get_locker_status([obj])
+        queryset = LockerStatusUtils.get_locker_status(obj)
         return queryset[0].status
     
     def has_delete_permission(self, request, obj=None):
@@ -71,7 +71,17 @@ class ULockerAdminAdmin(admin.ModelAdmin):
     def user_email(self, obj):
         return obj.user.email
 
+class ULockerConfigAdmin(admin.ModelAdmin):
+    list_display = ['__str__', 'monthly_price', 'semesterly_price', 'yearly_price', 'qr_code_image']
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request):
+        return False
+
 admin.site.register(Location, LocationAdmin)
 admin.site.register(Locker, LockerAdmin)
 admin.site.register(Booking, BookingAdmin)
 admin.site.register(ULockerAdmin, ULockerAdminAdmin)
+admin.site.register(ULockerConfig, ULockerConfigAdmin)

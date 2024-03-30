@@ -1,4 +1,5 @@
 from django.db import models
+from django.forms import ValidationError
 from sso.models import User
 from django.core.validators import RegexValidator
 
@@ -65,3 +66,21 @@ class ULockerAdmin(models.Model):
     class Meta:
         verbose_name = 'ULocker Admin'
         verbose_name_plural = 'ULocker Admins'
+
+class ULockerConfig(models.Model):
+    monthly_price = models.CharField(max_length=20)
+    semesterly_price = models.CharField(max_length=20)
+    yearly_price = models.CharField(max_length=20)
+    qr_code_image = models.ImageField(upload_to='ulocker/qrcodes/', null=True, blank=True)
+    
+    def save(self, *args, **kwargs):
+        if not self.pk and ULockerConfig.objects.exists():
+            raise ValidationError('There can only be one ULockerConfig instance')
+        return super().save(*args, **kwargs)
+    
+    def __str__(self) -> str:
+        return 'ULocker Configurations'
+    
+    class Meta:
+        verbose_name = 'ULocker Config'
+        verbose_name_plural = 'ULocker Config'

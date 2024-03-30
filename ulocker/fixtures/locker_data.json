@@ -586,5 +586,15 @@
     "passcode": "D56P",
     "is_available": true
   }
+},
+{
+  "model": "ulocker.ulockerconfig",
+  "pk": 1,
+  "fields": {
+    "monthly_price": "SGD10",
+    "semesterly_price": "SGD30",
+    "yearly_price": "SGD80",
+    "qr_code_image": "TODO"
+  }
 }
 ]

@@ -82,7 +82,7 @@ send email to ulocker admins when a new user is created
 - send_payment_email:
 send email to user when a Booking is approved and awaiting payment
 - send_verification_email:
-send email to ulocker admins requesting verification
+send email to ulocker admins requesting verification after payment is made
 - send_allocation_email:
 send email to user and ulocker admins when a Booking is allocated
 '''
@@ -140,12 +140,19 @@ Please proceed and make payment on the following link: TODO<br>
         send_email(email_subject, email_body, recipients=recipients)
     
     @staticmethod
-    def send_verification_email(user):
+    def send_verification_email(obj):
         admins = ULockerAdmin.objects.all()
         recipients = [admin.user.email for admin in admins if admin.is_send_creation_email]
-        email_subject = 'ULocker - New Booking'
+        email_subject = 'ULocker - Booking Verification Required'
         email_body = f'''
-Send Creation Email - TODO
+Dear ULocker Admin,<br>
+<br><br>
+Payment has been made for the following booking.
+TODO
+<br>
+Please verify the booking above.<br>
+<br><br>
+{DO_NOT_REPLY_MESSAGE}
         '''
         send_email(email_subject, email_body, recipients=recipients)
     

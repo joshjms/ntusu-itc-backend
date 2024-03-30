@@ -1,8 +1,8 @@
 from rest_framework import generics, status
-from rest_framework import generics
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 
@@ -16,6 +16,7 @@ from .serializers import (
     LockerListSerializer,
     LockerStatusListSerializer,
 )
+from .utils import LockerStatusUtils
 
 
 # GET and POST /ulocker/booking/
@@ -30,7 +31,7 @@ class UserBookingListView(generics.ListCreateAPIView):
     
     def get_serializer_class(self):
         return BookingPartialSerializer if self.request.method == 'POST' else BookingCompleteSerializer
-    
+
 # GET /ulocker/booking/admin/ for admin only
 class AdminBookingListView(generics.ListAPIView):
     serializer_class = BookingCompleteSerializer
@@ -97,7 +98,7 @@ class LockerListView(generics.ListAPIView):
         return queryset
 
 #GET /ulocker/locker/?location_id=<int>&start_month=<int>&duration=<int> 
-class isBookedListView(generics.ListAPIView):
+class isBookedListView(APIView):
     serializer_class = LockerStatusListSerializer
     permission_classes = [IsAuthenticated]
 
@@ -107,7 +108,6 @@ class isBookedListView(generics.ListAPIView):
         openapi.Parameter('duration', openapi.IN_QUERY, description="Duration", type=openapi.TYPE_INTEGER),
     ])
     def get(self, request, *args, **kwargs):
-        bookings = Booking.objects.all()
         location_id = self.request.query_params.get('location_id', None)
         start_month = self.request.query_params.get('start_month', None)
         duration = self.request.query_params.get('duration', None)
@@ -115,55 +115,8 @@ class isBookedListView(generics.ListAPIView):
             return Response({"error": "location_id, start_month and duration are required."}, status=status.HTTP_400_BAD_REQUEST)
         validate_date_format(start_month)
 
-        # filter by location
+        # filter by location, add status to each locker
         queryset = Locker.objects.filter(location_id=location_id)
-
-        # add status to each locker
-        for locker in queryset:
-            
-            locker.status = 'unused'
-            if locker.is_available == False:
-                locker.status = 'not available'
-                continue
-            
-            # filter the bookings for this locker within the start_month and duration
-            status_number_map = {
-                0: 'available',
-                1: 'reserved',
-                2: 'occupied'
-            }
-            for booking in bookings:
-                
-                status_number = 0
-                if self.check_overlap(booking.start_month, booking.duration, start_month, duration):
-                    if booking.status in ['allocated']:
-                        status_number = max(status_number, 2)
-                    elif booking.status in ['pending', 'approved - awaiting payment', 'approved - awaiting verification']:
-                        status_number = max(status_number, 1)
-                    else:
-                        status_number = max(status_number, 0)
-                        
-                locker.status = status_number_map[status_number]
+        queryset = LockerStatusUtils.get_locker_status(queryset, start_month, duration)
                 
         return Response(LockerStatusListSerializer(queryset, many=True).data)
-
-    def calculate_end_month(self, start_month, duration):
-        start_month = start_month.split('/')
-        month = int(start_month[0])
-        year = int(start_month[1])
-        duration = int(duration)
-        month += duration - 1
-        while month > 12:
-            month -= 12
-            year += 1
-        return f"{month:02d}/{year}"
-
-    def check_overlap(self, start_month1, duration1, start_month2, duration2):
-        end_month1 = self.calculate_end_month(start_month1, duration1)
-        end_month2 = self.calculate_end_month(start_month2, duration2)
-        if start_month1 == start_month2 or end_month1 == end_month2:
-            return True
-        if start_month1 < start_month2:
-            return end_month1 >= start_month2
-        else:
-            return end_month2 >= start_month1

@@ -59,3 +59,7 @@ class ULockerAdmin(models.Model):
     
     def __str__(self):
         return f'<ULocker Admin: {self.user.username}>'
+    
+    class Meta:
+        verbose_name = 'ULocker Admin'
+        verbose_name_plural = 'ULocker Admins'

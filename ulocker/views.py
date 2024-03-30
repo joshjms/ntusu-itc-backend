@@ -30,7 +30,7 @@ class UserBookingListView(generics.ListCreateAPIView):
         ULockerEmailService.send_creation_email(serializer.data)
 
     def get_queryset(self):
-        return Booking.objects.filter(user=self.request.user)
+        return Booking.objects.filter(user=self.request.user).order_by('-creation_date')
     
     def get_serializer_class(self):
         return BookingPartialSerializer if self.request.method == 'POST' else BookingCompleteSerializer
@@ -128,7 +128,7 @@ class BookingCancelView(APIView):
     def put(self, request, booking_id, *args, **kwargs):
         booking = get_object_or_404(Booking, id=booking_id)
         if booking.status != Booking.AllocationStatus.PENDING \
-                or booking.status != Booking.AllocationStatus.AWAITING_PAYMENT:
+                and booking.status != Booking.AllocationStatus.AWAITING_PAYMENT:
             return Response({
                 'error': 'Booking is not pending nor awaiting payment.'
             }, status=status.HTTP_400_BAD_REQUEST)

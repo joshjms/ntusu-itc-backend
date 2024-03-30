@@ -31,7 +31,7 @@ class LockerAdmin(admin.ModelAdmin):
     ordering = ['id']
 
     def status(self, obj):
-        queryset = LockerStatusUtils.get_locker_status(obj)
+        queryset = LockerStatusUtils.get_locker_status([obj])
         return queryset[0].status
     
     def has_delete_permission(self, request, obj=None):

@@ -9,6 +9,7 @@ urlpatterns = [
     path('booking/', views.UserBookingListView.as_view(), name='user_booking_list'),
     path('booking/<int:booking_id>/cancel/', views.BookingCancelView.as_view(), name='booking_cancel'),
     path('booking/<int:booking_id>/verify/', views.BookingVerifyView.as_view(), name='booking_verify'),
+    path('config/', views.ULockerConfigView.as_view(), name='config'),
     
     path('booking/admin/', views.AdminBookingListView.as_view(), name='admin_booking_list'),
     path('change_booking_status/', views.ChangeBookingStatusView.as_view(), name='change_booking_status'),

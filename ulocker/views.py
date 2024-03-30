@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 
-from .models import Booking, Location, Locker, validate_date_format
+from .models import Booking, Location, Locker, ULockerConfig, validate_date_format
 from .permission import IsULockerAdmin
 from .serializers import (
     BookingPartialSerializer,
@@ -16,6 +16,7 @@ from .serializers import (
     LocationListSerializer,
     LockerListSerializer,
     LockerStatusListSerializer,
+    ULockerConfigSerializer,
 )
 from .utils import LockerStatusUtils, ULockerEmailService
 
@@ -147,3 +148,8 @@ class BookingVerifyView(APIView):
         ULockerEmailService.send_verification_email(booking)
         # TODO - upload proof of payment too (image)
         return Response(status=status.HTTP_200_OK)
+
+class ULockerConfigView(APIView):
+    def get(self, request, *args, **kwargs):
+        config = ULockerConfig.objects.first()
+        return Response(ULockerConfigSerializer(config).data)

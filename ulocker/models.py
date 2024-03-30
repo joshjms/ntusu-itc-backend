@@ -48,11 +48,10 @@ class Booking(models.Model):
     creation_date = models.DateTimeField(auto_now_add=True)
     start_month = models.CharField(max_length=7, validators=[validate_date_format])
     duration = models.IntegerField()
-    end_month = models.CharField(max_length=7, validators=[validate_date_format])
-    command = models.CharField(max_length=50, null=True)
+    comment = models.CharField(max_length=300, null=True, blank=True)
 
     def __str__(self):
-        return f"<{self.applicant_name} -> {self.locker} ({self.start_month} - {self.end_month})>"
+        return f"<{self.applicant_name} -> {self.locker} ({self.start_month} - {self.duration} month(s))>"
 
 class ULockerAdmin(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)

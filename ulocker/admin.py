@@ -45,7 +45,7 @@ class LockerAdmin(admin.ModelAdmin):
         return readonly_fields
 
 class BookingAdmin(admin.ModelAdmin):
-    list_display = ['id', 'location_name', 'locker_name', 'user', 'user_email', 'start_month', 'duration', 'status', 'creation_date']
+    list_display = ['id', 'location_name', 'locker_name', 'user_email', 'applicant_name', 'start_month', 'duration', 'status', 'creation_date']
 
     def location_name(self, obj):
         return obj.locker.location.location_name

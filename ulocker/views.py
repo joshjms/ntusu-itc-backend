@@ -38,13 +38,13 @@ class AdminBookingListView(generics.ListAPIView):
     permission_classes = [IsULockerAdmin]
     filter_backends = [SearchFilter, OrderingFilter]
     search_fields = ['applicant_name', 'matric_no', 'organization_name']
-    ordering_fields = ['creation_date', 'start_month', 'end_month', 'duration', 'organization_name', 'applicant_name']
+    ordering_fields = ['creation_date', 'start_month', 'duration', 'organization_name', 'applicant_name']
 
     def get_queryset(self):
         queryset = Booking.objects.all()
 
         for key, value in self.request.query_params.items():
-            if key in ['creation_date', 'start_month', 'end_month', 'duration', 'organization_name', 'applicant_name']:
+            if key in ['creation_date', 'start_month', 'duration', 'organization_name', 'applicant_name']:
                 queryset = queryset.filter(**{key: value})
 
         return queryset

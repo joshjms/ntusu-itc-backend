@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.permissions import IsAuthenticated
@@ -121,3 +122,28 @@ class isBookedListView(APIView):
         queryset = LockerStatusUtils.get_locker_status(queryset, start_month, duration)
                 
         return Response(LockerStatusListSerializer(queryset, many=True).data)
+
+class BookingCancelView(APIView):
+    def put(self, request, booking_id, *args, **kwargs):
+        booking = get_object_or_404(Booking, id=booking_id)
+        if booking.status != Booking.AllocationStatus.PENDING \
+                or booking.status != Booking.AllocationStatus.AWAITING_PAYMENT:
+            return Response({
+                'error': 'Booking is not pending nor awaiting payment.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        booking.status = Booking.AllocationStatus.WITHDRAWN
+        booking.save()
+        return Response(status=status.HTTP_200_OK)
+
+class BookingVerifyView(APIView):
+    def put(self, request, booking_id, *args, **kwargs):
+        booking = get_object_or_404(Booking, id=booking_id)
+        if booking.status != Booking.AllocationStatus.AWAITING_PAYMENT:
+            return Response({
+                'error': 'Booking is not awaiting payment.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        booking.status = Booking.AllocationStatus.AWAITING_VERIFICATION
+        booking.save()
+        ULockerEmailService.send_verification_email(booking)
+        # TODO - upload proof of payment too (image)
+        return Response(status=status.HTTP_200_OK)

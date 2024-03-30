@@ -1,6 +1,6 @@
 from datetime import datetime as dt
 from typing import Iterable
-from ulocker.models import Booking, Locker, ULockerAdmin
+from ulocker.models import Booking, Locker, ULockerAdmin, ULockerConfig
 from sso.utils import send_email, DO_NOT_REPLY_MESSAGE
 
 
@@ -115,7 +115,12 @@ Please confirm the booking above.<br>
         
     @staticmethod
     def send_payment_email(obj):
-        print(obj)
+        config = ULockerConfig.objects.first()
+        price = config.monthly_price if obj.duration == 1 \
+            else config.semesterly_price if obj.duration == 4 \
+            else config.yearly_price if obj.duration == 12 \
+            else 'N/A'
+        frontend_link = 'TODO'
         recipients = [obj.user.email]
         email_subject = 'ULocker - Payment Required'
         email_body = f'''
@@ -132,8 +137,8 @@ Phone Number: {obj.phone_no}<br>
 Organization Name: {obj.organization_name}<br>
 Position: {obj.position}<br>
 <br>
-The price for the booking is <b>$TODO</b>.<br>
-Please proceed and make payment on the following link: TODO<br>
+The price for the booking is <b>{price}</b>.<br>
+Please proceed and make payment on the following link: {frontend_link}<br>
 <br><br>
 {DO_NOT_REPLY_MESSAGE}
         '''
@@ -147,8 +152,16 @@ Please proceed and make payment on the following link: TODO<br>
         email_body = f'''
 Dear ULocker Admin,<br>
 <br><br>
-Payment has been made for the following booking.
-TODO
+Payment has been made for the following booking. Here are the details:<br>
+<br>
+Locker Name: {obj.locker.name}<br>
+Start Month: {obj.start_month}<br>
+Duration: {obj.duration}<br>
+Applicant Name: {obj.applicant_name}<br>
+Matriculation Number: {obj.matric_no}<br>
+Phone Number: {obj.phone_no}<br>
+Organization Name: {obj.organization_name}<br>
+Position: {obj.position}<br>
 <br>
 Please verify the booking above.<br>
 <br><br>

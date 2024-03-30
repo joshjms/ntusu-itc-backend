@@ -1,16 +1,22 @@
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from .models import Booking, Location, Locker
-from rest_framework import status
-from .serializers import BookingPartialSerializer, BookingCompleteSerializer, BookingStatusSerializer, PaymentStatusSerializer, LocationListSerializer, LockerListSerializer, LockerStatusListSerializer
-from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework import generics, status
 from rest_framework import generics
+from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from .permission import IsULockerAdmin
-from rest_framework.response import Response
-
-from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-from .models import validate_date_format
+from drf_yasg.utils import swagger_auto_schema
+
+from .models import Booking, Location, Locker, validate_date_format
+from .permission import IsULockerAdmin
+from .serializers import (
+    BookingPartialSerializer,
+    BookingCompleteSerializer,
+    BookingStatusSerializer,
+    LocationListSerializer,
+    LockerListSerializer,
+    LockerStatusListSerializer,
+)
+
 
 # GET and POST /ulocker/booking/
 class UserBookingListView(generics.ListCreateAPIView):
@@ -62,26 +68,6 @@ class ChangeBookingStatusView(generics.UpdateAPIView):
 
         return Response(status=status.HTTP_200_OK)
 
-# PUT /ulocker/change_payment_status/ for admin only
-class ChangePaymentStatusView(generics.UpdateAPIView):
-    serializer_class = PaymentStatusSerializer
-    permission_classes = [IsULockerAdmin]
-
-    def update(self, request, *args, **kwargs):
-        booking_id = request.data.get('booking_id')
-        payment_status = request.data.get('payment_status')
-
-        try:
-            booking = Booking.objects.get(id=booking_id)
-        except Booking.DoesNotExist:
-            return Response({"error": "Booking with this ID does not exist."}, status=status.HTTP_404_NOT_FOUND)
-
-        serializer = self.get_serializer(booking, data={'payment_status': payment_status}, partial=True)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-
-        return Response(status=status.HTTP_200_OK)
-    
 # GET /ulocker/location/
 class LocationListView(generics.ListAPIView):
     serializer_class = LocationListSerializer
@@ -134,13 +120,30 @@ class isBookedListView(generics.ListAPIView):
 
         # add status to each locker
         for locker in queryset:
+            
             locker.status = 'unused'
+            if locker.is_available == False:
+                locker.status = 'not available'
+                continue
             
             # filter the bookings for this locker within the start_month and duration
+            status_number_map = {
+                0: 'available',
+                1: 'reserved',
+                2: 'occupied'
+            }
             for booking in bookings:
-                if booking.locker == locker and self.check_overlap(booking.start_month, booking.duration, start_month, duration):
-                    locker.status = booking.status
-                    break
+                
+                status_number = 0
+                if self.check_overlap(booking.start_month, booking.duration, start_month, duration):
+                    if booking.status in ['allocated']:
+                        status_number = max(status_number, 2)
+                    elif booking.status in ['pending', 'approved - awaiting payment', 'approved - awaiting verification']:
+                        status_number = max(status_number, 1)
+                    else:
+                        status_number = max(status_number, 0)
+                        
+                locker.status = status_number_map[status_number]
                 
         return Response(LockerStatusListSerializer(queryset, many=True).data)
 

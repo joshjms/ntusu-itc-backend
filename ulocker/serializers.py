@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Booking, Location, Locker
 
+
 class BookingCompleteSerializer(serializers.ModelSerializer):
     locker_name = serializers.SerializerMethodField(read_only=True)
     locker_location = serializers.SerializerMethodField(read_only=True)
@@ -26,12 +27,6 @@ class BookingStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking
         fields = ['status']
-        extra_fields = ['booking_id']
-
-class PaymentStatusSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Booking
-        fields = ['payment_status']
         extra_fields = ['booking_id']
 
 class LocationListSerializer(serializers.ModelSerializer):

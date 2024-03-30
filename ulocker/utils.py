@@ -33,7 +33,6 @@ class LockerStatusUtils:
                           duration: int=1) -> Iterable[Locker]:
         if start_month is None:
             start_month = dt.now().strftime('%m/%Y')
-        bookings = Booking.objects.all()
         
         for locker in queryset:
             if locker.is_available == False:
@@ -41,6 +40,7 @@ class LockerStatusUtils:
                 continue
             
             status_number = 0
+            bookings = Booking.objects.filter(locker=locker)
             for booking in bookings:
                 if LockerStatusUtils.check_overlap(booking.start_month, booking.duration, start_month, duration):
                     if booking.status in ['allocated']:

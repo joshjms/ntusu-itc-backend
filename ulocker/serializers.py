@@ -5,6 +5,7 @@ from .models import Booking, Location, Locker, ULockerConfig
 class BookingCompleteSerializer(serializers.ModelSerializer):
     locker_name = serializers.SerializerMethodField(read_only=True)
     locker_location = serializers.SerializerMethodField(read_only=True)
+    creation_date = serializers.DateTimeField(format="%Y-%m-%d")
     class Meta:
         model = Booking
         fields = '__all__'

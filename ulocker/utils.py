@@ -1,4 +1,5 @@
-from datetime import datetime as dt
+import calendar
+from datetime import datetime as dt, timedelta as td
 from typing import Iterable
 from ulocker.models import Booking, Locker, ULockerAdmin, ULockerConfig
 from sso.utils import send_email, DO_NOT_REPLY_MESSAGE
@@ -87,6 +88,19 @@ send email to ulocker admins requesting verification after payment is made
 send email to user and ulocker admins when a Booking is allocated
 '''
 class ULockerEmailService:
+    PRODUCTION_BACKEND_LINK = 'https://backend.ntusu.org/admin/ulocker/booking/'
+    
+    @staticmethod
+    def get_rental_period(start_month: str, duration: int) -> str:
+        start_month_dt = dt.strptime(start_month, "%m/%Y")
+        end_month_dt = start_month_dt
+        for _ in range(duration):
+            next_month = (end_month_dt.month % 12) + 1
+            end_month_dt = end_month_dt.replace(month=next_month, year=end_month_dt.year + (next_month == 1))
+            last_day_of_month = calendar.monthrange(end_month_dt.year, end_month_dt.month)[1]
+            end_month_dt = end_month_dt.replace(day=min(end_month_dt.day, last_day_of_month))
+        return f"{start_month_dt.strftime('%d/%m/%Y')} - {end_month_dt.strftime('%d/%m/%Y')}"
+
     @staticmethod
     def send_creation_email(*args):
         admins = ULockerAdmin.objects.all()
@@ -98,16 +112,18 @@ Dear ULocker Admin,<br>
 <br><br>
 A new locker booking has been created. Here are the details:<br>
 <br>
+Location: {locker.location.location_name}<br
 Locker Name: {locker.name}<br>
-Start Month: {args[0]['start_month']}<br>
-Duration: {args[0]['duration']}<br>
+Rental Duration: {ULockerEmailService.get_rental_period(args[0]['start_month'], args[0]['duration'])}<br>
 Applicant Name: {args[0]['applicant_name']}<br>
 Matriculation Number: {args[0]['matric_no']}<br>
 Phone Number: {args[0]['phone_no']}<br>
 Organization Name: {args[0]['organization_name']}<br>
 Position: {args[0]['position']}<br>
 <br>
-Please confirm the booking above.<br>
+<a href='{ULockerEmailService.PRODUCTION_BACKEND_LINK}'>
+Please confirm the booking above by clicking on this link.
+</a>
 <br><br>
 {DO_NOT_REPLY_MESSAGE}
         '''
@@ -122,15 +138,18 @@ Please confirm the booking above.<br>
             else 'N/A'
         frontend_link = 'TODO'
         recipients = [obj.user.email]
+        recipients += [admin.user.email for admin in ULockerAdmin.objects.all() if admin.is_send_creation_email]
         email_subject = 'ULocker - Payment Required'
+        rental_duration = ULockerEmailService.get_rental_period(obj.start_month, obj.duration)
+        print(rental_duration)
         email_body = f'''
-Dear User (username: ${obj.user.username}),<br>
+Dear {obj.user.username},<br>
 <br><br>
-Your locker booking has been approved. Here are the details:<br>
+We are pleased to inform you that your locker booking has been approved! Here are the details:<br>
 <br>
+Location: {obj.locker.location.location_name}<br>
 Locker Name: {obj.locker.name}<br>
-Start Month: {obj.start_month}<br>
-Duration: {obj.duration}<br>
+Rental Duration: {ULockerEmailService.get_rental_period(obj.start_month, obj.duration)}<br>
 Applicant Name: {obj.applicant_name}<br>
 Matriculation Number: {obj.matric_no}<br>
 Phone Number: {obj.phone_no}<br>
@@ -142,6 +161,7 @@ Please proceed and make payment on the following link: {frontend_link}<br>
 <br><br>
 {DO_NOT_REPLY_MESSAGE}
         '''
+        print(email_body)
         send_email(email_subject, email_body, recipients=recipients)
     
     @staticmethod
@@ -154,16 +174,18 @@ Dear ULocker Admin,<br>
 <br><br>
 Payment has been made for the following booking. Here are the details:<br>
 <br>
+Location: {obj.locker.location.location_name}<br>
 Locker Name: {obj.locker.name}<br>
-Start Month: {obj.start_month}<br>
-Duration: {obj.duration}<br>
+Rental Duration: {ULockerEmailService.get_rental_period(obj.start_month, obj.duration)}<br>
 Applicant Name: {obj.applicant_name}<br>
 Matriculation Number: {obj.matric_no}<br>
 Phone Number: {obj.phone_no}<br>
 Organization Name: {obj.organization_name}<br>
 Position: {obj.position}<br>
 <br>
-Please verify the booking above.<br>
+<a href='{ULockerEmailService.PRODUCTION_BACKEND_LINK}'>
+Please verify the payment for the booking above by clicking on this link.
+</a>
 <br><br>
 {DO_NOT_REPLY_MESSAGE}
         '''
@@ -178,18 +200,26 @@ Please verify the booking above.<br>
         email_body = f'''
 Dear User (username: ${obj.user.username}),<br>
 <br><br>
-Your locker booking has been allocated. Here are the details:<br>
+We are pleased to inform you that your locker booking has been allocated!
+Your personal space is now ready for use. Here are the details:<br>
 <br>
+Location: {obj.locker.location.location_name}<br>
 Locker Name: {obj.locker.name}<br>
-Start Month: {obj.start_month}<br>
-Duration: {obj.duration}<br>
+Rental Duration: {ULockerEmailService.get_rental_period(obj.start_month, obj.duration)}<br>
 Applicant Name: {obj.applicant_name}<br>
 Matriculation Number: {obj.matric_no}<br>
 Phone Number: {obj.phone_no}<br>
 Organization Name: {obj.organization_name}<br>
 Position: {obj.position}<br>
 <br>
-Your locker passcode is: {obj.locker.passcode}<br>
+Your locker passcode is: <b>{obj.locker.passcode}</b><br>
+<br>
+<b>PLEASE NOTE THAT:</b><br>
+<p>
+    The locker must be cleared on or before the expiry date.
+    Otherwise your belongings will be disposed of, and no claims
+    whatsoever will be entertained thereafter!
+</p>
 <br><br>
 {DO_NOT_REPLY_MESSAGE}
         '''

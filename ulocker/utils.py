@@ -1,6 +1,7 @@
 from datetime import datetime as dt
 from typing import Iterable
-from ulocker.models import Booking, Locker
+from ulocker.models import Booking, Locker, ULockerAdmin
+from sso.utils import send_email, DO_NOT_REPLY_MESSAGE
 
 
 '''
@@ -74,3 +75,102 @@ class LockerStatusUtils:
             return end_month1 >= start_month2
         else:
             return end_month2 >= start_month1
+
+'''
+- send_creation_email:
+send email to ulocker admins when a new user is created
+- send_payment_email:
+send email to user when a Booking is approved and awaiting payment
+- send_verification_email:
+send email to ulocker admins requesting verification
+- send_allocation_email:
+send email to user and ulocker admins when a Booking is allocated
+'''
+class ULockerEmailService:
+    @staticmethod
+    def send_creation_email(*args):
+        admins = ULockerAdmin.objects.all()
+        locker = Locker.objects.get(id=args[0]['locker'])
+        recipients = [admin.user.email for admin in admins if admin.is_send_creation_email]
+        email_subject = 'ULocker - New Booking'
+        email_body = f'''
+Dear ULocker Admin,<br>
+<br><br>
+A new locker booking has been created. Here are the details:<br>
+<br>
+Locker Name: {locker.name}<br>
+Start Month: {args[0]['start_month']}<br>
+Duration: {args[0]['duration']}<br>
+Applicant Name: {args[0]['applicant_name']}<br>
+Matriculation Number: {args[0]['matric_no']}<br>
+Phone Number: {args[0]['phone_no']}<br>
+Organization Name: {args[0]['organization_name']}<br>
+Position: {args[0]['position']}<br>
+<br>
+Please confirm the booking above.<br>
+<br><br>
+{DO_NOT_REPLY_MESSAGE}
+        '''
+        send_email(email_subject, email_body, recipients=recipients)
+        
+    @staticmethod
+    def send_payment_email(obj):
+        print(obj)
+        recipients = [obj.user.email]
+        email_subject = 'ULocker - Payment Required'
+        email_body = f'''
+Dear User (username: ${obj.user.username}),<br>
+<br><br>
+Your locker booking has been approved. Here are the details:<br>
+<br>
+Locker Name: {obj.locker.name}<br>
+Start Month: {obj.start_month}<br>
+Duration: {obj.duration}<br>
+Applicant Name: {obj.applicant_name}<br>
+Matriculation Number: {obj.matric_no}<br>
+Phone Number: {obj.phone_no}<br>
+Organization Name: {obj.organization_name}<br>
+Position: {obj.position}<br>
+<br>
+The price for the booking is <b>$TODO</b>.<br>
+Please proceed and make payment on the following link: TODO<br>
+<br><br>
+{DO_NOT_REPLY_MESSAGE}
+        '''
+        send_email(email_subject, email_body, recipients=recipients)
+    
+    @staticmethod
+    def send_verification_email(user):
+        admins = ULockerAdmin.objects.all()
+        recipients = [admin.user.email for admin in admins if admin.is_send_creation_email]
+        email_subject = 'ULocker - New Booking'
+        email_body = f'''
+Send Creation Email - TODO
+        '''
+        send_email(email_subject, email_body, recipients=recipients)
+    
+    @staticmethod
+    def send_allocation_email(obj):
+        admins = ULockerAdmin.objects.all()
+        recipients = [admin.user.email for admin in admins if admin.is_send_creation_email]
+        recipients.append(obj.user.email)
+        email_subject = 'ULocker - Booking Allocated'
+        email_body = f'''
+Dear User (username: ${obj.user.username}),<br>
+<br><br>
+Your locker booking has been allocated. Here are the details:<br>
+<br>
+Locker Name: {obj.locker.name}<br>
+Start Month: {obj.start_month}<br>
+Duration: {obj.duration}<br>
+Applicant Name: {obj.applicant_name}<br>
+Matriculation Number: {obj.matric_no}<br>
+Phone Number: {obj.phone_no}<br>
+Organization Name: {obj.organization_name}<br>
+Position: {obj.position}<br>
+<br>
+Your locker passcode is: {obj.locker.passcode}<br>
+<br><br>
+{DO_NOT_REPLY_MESSAGE}
+        '''
+        send_email(email_subject, email_body, recipients=recipients)

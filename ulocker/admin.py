@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.db.models import Count
 from ulocker.models import Location, Booking, ULockerAdmin, Locker
-from ulocker.utils import LockerStatusUtils as LSU
+from ulocker.utils import LockerStatusUtils as LSU, ULockerEmailService
 
 
 class LocationAdmin(admin.ModelAdmin):
@@ -55,6 +55,15 @@ class BookingAdmin(admin.ModelAdmin):
     
     def user_email(self, obj):
         return obj.user.email
+    
+    def save_model(self, request, obj, form, change):
+        if change and form.initial['status'] != Booking.AllocationStatus.AWAITING_PAYMENT \
+                and obj.status == Booking.AllocationStatus.AWAITING_PAYMENT:
+            ULockerEmailService.send_payment_email(obj)
+        elif change and form.initial['status'] != Booking.AllocationStatus.ALLOCATED \
+                and obj.status == Booking.AllocationStatus.ALLOCATED:
+            ULockerEmailService.send_allocation_email(obj)
+        super().save_model(request, obj, form, change)
 
 class ULockerAdminAdmin(admin.ModelAdmin):
     list_display = ['id', 'user', 'user_email']

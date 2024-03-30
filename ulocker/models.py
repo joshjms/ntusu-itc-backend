@@ -55,6 +55,9 @@ class Booking(models.Model):
 
 class ULockerAdmin(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    is_send_creation_email = models.BooleanField(default=True)
+    is_send_verification_email = models.BooleanField(default=True)
+    is_send_allocation_email = models.BooleanField(default=True)
     
     def __str__(self):
         return f'<ULocker Admin: {self.user.username}>'

@@ -16,7 +16,7 @@ from .serializers import (
     LockerListSerializer,
     LockerStatusListSerializer,
 )
-from .utils import LockerStatusUtils
+from .utils import LockerStatusUtils, ULockerEmailService
 
 
 # GET and POST /ulocker/booking/
@@ -25,6 +25,7 @@ class UserBookingListView(generics.ListCreateAPIView):
     
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+        ULockerEmailService.send_creation_email(serializer.data)
 
     def get_queryset(self):
         return Booking.objects.filter(user=self.request.user)

@@ -138,7 +138,6 @@ Please confirm the booking above by clicking on this link.
             else 'N/A'
         frontend_link = 'TODO'
         recipients = [obj.user.email]
-        recipients += [admin.user.email for admin in ULockerAdmin.objects.all() if admin.is_send_creation_email]
         email_subject = 'ULocker - Payment Required'
         rental_duration = ULockerEmailService.get_rental_period(obj.start_month, obj.duration)
         print(rental_duration)
@@ -167,7 +166,7 @@ Please proceed and make payment on the following link: {frontend_link}<br>
     @staticmethod
     def send_verification_email(obj):
         admins = ULockerAdmin.objects.all()
-        recipients = [admin.user.email for admin in admins if admin.is_send_creation_email]
+        recipients = [admin.user.email for admin in admins if admin.is_send_verification_email]
         email_subject = 'ULocker - Booking Verification Required'
         email_body = f'''
 Dear ULocker Admin,<br>
@@ -194,7 +193,7 @@ Please verify the payment for the booking above by clicking on this link.
     @staticmethod
     def send_allocation_email(obj):
         admins = ULockerAdmin.objects.all()
-        recipients = [admin.user.email for admin in admins if admin.is_send_creation_email]
+        recipients = [admin.user.email for admin in admins if admin.is_send_allocation_email]
         recipients.append(obj.user.email)
         email_subject = 'ULocker - Booking Allocated'
         email_body = f'''

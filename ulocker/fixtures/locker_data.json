@@ -1,600 +1,600 @@
 [
-{
-  "model": "ulocker.location",
-  "pk": 1,
-  "fields": {
-    "location_name": "(A) LT3 Entrance"
+  {
+    "model": "ulocker.location",
+    "pk": 1,
+    "fields": {
+      "location_name": "(A) LT3 Entrance"
+    }
+  },
+  {
+    "model": "ulocker.location",
+    "pk": 2,
+    "fields": {
+      "location_name": "(B) LT3 Exit"
+    }
+  },
+  {
+    "model": "ulocker.location",
+    "pk": 3,
+    "fields": {
+      "location_name": "(C) LT4 Exit"
+    }
+  },
+  {
+    "model": "ulocker.location",
+    "pk": 4,
+    "fields": {
+      "location_name": "(D) LT4 Entrance"
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 1,
+    "fields": {
+      "name": "SU-A-01",
+      "location": 1,
+      "passcode": "A01P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 2,
+    "fields": {
+      "name": "SU-A-02",
+      "location": 1,
+      "passcode": "A02P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 3,
+    "fields": {
+      "name": "SU-A-03",
+      "location": 1,
+      "passcode": "A03P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 4,
+    "fields": {
+      "name": "SU-A-04",
+      "location": 1,
+      "passcode": "A04P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 5,
+    "fields": {
+      "name": "SU-A-05",
+      "location": 1,
+      "passcode": "A05P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 6,
+    "fields": {
+      "name": "SU-A-06",
+      "location": 1,
+      "passcode": "A06P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 7,
+    "fields": {
+      "name": "SU-A-07",
+      "location": 1,
+      "passcode": "A07P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 8,
+    "fields": {
+      "name": "SU-A-08",
+      "location": 1,
+      "passcode": "A08P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 9,
+    "fields": {
+      "name": "SU-A-09",
+      "location": 1,
+      "passcode": "A09P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 10,
+    "fields": {
+      "name": "SU-A-10",
+      "location": 1,
+      "passcode": "A10P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 11,
+    "fields": {
+      "name": "SU-A-11",
+      "location": 1,
+      "passcode": "A11P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 12,
+    "fields": {
+      "name": "SU-A-12",
+      "location": 1,
+      "passcode": "A12P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 13,
+    "fields": {
+      "name": "SU-A-13",
+      "location": 1,
+      "passcode": "A13P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 14,
+    "fields": {
+      "name": "SU-A-14",
+      "location": 1,
+      "passcode": "A14P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 15,
+    "fields": {
+      "name": "SU-B-15",
+      "location": 2,
+      "passcode": "B15P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 16,
+    "fields": {
+      "name": "SU-B-16",
+      "location": 2,
+      "passcode": "B16P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 17,
+    "fields": {
+      "name": "SU-B-17",
+      "location": 2,
+      "passcode": "B17P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 18,
+    "fields": {
+      "name": "SU-B-18",
+      "location": 2,
+      "passcode": "B18P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 19,
+    "fields": {
+      "name": "SU-B-19",
+      "location": 2,
+      "passcode": "B19P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 20,
+    "fields": {
+      "name": "SU-B-20",
+      "location": 2,
+      "passcode": "B20P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 21,
+    "fields": {
+      "name": "SU-B-21",
+      "location": 2,
+      "passcode": "B21P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 22,
+    "fields": {
+      "name": "SU-B-22",
+      "location": 2,
+      "passcode": "B22P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 23,
+    "fields": {
+      "name": "SU-B-23",
+      "location": 2,
+      "passcode": "B23P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 24,
+    "fields": {
+      "name": "SU-B-24",
+      "location": 2,
+      "passcode": "B24P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 25,
+    "fields": {
+      "name": "SU-B-25",
+      "location": 2,
+      "passcode": "B25P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 26,
+    "fields": {
+      "name": "SU-B-26",
+      "location": 2,
+      "passcode": "B26P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 27,
+    "fields": {
+      "name": "SU-B-27",
+      "location": 2,
+      "passcode": "B27P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 28,
+    "fields": {
+      "name": "SU-B-28",
+      "location": 2,
+      "passcode": "B28P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 29,
+    "fields": {
+      "name": "SU-B-29",
+      "location": 2,
+      "passcode": "B29P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 30,
+    "fields": {
+      "name": "SU-B-30",
+      "location": 2,
+      "passcode": "B30P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 31,
+    "fields": {
+      "name": "SU-C-31",
+      "location": 3,
+      "passcode": "C31P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 32,
+    "fields": {
+      "name": "SU-C-32",
+      "location": 3,
+      "passcode": "C32P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 33,
+    "fields": {
+      "name": "SU-C-33",
+      "location": 3,
+      "passcode": "C33P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 34,
+    "fields": {
+      "name": "SU-C-34",
+      "location": 3,
+      "passcode": "C34P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 35,
+    "fields": {
+      "name": "SU-C-35",
+      "location": 3,
+      "passcode": "C35P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 36,
+    "fields": {
+      "name": "SU-C-36",
+      "location": 3,
+      "passcode": "C36P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 37,
+    "fields": {
+      "name": "SU-C-37",
+      "location": 3,
+      "passcode": "C37P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 38,
+    "fields": {
+      "name": "SU-C-38",
+      "location": 3,
+      "passcode": "C38P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 39,
+    "fields": {
+      "name": "SU-C-39",
+      "location": 3,
+      "passcode": "C39P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 40,
+    "fields": {
+      "name": "SU-C-40",
+      "location": 3,
+      "passcode": "C40P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 41,
+    "fields": {
+      "name": "SU-C-41",
+      "location": 3,
+      "passcode": "C41P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 42,
+    "fields": {
+      "name": "SU-C-42",
+      "location": 3,
+      "passcode": "C42P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 43,
+    "fields": {
+      "name": "SU-C-43",
+      "location": 3,
+      "passcode": "C43P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 44,
+    "fields": {
+      "name": "SU-C-44",
+      "location": 3,
+      "passcode": "C44P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 45,
+    "fields": {
+      "name": "SU-C-45",
+      "location": 3,
+      "passcode": "C45P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 46,
+    "fields": {
+      "name": "SU-C-46",
+      "location": 3,
+      "passcode": "C46P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 47,
+    "fields": {
+      "name": "SU-D-47",
+      "location": 4,
+      "passcode": "D47P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 48,
+    "fields": {
+      "name": "SU-D-48",
+      "location": 4,
+      "passcode": "D48P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 49,
+    "fields": {
+      "name": "SU-D-49",
+      "location": 4,
+      "passcode": "D49P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 50,
+    "fields": {
+      "name": "SU-D-50",
+      "location": 4,
+      "passcode": "D50P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 51,
+    "fields": {
+      "name": "SU-D-51",
+      "location": 4,
+      "passcode": "D51P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 52,
+    "fields": {
+      "name": "SU-D-52",
+      "location": 4,
+      "passcode": "D52P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 53,
+    "fields": {
+      "name": "SU-D-53",
+      "location": 4,
+      "passcode": "D53P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 54,
+    "fields": {
+      "name": "SU-D-54",
+      "location": 4,
+      "passcode": "D54P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 55,
+    "fields": {
+      "name": "SU-D-55",
+      "location": 4,
+      "passcode": "D55P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.locker",
+    "pk": 56,
+    "fields": {
+      "name": "SU-D-56",
+      "location": 4,
+      "passcode": "D56P",
+      "is_available": true
+    }
+  },
+  {
+    "model": "ulocker.ulockerconfig",
+    "pk": 1,
+    "fields": {
+      "monthly_price": "SGD10",
+      "semesterly_price": "SGD30",
+      "yearly_price": "SGD80",
+      "qr_code_image": "TODO"
+    }
   }
-},
-{
-  "model": "ulocker.location",
-  "pk": 2,
-  "fields": {
-    "location_name": "(B) LT3 Exit"
-  }
-},
-{
-  "model": "ulocker.location",
-  "pk": 3,
-  "fields": {
-    "location_name": "(C) LT4 Exit"
-  }
-},
-{
-  "model": "ulocker.location",
-  "pk": 4,
-  "fields": {
-    "location_name": "(D) LT4 Entrance"
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 1,
-  "fields": {
-    "name": "SU-A-01",
-    "location": 1,
-    "passcode": "A01P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 2,
-  "fields": {
-    "name": "SU-A-02",
-    "location": 1,
-    "passcode": "A02P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 3,
-  "fields": {
-    "name": "SU-A-03",
-    "location": 1,
-    "passcode": "A03P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 4,
-  "fields": {
-    "name": "SU-A-04",
-    "location": 1,
-    "passcode": "A04P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 5,
-  "fields": {
-    "name": "SU-A-05",
-    "location": 1,
-    "passcode": "A05P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 6,
-  "fields": {
-    "name": "SU-A-06",
-    "location": 1,
-    "passcode": "A06P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 7,
-  "fields": {
-    "name": "SU-A-07",
-    "location": 1,
-    "passcode": "A07P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 8,
-  "fields": {
-    "name": "SU-A-08",
-    "location": 1,
-    "passcode": "A08P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 9,
-  "fields": {
-    "name": "SU-A-09",
-    "location": 1,
-    "passcode": "A09P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 10,
-  "fields": {
-    "name": "SU-A-10",
-    "location": 1,
-    "passcode": "A10P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 11,
-  "fields": {
-    "name": "SU-A-11",
-    "location": 1,
-    "passcode": "A11P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 12,
-  "fields": {
-    "name": "SU-A-12",
-    "location": 1,
-    "passcode": "A12P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 13,
-  "fields": {
-    "name": "SU-A-13",
-    "location": 1,
-    "passcode": "A13P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 14,
-  "fields": {
-    "name": "SU-A-14",
-    "location": 1,
-    "passcode": "A14P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 15,
-  "fields": {
-    "name": "SU-B-15",
-    "location": 2,
-    "passcode": "B15P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 16,
-  "fields": {
-    "name": "SU-B-16",
-    "location": 2,
-    "passcode": "B16P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 17,
-  "fields": {
-    "name": "SU-B-17",
-    "location": 2,
-    "passcode": "B17P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 18,
-  "fields": {
-    "name": "SU-B-18",
-    "location": 2,
-    "passcode": "B18P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 19,
-  "fields": {
-    "name": "SU-B-19",
-    "location": 2,
-    "passcode": "B19P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 20,
-  "fields": {
-    "name": "SU-B-20",
-    "location": 2,
-    "passcode": "B20P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 21,
-  "fields": {
-    "name": "SU-B-21",
-    "location": 2,
-    "passcode": "B21P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 22,
-  "fields": {
-    "name": "SU-B-22",
-    "location": 2,
-    "passcode": "B22P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 23,
-  "fields": {
-    "name": "SU-B-23",
-    "location": 2,
-    "passcode": "B23P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 24,
-  "fields": {
-    "name": "SU-B-24",
-    "location": 2,
-    "passcode": "B24P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 25,
-  "fields": {
-    "name": "SU-B-25",
-    "location": 2,
-    "passcode": "B25P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 26,
-  "fields": {
-    "name": "SU-B-26",
-    "location": 2,
-    "passcode": "B26P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 27,
-  "fields": {
-    "name": "SU-B-27",
-    "location": 2,
-    "passcode": "B27P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 28,
-  "fields": {
-    "name": "SU-B-28",
-    "location": 2,
-    "passcode": "B28P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 29,
-  "fields": {
-    "name": "SU-B-29",
-    "location": 2,
-    "passcode": "B29P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 30,
-  "fields": {
-    "name": "SU-B-30",
-    "location": 2,
-    "passcode": "B30P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 31,
-  "fields": {
-    "name": "SU-C-31",
-    "location": 3,
-    "passcode": "C31P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 32,
-  "fields": {
-    "name": "SU-C-32",
-    "location": 3,
-    "passcode": "C32P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 33,
-  "fields": {
-    "name": "SU-C-33",
-    "location": 3,
-    "passcode": "C33P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 34,
-  "fields": {
-    "name": "SU-C-34",
-    "location": 3,
-    "passcode": "C34P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 35,
-  "fields": {
-    "name": "SU-C-35",
-    "location": 3,
-    "passcode": "C35P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 36,
-  "fields": {
-    "name": "SU-C-36",
-    "location": 3,
-    "passcode": "C36P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 37,
-  "fields": {
-    "name": "SU-C-37",
-    "location": 3,
-    "passcode": "C37P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 38,
-  "fields": {
-    "name": "SU-C-38",
-    "location": 3,
-    "passcode": "C38P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 39,
-  "fields": {
-    "name": "SU-C-39",
-    "location": 3,
-    "passcode": "C39P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 40,
-  "fields": {
-    "name": "SU-C-40",
-    "location": 3,
-    "passcode": "C40P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 41,
-  "fields": {
-    "name": "SU-C-41",
-    "location": 3,
-    "passcode": "C41P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 42,
-  "fields": {
-    "name": "SU-C-42",
-    "location": 3,
-    "passcode": "C42P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 43,
-  "fields": {
-    "name": "SU-C-43",
-    "location": 3,
-    "passcode": "C43P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 44,
-  "fields": {
-    "name": "SU-C-44",
-    "location": 3,
-    "passcode": "C44P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 45,
-  "fields": {
-    "name": "SU-C-45",
-    "location": 3,
-    "passcode": "C45P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 46,
-  "fields": {
-    "name": "SU-C-46",
-    "location": 3,
-    "passcode": "C46P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 47,
-  "fields": {
-    "name": "SU-D-47",
-    "location": 4,
-    "passcode": "D47P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 48,
-  "fields": {
-    "name": "SU-D-48",
-    "location": 4,
-    "passcode": "D48P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 49,
-  "fields": {
-    "name": "SU-D-49",
-    "location": 4,
-    "passcode": "D49P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 50,
-  "fields": {
-    "name": "SU-D-50",
-    "location": 4,
-    "passcode": "D50P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 51,
-  "fields": {
-    "name": "SU-D-51",
-    "location": 4,
-    "passcode": "D51P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 52,
-  "fields": {
-    "name": "SU-D-52",
-    "location": 4,
-    "passcode": "D52P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 53,
-  "fields": {
-    "name": "SU-D-53",
-    "location": 4,
-    "passcode": "D53P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 54,
-  "fields": {
-    "name": "SU-D-54",
-    "location": 4,
-    "passcode": "D54P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 55,
-  "fields": {
-    "name": "SU-D-55",
-    "location": 4,
-    "passcode": "D55P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.locker",
-  "pk": 56,
-  "fields": {
-    "name": "SU-D-56",
-    "location": 4,
-    "passcode": "D56P",
-    "is_available": true
-  }
-},
-{
-  "model": "ulocker.ulockerconfig",
-  "pk": 1,
-  "fields": {
-    "monthly_price": "SGD10",
-    "semesterly_price": "SGD30",
-    "yearly_price": "SGD80",
-    "qr_code_image": "TODO"
-  }
-}
 ]

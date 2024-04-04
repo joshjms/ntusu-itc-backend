@@ -45,7 +45,6 @@ class UserBookingListView(generics.ListCreateAPIView):
 
         # check if the locker is available
         queryset = LockerStatusUtils.get_locker_status(queryset, self.request.data['start_month'], self.request.data['duration'])
-        # if the query is empty, the locker does not exist
 
         if queryset[0].status != 'available':
             raise LockerNotAvailable()

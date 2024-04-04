@@ -19,21 +19,39 @@ from .serializers import (
     ULockerConfigSerializer,
 )
 from .utils import LockerStatusUtils, ULockerEmailService
+from rest_framework.exceptions import APIException
 
+class LockerNotAvailable(APIException):
+    status_code = 405
+    default_detail = "Locker is not available."
 
 # GET and POST /ulocker/booking/
 class UserBookingListView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-        ULockerEmailService.send_creation_email(serializer.data)
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return BookingPartialSerializer 
+        else:
+            return BookingCompleteSerializer
 
     def get_queryset(self):
         return Booking.objects.filter(user=self.request.user).order_by('-creation_date')
-    
-    def get_serializer_class(self):
-        return BookingPartialSerializer if self.request.method == 'POST' else BookingCompleteSerializer
+
+    def perform_create(self, serializer):
+        queryset = Locker.objects.filter(id=self.request.data['locker'])
+        if not queryset.exists():
+            return Response({"error": "Locker with this ID does not exist."}, status=status.HTTP_404_NOT_FOUND)
+
+        # check if the locker is available
+        queryset = LockerStatusUtils.get_locker_status(queryset, self.request.data['start_month'], self.request.data['duration'])
+        # if the query is empty, the locker does not exist
+
+        if queryset[0].status != 'available':
+            raise LockerNotAvailable()
+        else:
+            serializer.save(user=self.request.user)
+            ULockerEmailService.send_creation_email(serializer.data)
 
 # GET /ulocker/booking/admin/ for admin only
 class AdminBookingListView(generics.ListAPIView):

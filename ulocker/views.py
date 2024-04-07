@@ -1,30 +1,57 @@
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from .models import Booking, Location, Locker, ULockerAdmin
-from rest_framework import status
-from .serializers import BookingPartialSerializer, BookingCompleteSerializer, BookingStatusSerializer, PaymentStatusSerializer, LocationListSerializer, LockerListSerializer, LockerStatusListSerializer
+from django.shortcuts import get_object_or_404
+from rest_framework import generics, status
 from rest_framework.filters import SearchFilter, OrderingFilter
-from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from .permission import IsULockerAdmin
-from rest_framework.response import Response
-
-from drf_yasg.utils import swagger_auto_schema
+from rest_framework.views import APIView
 from drf_yasg import openapi
-from .models import validate_date_format
+from drf_yasg.utils import swagger_auto_schema
+
+from .models import Booking, Location, Locker, ULockerConfig, validate_date_format
+from .permission import IsULockerAdmin
+from .serializers import (
+    BookingPartialSerializer,
+    BookingCompleteSerializer,
+    BookingStatusSerializer,
+    LocationListSerializer,
+    LockerListSerializer,
+    LockerStatusListSerializer,
+    ULockerConfigSerializer,
+)
+from .utils import LockerStatusUtils, ULockerEmailService
+from rest_framework.exceptions import APIException
+
+class LockerNotAvailable(APIException):
+    status_code = 405
+    default_detail = "Locker is not available."
 
 # GET and POST /ulocker/booking/
 class UserBookingListView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return BookingPartialSerializer 
+        else:
+            return BookingCompleteSerializer
 
     def get_queryset(self):
-        return Booking.objects.filter(user=self.request.user)
-    
-    def get_serializer_class(self):
-        return BookingPartialSerializer if self.request.method == 'POST' else BookingCompleteSerializer
-    
+        return Booking.objects.filter(user=self.request.user).order_by('-creation_date')
+
+    def perform_create(self, serializer):
+        queryset = Locker.objects.filter(id=self.request.data['locker'])
+        if not queryset.exists():
+            return Response({"error": "Locker with this ID does not exist."}, status=status.HTTP_404_NOT_FOUND)
+
+        # check if the locker is available
+        queryset = LockerStatusUtils.get_locker_status(queryset, self.request.data['start_month'], self.request.data['duration'])
+
+        if queryset[0].status != 'available':
+            raise LockerNotAvailable()
+        else:
+            serializer.save(user=self.request.user)
+            ULockerEmailService.send_creation_email(serializer.data)
+
 # GET /ulocker/booking/admin/ for admin only
 class AdminBookingListView(generics.ListAPIView):
     serializer_class = BookingCompleteSerializer
@@ -62,26 +89,6 @@ class ChangeBookingStatusView(generics.UpdateAPIView):
 
         return Response(status=status.HTTP_200_OK)
 
-# PUT /ulocker/change_payment_status/ for admin only
-class ChangePaymentStatusView(generics.UpdateAPIView):
-    serializer_class = PaymentStatusSerializer
-    permission_classes = [IsULockerAdmin]
-
-    def update(self, request, *args, **kwargs):
-        booking_id = request.data.get('booking_id')
-        payment_status = request.data.get('payment_status')
-
-        try:
-            booking = Booking.objects.get(id=booking_id)
-        except Booking.DoesNotExist:
-            return Response({"error": "Booking with this ID does not exist."}, status=status.HTTP_404_NOT_FOUND)
-
-        serializer = self.get_serializer(booking, data={'payment_status': payment_status}, partial=True)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-
-        return Response(status=status.HTTP_200_OK)
-    
 # GET /ulocker/location/
 class LocationListView(generics.ListAPIView):
     serializer_class = LocationListSerializer
@@ -111,7 +118,7 @@ class LockerListView(generics.ListAPIView):
         return queryset
 
 #GET /ulocker/locker/?location_id=<int>&start_month=<int>&duration=<int> 
-class isBookedListView(generics.ListAPIView):
+class isBookedListView(APIView):
     serializer_class = LockerStatusListSerializer
     permission_classes = [IsAuthenticated]
 
@@ -121,7 +128,6 @@ class isBookedListView(generics.ListAPIView):
         openapi.Parameter('duration', openapi.IN_QUERY, description="Duration", type=openapi.TYPE_INTEGER),
     ])
     def get(self, request, *args, **kwargs):
-        bookings = Booking.objects.all()
         location_id = self.request.query_params.get('location_id', None)
         start_month = self.request.query_params.get('start_month', None)
         duration = self.request.query_params.get('duration', None)
@@ -129,49 +135,42 @@ class isBookedListView(generics.ListAPIView):
             return Response({"error": "location_id, start_month and duration are required."}, status=status.HTTP_400_BAD_REQUEST)
         validate_date_format(start_month)
 
-        # filter by location
+        # filter by location, add status to each locker
         queryset = Locker.objects.filter(location_id=location_id)
-
-        # add status to each locker
-        for locker in queryset:
-            locker.status = 'unused'
-            
-            # filter the bookings for this locker within the start_month and duration
-            for booking in bookings:
-                if booking.locker == locker and self.check_overlap(booking.start_month, booking.duration, start_month, duration):
-                    locker.status = booking.status
-                    break
+        queryset = LockerStatusUtils.get_locker_status(queryset, start_month, duration)
                 
         return Response(LockerStatusListSerializer(queryset, many=True).data)
 
-    def calculate_end_month(self, start_month, duration):
-        start_month = start_month.split('/')
-        month = int(start_month[0])
-        year = int(start_month[1])
-        duration = int(duration)
-        month += duration - 1
-        while month > 12:
-            month -= 12
-            year += 1
-        return f"{month:02d}/{year}"
+class BookingCancelView(APIView):
+    permission_classes = [IsULockerAdmin]
 
-    def check_overlap(self, start_month1, duration1, start_month2, duration2):
-        end_month1 = self.calculate_end_month(start_month1, duration1)
-        end_month2 = self.calculate_end_month(start_month2, duration2)
-        if start_month1 == start_month2 or end_month1 == end_month2:
-            return True
-        if start_month1 < start_month2:
-            return end_month1 >= start_month2
-        else:
-            return end_month2 >= start_month1
+    def put(self, request, booking_id, *args, **kwargs):
+        booking = get_object_or_404(Booking, id=booking_id)
+        if booking.status != Booking.AllocationStatus.PENDING \
+                and booking.status != Booking.AllocationStatus.AWAITING_PAYMENT:
+            return Response({
+                'error': 'Booking is not pending nor awaiting payment.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        booking.status = Booking.AllocationStatus.WITHDRAWN
+        booking.save()
+        return Response(status=status.HTTP_200_OK)
 
-# GET /ulocker/check_admin/
-class CheckAdminView(generics.RetrieveAPIView):
-    permission_classes = [IsAuthenticated]
+class BookingVerifyView(APIView):
+    permission_classes = [IsULockerAdmin]
+    
+    def put(self, request, booking_id, *args, **kwargs):
+        booking = get_object_or_404(Booking, id=booking_id)
+        if booking.status != Booking.AllocationStatus.AWAITING_PAYMENT:
+            return Response({
+                'error': 'Booking is not awaiting payment.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        booking.status = Booking.AllocationStatus.AWAITING_VERIFICATION
+        booking.save()
+        ULockerEmailService.send_verification_email(booking)
+        # TODO - upload proof of payment too (image)
+        return Response(status=status.HTTP_200_OK)
 
+class ULockerConfigView(APIView):
     def get(self, request, *args, **kwargs):
-        try:
-            ULockerAdmin.objects.get(user=request.user)
-            return Response({"is_admin": True})
-        except:
-            return Response({"is_admin": False})
+        config = ULockerConfig.objects.first()
+        return Response(ULockerConfigSerializer(config).data)

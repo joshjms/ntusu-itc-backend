@@ -1,9 +1,11 @@
 from rest_framework import serializers
-from .models import Booking, Location, Locker
+from .models import Booking, Location, Locker, ULockerConfig
+
 
 class BookingCompleteSerializer(serializers.ModelSerializer):
     locker_name = serializers.SerializerMethodField(read_only=True)
     locker_location = serializers.SerializerMethodField(read_only=True)
+    creation_date = serializers.DateTimeField(format="%Y-%m-%d")
     class Meta:
         model = Booking
         fields = '__all__'
@@ -28,12 +30,6 @@ class BookingStatusSerializer(serializers.ModelSerializer):
         fields = ['status']
         extra_fields = ['booking_id']
 
-class PaymentStatusSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Booking
-        fields = ['payment_status']
-        extra_fields = ['booking_id']
-
 class LocationListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
@@ -51,3 +47,8 @@ class LockerStatusListSerializer(serializers.ModelSerializer):
         model = Locker
         fields = '__all__'
         extra_fields = ['status']
+
+class ULockerConfigSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ULockerConfig
+        fields = '__all__'

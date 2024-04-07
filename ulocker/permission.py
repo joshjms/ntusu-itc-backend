@@ -1,6 +1,7 @@
 from .models import ULockerAdmin
 from rest_framework.permissions import IsAuthenticated
 
+
 class IsULockerAdmin(IsAuthenticated):
     message = 'ULocker Admin Required'
 

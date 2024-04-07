@@ -1,6 +1,6 @@
 from rest_framework.test import APITestCase, APIClient
 from sso.models import User
-from ulocker.models import ULockerAdmin, Locker, Location
+from ulocker.models import ULockerAdmin, Locker, Location, Booking
 
 '''
     Provide 2 clients as follows:

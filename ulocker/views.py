@@ -142,6 +142,8 @@ class isBookedListView(APIView):
         return Response(LockerStatusListSerializer(queryset, many=True).data)
 
 class BookingCancelView(APIView):
+    permission_classes = [IsULockerAdmin]
+
     def put(self, request, booking_id, *args, **kwargs):
         booking = get_object_or_404(Booking, id=booking_id)
         if booking.status != Booking.AllocationStatus.PENDING \
@@ -154,6 +156,8 @@ class BookingCancelView(APIView):
         return Response(status=status.HTTP_200_OK)
 
 class BookingVerifyView(APIView):
+    permission_classes = [IsULockerAdmin]
+    
     def put(self, request, booking_id, *args, **kwargs):
         booking = get_object_or_404(Booking, id=booking_id)
         if booking.status != Booking.AllocationStatus.AWAITING_PAYMENT:

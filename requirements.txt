@@ -40,7 +40,7 @@ charset-normalizer==2.1.1
 coreapi==2.3.3
 coreschema==0.0.4
 drf-yasg==1.21.4
-idna==3.4
+idna==3.7
 inflection==0.5.1
 itypes==1.2.0
 Jinja2==3.1.3

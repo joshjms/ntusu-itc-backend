@@ -41,8 +41,10 @@ def get_info_data(_):
 
 @api_view(['GET'])
 @permission_classes([IsSuperUser])
-def get_description_data(_):
-    perform_description_scraping()
+def get_description_data(request):
+    start_index = request.query_params.get('start_index', 0)
+    end_index = request.query_params.get('end_index', CourseCode.objects.count())
+    perform_description_scraping(int(start_index), int(end_index))
     return Response('Description Scraping Completed')
 
 

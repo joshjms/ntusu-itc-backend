@@ -47,13 +47,13 @@ def save_single_course_description(soup: BeautifulSoup, course: CourseCode):
     # save the changes
     course.save()
 
-def perform_description_scraping():
+def perform_description_scraping(start_index, end_index):
     FORMDATA_ACADSEM = '2024_1'
     FORMDATA_ACAD = '2024'
     FORMDATA_SEMESTER = '1'
     
     courses = CourseCode.objects.all()
-    for course in courses:
+    for course in courses[start_index:end_index]:
         try:
             form_data = {
                 'acadsem': FORMDATA_ACADSEM,

@@ -179,8 +179,8 @@ def save_course_data(data: List[Dict]) -> None:
 
 
 def perform_course_scraping():
-    ACADEMIC_YEAR = '2023'
-    ACADEMIC_SEMESTER = '2'
+    ACADEMIC_YEAR = '2024'
+    ACADEMIC_SEMESTER = '1'
     try:
         soup = get_soup_from_url(ACADEMIC_YEAR, ACADEMIC_SEMESTER)
         raw_data = get_raw_data(soup)

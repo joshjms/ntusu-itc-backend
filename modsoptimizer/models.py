@@ -35,6 +35,14 @@ class CourseCode(models.Model):
     # information that is common across all indexes of this course
     common_information = models.TextField(null=True, blank=True, validators=[validate_information])
     
+    description = models.TextField(null=True, blank=True)
+    prerequisite = models.CharField(max_length=300, null=True, blank=True)
+    mutually_exclusive = models.CharField(max_length=300, null=True, blank=True)
+    not_available = models.CharField(max_length=300, null=True, blank=True)
+    not_available_all = models.CharField(max_length=300, null=True, blank=True)
+    offered_as_ue = models.BooleanField(default=True)
+    offered_as_bde = models.BooleanField(default=True)
+    
     def serialize_info(self, info):
         single_infos = info.split('^')
         return {

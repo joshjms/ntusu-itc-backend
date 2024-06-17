@@ -26,8 +26,10 @@ class FeedbackForm(models.Model):
     title = models.CharField(max_length=100)
     details = models.TextField()
     email = models.EmailField(max_length=100, blank=True)
+    acknowledged = models.BooleanField(default=False)
     resolved = models.BooleanField(default=False)
     response = models.TextField(blank=True)
+    time = models.DateTimeField(default=tz.now)
 
     def __str__(self):
         return f'<FeedbackForm {self.id}: ({self.type}) {self.title}>'

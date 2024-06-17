@@ -1,10 +1,8 @@
 from django.shortcuts import get_object_or_404
-from drf_yasg import openapi
-from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
 from rest_framework.response import Response
-from modsoptimizer.models import CourseCode, CourseIndex
+from modsoptimizer.models import CourseCode, CourseIndex, CourseProgram
 from modsoptimizer.serializers import (
     CourseCodePartialSerializer,
     CourseCodeSerializer,
@@ -13,10 +11,12 @@ from modsoptimizer.serializers import (
 )
 from modsoptimizer.utils.algo import optimize_index
 from modsoptimizer.utils.course_scraper import perform_course_scraping
+from modsoptimizer.utils.decorators import custom_swagger_index_schema
 from modsoptimizer.utils.description_scraper import perform_description_scraping
 from modsoptimizer.utils.exam_scraper import perform_exam_schedule_scraping
 from modsoptimizer.utils.info_scraper import perform_info_update
 from modsoptimizer.utils.mixin import CourseCodeQueryParamsMixin
+from modsoptimizer.utils.program_scraper import perform_program_scraping
 from portal.permissions import IsSuperUser
 
 
@@ -41,13 +41,7 @@ def get_info_data(_):
     return Response('Info Update Completed')
 
 
-@swagger_auto_schema(
-    method='get',
-    manual_parameters=[
-        openapi.Parameter('start_index', openapi.IN_QUERY, description="Start index for scraping", type=openapi.TYPE_INTEGER, default=0),
-        openapi.Parameter('end_index', openapi.IN_QUERY, description="End index for scraping", type=openapi.TYPE_INTEGER, default=None)
-    ]
-)
+@custom_swagger_index_schema
 @api_view(['GET'])
 @permission_classes([IsSuperUser])
 def get_description_data(request):
@@ -55,6 +49,16 @@ def get_description_data(request):
     end_index = request.query_params.get('end_index', CourseCode.objects.count())
     perform_description_scraping(int(start_index), int(end_index))
     return Response('Description Scraping Completed')
+
+
+@custom_swagger_index_schema
+@api_view(['GET'])
+@permission_classes([IsSuperUser])
+def get_program_data(request):
+    start_index = request.query_params.get('start_index', 0)
+    end_index = request.query_params.get('end_index', CourseProgram.objects.count())
+    perform_program_scraping(int(start_index), int(end_index))
+    return Response('Program Scraping Completed')
 
 
 class CourseCodeListView(CourseCodeQueryParamsMixin, ListAPIView):

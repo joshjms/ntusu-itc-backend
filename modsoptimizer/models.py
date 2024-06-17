@@ -47,6 +47,7 @@ class CourseCode(models.Model):
     not_offered_as_pe_to = models.CharField(max_length=300, null=True, blank=True)
     not_offered_as_bde_ue_to = models.CharField(max_length=300, null=True, blank=True)
     department_maintaining = models.CharField(max_length=50, null=True, blank=True)
+    program_list = models.CharField(max_length=1000, null=True, blank=True)
     
     def serialize_info(self, info):
         single_infos = info.split('^')
@@ -118,3 +119,17 @@ class CourseIndex(models.Model):
 
     def __str__(self):
         return f'<Index {self.index} for course {self.course.code}>'
+
+
+class CourseProgram(models.Model):
+    name = models.CharField(max_length=300, unique=True)
+    value = models.CharField(max_length=300, unique=True)
+    datetime_added = models.DateTimeField(auto_now_add=True)
+    courses = models.ManyToManyField(CourseCode, related_name='programs')
+    year = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(4)], null=True, blank=True)
+    
+    def __str__(self):
+        return f'<CourseProgram ID #{self.id}: {self.name}>'
+    
+    class Meta:
+        verbose_name_plural = 'Course Programs'

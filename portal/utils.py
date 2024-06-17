@@ -9,15 +9,14 @@ def send_feedback_confirmation(feedback: dict):
         Hi,
         <br><br>
         This is an acknowledgement email that we have received your feedback
-        through NTUSU ITC Portal. The details are follows: <br>
+        through NTUMods / NTUSU ITC Portal. The details are follows: <br>
         Type          : {FeedbackForm.Type(feedback['type']).name} <br>
         Title         : {feedback['title']} <br>
         Details       : {feedback['details']} <br>
         <br>
         Thank you for providing us these information, we will get back
-        to you soon if needed. The information you provided are really
-        useful for our team to improve. <br>
-        <br>
+        to you soon if needed. Your feedback is very important for us to improve our service.
+        <br><br>
         {DO_NOT_REPLY_MESSAGE}
     '''
     send_email(SUBJECT, CONTENT, [feedback['email']])

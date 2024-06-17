@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from modsoptimizer.models import CourseCode, CourseIndex
+from modsoptimizer.models import CourseCode, CourseIndex, CourseProgram
 
 
 class CourseCodePartialSerializer(serializers.ModelSerializer):
@@ -68,6 +68,17 @@ class CourseOptimizerInputSerializer(serializers.Serializer):
                 if index not in data['code'].indexes.values_list('index', flat=True):
                     raise serializers.ValidationError(f'Index `{index}` does not exist for course `{data["code"]}`.')
         return data
+
+
+class CourseProgramSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CourseProgram
+        fields = [
+            'id',
+            'name',
+            'value',
+            'year',
+        ]
 
 
 class OptimizerInputSerialzer(serializers.Serializer):

@@ -126,7 +126,7 @@ class CourseProgram(models.Model):
     value = models.CharField(max_length=300, unique=True)
     datetime_added = models.DateTimeField(auto_now_add=True)
     courses = models.ManyToManyField(CourseCode, related_name='programs')
-    year = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(4)], null=True, blank=True)
+    year = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], null=True, blank=True)
     
     def __str__(self):
         return f'<CourseProgram ID #{self.id}: {self.name}>'

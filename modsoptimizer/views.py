@@ -7,6 +7,7 @@ from modsoptimizer.serializers import (
     CourseCodePartialSerializer,
     CourseCodeSerializer,
     CourseIndexSerializer,
+    CourseProgramSerializer,
     OptimizerInputSerialzer,
 )
 from modsoptimizer.utils.algo import optimize_index
@@ -15,7 +16,7 @@ from modsoptimizer.utils.decorators import custom_swagger_index_schema
 from modsoptimizer.utils.description_scraper import perform_description_scraping
 from modsoptimizer.utils.exam_scraper import perform_exam_schedule_scraping
 from modsoptimizer.utils.info_scraper import perform_info_update
-from modsoptimizer.utils.mixin import CourseCodeQueryParamsMixin
+from modsoptimizer.utils.mixin import CourseCodeQueryParamsMixin, CourseProgramQueryParamsMixin
 from modsoptimizer.utils.program_scraper import perform_program_scraping
 from portal.permissions import IsSuperUser
 
@@ -80,6 +81,11 @@ class CourseIndexDetailView(RetrieveAPIView):
 
     def get_object(self):
         return get_object_or_404(CourseIndex, index=self.kwargs['course_index'])
+
+
+class CourseProgramListView(CourseProgramQueryParamsMixin, ListAPIView):
+    serializer_class = CourseProgramSerializer
+    queryset = CourseProgram.objects.all()
 
 
 class OptimizeView(CreateAPIView):

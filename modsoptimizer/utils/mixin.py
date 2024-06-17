@@ -56,3 +56,14 @@ class CourseCodeQueryParamsMixin:
     }
     ordering_fields = ['code', 'name', 'academic_units',]
     pagination_class = PaginationConfig
+
+
+class CourseProgramQueryParamsMixin:
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_fields = {
+        'name': ['icontains'],
+        'year': ['exact'],
+        'value': ['exact'],
+    }
+    ordering_fields = ['name', 'year', 'value',]
+    pagination_class = PaginationConfig

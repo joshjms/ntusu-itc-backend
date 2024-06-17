@@ -26,15 +26,23 @@ def save_single_course_description(soup: BeautifulSoup, course: CourseCode):
                     return tds[1].get_text(strip=True)
         return None
 
-    # extract information: mutually_exclusive, prerequisite, not_available, not_available_all
-    mutually_exclusive = get_tr_text(soup, 'Mutually exclusive with:')
+    # extract information
     prerequisite = get_tr_text(soup, 'Prerequisite:')
-    not_available = get_tr_text(soup, 'Not available to Programme:')
-    not_available_all = get_tr_text(soup, 'Not available to all Programme with:')
     course.prerequisite = prerequisite
+    mutually_exclusive = get_tr_text(soup, 'Mutually exclusive with:')
     course.mutually_exclusive = mutually_exclusive
+    not_available = get_tr_text(soup, 'Not available to Programme:')
     course.not_available = not_available
+    not_available_all = get_tr_text(soup, 'Not available to all Programme with:')
     course.not_available_all = not_available_all
+    grade_type = get_tr_text(soup, 'Grade Type:')
+    course.grade_type = grade_type
+    not_available_as_core_to = get_tr_text(soup, 'Not available as Core to Programme:')
+    course.not_offered_as_core_to = not_available_as_core_to
+    not_available_as_pe_to = get_tr_text(soup, 'Not available as PE to Programme:')
+    course.not_offered_as_pe_to = not_available_as_pe_to
+    not_available_as_bde_ue_to = get_tr_text(soup, 'Not available as BDE/UE to Programme:')
+    course.not_offered_as_bde_ue_to = not_available_as_bde_ue_to
     
     # check if the course is not offered as UE or BDE, otherwise it's True by default
     tds = soup.find_all('td')
@@ -43,11 +51,18 @@ def save_single_course_description(soup: BeautifulSoup, course: CourseCode):
             course.offered_as_ue = False
         if 'Not offered as Broadening and Deepening Elective' in td.get_text():
             course.offered_as_bde = False
+            
+    # get the department that maintain / offer this course
+    second_tr = soup.find_all('tr')[1]
+    last_td = second_tr.find_all('td')[-1]
+    last_td_text = last_td.get_text(strip=True)
+    course.department_maintaining = last_td_text
     
     # save the changes
     course.save()
 
 def perform_description_scraping(start_index, end_index):
+    ENDPOINT = 'https://wis.ntu.edu.sg/webexe/owa/AUS_SUBJ_CONT.main_display1'
     FORMDATA_ACADSEM = '2024_1'
     FORMDATA_ACAD = '2024'
     FORMDATA_SEMESTER = '1'
@@ -63,7 +78,7 @@ def perform_description_scraping(start_index, end_index):
                 'semester': FORMDATA_SEMESTER,
             }
             response = requests.post(
-                'https://wis.ntu.edu.sg/webexe/owa/AUS_SUBJ_CONT.main_display1',
+                ENDPOINT,
                 data=form_data
             )
             if response.status_code == 200:

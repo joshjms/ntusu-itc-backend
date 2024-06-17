@@ -1,4 +1,6 @@
 from django.shortcuts import get_object_or_404
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
 from rest_framework.response import Response
@@ -39,6 +41,13 @@ def get_info_data(_):
     return Response('Info Update Completed')
 
 
+@swagger_auto_schema(
+    method='get',
+    manual_parameters=[
+        openapi.Parameter('start_index', openapi.IN_QUERY, description="Start index for scraping", type=openapi.TYPE_INTEGER, default=0),
+        openapi.Parameter('end_index', openapi.IN_QUERY, description="End index for scraping", type=openapi.TYPE_INTEGER, default=None)
+    ]
+)
 @api_view(['GET'])
 @permission_classes([IsSuperUser])
 def get_description_data(request):

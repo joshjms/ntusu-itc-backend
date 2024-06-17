@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from modsoptimizer.models import CourseCode, CourseIndex
+from modsoptimizer.models import CourseCode, CourseIndex, CourseProgram
 
 
 class CourseCodePartialSerializer(serializers.ModelSerializer):
@@ -27,6 +27,7 @@ class CourseIndexSerializer(serializers.ModelSerializer):
 
 class CourseCodeSerializer(serializers.ModelSerializer):
     indexes = CourseIndexSerializer(many=True, read_only=True)
+    program_list = serializers.SerializerMethodField()
 
     class Meta:
         model = CourseCode
@@ -47,7 +48,17 @@ class CourseCodeSerializer(serializers.ModelSerializer):
             'not_available_all',
             'offered_as_ue',
             'offered_as_bde',
+            'grade_type',
+            'not_offered_as_core_to',
+            'not_offered_as_pe_to',
+            'not_offered_as_bde_ue_to',
+            'department_maintaining',
+            'program_list',
         ]
+        
+    def get_program_list(self, obj):
+        program_list = obj.program_list.split(', ') if obj.program_list else []
+        return program_list
 
 
 class CourseOptimizerInputSerializer(serializers.Serializer):
@@ -68,6 +79,17 @@ class CourseOptimizerInputSerializer(serializers.Serializer):
                 if index not in data['code'].indexes.values_list('index', flat=True):
                     raise serializers.ValidationError(f'Index `{index}` does not exist for course `{data["code"]}`.')
         return data
+
+
+class CourseProgramSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CourseProgram
+        fields = [
+            'id',
+            'name',
+            'value',
+            'year',
+        ]
 
 
 class OptimizerInputSerialzer(serializers.Serializer):

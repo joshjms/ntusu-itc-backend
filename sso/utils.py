@@ -5,9 +5,12 @@ import os
 DO_NOT_REPLY_MESSAGE = f'''
     <p style="color: red;">        
         This is a system generated email, please do <b>not</b> reply
-        directly to this email. If you have any other enquiries regarding
-        our IT services, please contact the mail su-itc@e.ntu.edu.sg
-        (Student Union Information Technology Committee).
+        directly to this email.
+        Please do not send a message to su-itc@e.ntu.edu.sg as
+        that email is currently not monitored.
+        If you have any other enquiries or wanted to reach out to us directly,
+        you may send an email to mich0107@e.ntu.edu.sg or drop a message
+        through telegram id @michac789 (Michael, chairperson of Information Technology Committee).
     </p>
 '''
 

@@ -40,6 +40,13 @@ class CourseCodeSerializer(serializers.ModelSerializer):
             'get_common_information',
             'common_schedule',
             'indexes',
+            'description',
+            'prerequisite',
+            'mutually_exclusive',
+            'not_available',
+            'not_available_all',
+            'offered_as_ue',
+            'offered_as_bde',
         ]
 
 

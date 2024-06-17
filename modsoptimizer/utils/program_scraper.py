@@ -31,17 +31,29 @@ def perform_program_scraping(start_index, end_index):
     try:
         soup = BeautifulSoup(html_content, 'html.parser')
         options = soup.find('select', {'name': 'r_course_yr'}).find_all('option')
+        programs = []
         for option in options:
             text = option.get_text(strip=True)
             value = option.get('value')
             if value == '': # skip the first option
                 continue
-            year = int(value.split(';')[2])
+            year = None
+            try:
+                year = int(value.split(';')[2])
+            except ValueError:
+                pass
+            programs.append({
+                'name': text,
+                'value': value,
+                'year': year,
+            })
+            
+        for program in programs[start_index:end_index]:
             try:
                 CourseProgram.objects.create(
-                    name=text,
-                    value=value,
-                    year=year,
+                    name=program['name'],
+                    value=program['value'],
+                    year=program['year'],
                 )
             except IntegrityError:
                 pass

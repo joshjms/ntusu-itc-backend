@@ -4,7 +4,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import BaseFilterBackend, OrderingFilter
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
-from modsoptimizer.models import CourseCode, CourseIndex
+from modsoptimizer.models import CourseCode, CourseProgram
 
 
 class PaginationConfig(PageNumberPagination):
@@ -44,15 +44,53 @@ class CustomCodeAndNameSearch2(BaseFilterBackend):
             return queryset
 
 
+class CustomProgramSearch(BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        program_qp = request.query_params.get('program__icontains', None)
+        if not program_qp:
+            return queryset
+        programs_list = program_qp.split(';') if program_qp else None
+        programs_list = [int(id.strip()) for id in programs_list if id.strip()]
+        queryset = queryset.filter(programs__in=programs_list).distinct()
+        return queryset
+
+
+class CustomYearSearch(BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        year_qp = request.query_params.get('year', None)
+        if not year_qp or year_qp not in ['1', '2', '3', '4', '5']:
+            return queryset
+        year_qp = int(year_qp)
+        course_programs = CourseProgram.objects.filter(year=year_qp).values_list('id', flat=True)
+        queryset = queryset.filter(programs__in=course_programs).distinct()
+        return queryset
+
+
 class CourseCodeQueryParamsMixin:
-    filter_backends = [DjangoFilterBackend,
-                       OrderingFilter,
-                       CustomCodeAndNameSearch,
-                       CustomCodeAndNameSearch2,]
+    filter_backends = [
+        DjangoFilterBackend,
+        OrderingFilter,
+        CustomCodeAndNameSearch,
+        CustomCodeAndNameSearch2,
+        CustomProgramSearch,
+        CustomYearSearch,
+    ]
     filterset_fields = {
         'code': ['icontains'],
         'name': ['icontains'],
         'academic_units': ['lte', 'gte'],
+        'prerequisite': ['icontains'],
+        'mutually_exclusive': ['icontains'],
+        'not_available': ['icontains'],
+        'not_available_all': ['icontains'],
+        'offered_as_ue': ['exact'],
+        'offered_as_bde': ['exact'],
+        'grade_type': ['icontains'],
+        'not_offered_as_core_to': ['icontains'],
+        'not_offered_as_pe_to': ['icontains'],
+        'not_offered_as_bde_ue_to': ['icontains'],
+        'department_maintaining': ['icontains'],
+        'program_list': ['icontains'],
     }
     ordering_fields = ['code', 'name', 'academic_units',]
     pagination_class = PaginationConfig

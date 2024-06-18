@@ -10,6 +10,10 @@ from modsoptimizer.models import CourseCode, CourseProgram
 class PaginationConfig(PageNumberPagination):
     page_size = 10
     page_size_query_param = 'page_size'
+    
+    def get_page_number(self, request, paginator):
+        page_number = request.query_params.get(self.page_query_param, 1)
+        return min(int(page_number), paginator.num_pages)
 
     def get_paginated_response(self, data):
         return Response({

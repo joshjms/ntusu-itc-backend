@@ -1,5 +1,5 @@
 from django.contrib import admin
-from modsoptimizer.models import CourseCode, CourseIndex, CourseProgram
+from modsoptimizer.models import CourseCode, CourseIndex, CourseProgram, CourseCodeProgram
 
 
 class CourseCodeAdmin(admin.ModelAdmin):
@@ -16,3 +16,4 @@ class CourseProgramAdmin(admin.ModelAdmin):
 admin.site.register(CourseCode, CourseCodeAdmin)
 admin.site.register(CourseIndex)
 admin.site.register(CourseProgram, CourseProgramAdmin)
+admin.site.register(CourseCodeProgram)

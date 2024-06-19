@@ -149,6 +149,14 @@ class CourseIndex(models.Model):
         return f'<Index {self.index} for course {self.course.code}>'
 
 
+'''
+To store Bachelors program such as:
+Accountancy Year 1
+Accountancy Year 2
+Minor in Computing and Data Analysis
+Minor in Mathematics
+etc
+'''
 class CourseProgram(models.Model):
     name = models.CharField(max_length=300, unique=True)
     value = models.CharField(max_length=300, unique=True)
@@ -161,3 +169,14 @@ class CourseProgram(models.Model):
     
     class Meta:
         verbose_name_plural = 'Course Programs'
+
+
+'''
+Store unique program_code from CourseCode so it does not have to be
+requeried everytime such as MH, SC, etc...
+'''
+class CourseCodeProgram(models.Model):
+    program_code = models.CharField(max_length=3, unique=True)
+    
+    def __str__(self):
+        return f'<CourseCodeProgram ID #{self.id}: {self.program_code}>'

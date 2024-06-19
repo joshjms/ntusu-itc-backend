@@ -1,8 +1,8 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
+from rest_framework.generics import CreateAPIView, GenericAPIView, ListAPIView, RetrieveAPIView
 from rest_framework.response import Response
-from modsoptimizer.models import CourseCode, CourseIndex, CourseProgram
+from modsoptimizer.models import CourseCode, CourseIndex, CourseProgram, CourseCodeProgram
 from modsoptimizer.serializers import (
     CourseCodePartialSerializer,
     CourseCodeSerializer,
@@ -98,6 +98,12 @@ class CourseIndexDetailView(RetrieveAPIView):
 class CourseProgramListView(CourseProgramQueryParamsMixin, ListAPIView):
     serializer_class = CourseProgramSerializer
     queryset = CourseProgram.objects.all()
+    
+
+class CourseCodeProgramListView(GenericAPIView):
+    def get(self, request):
+        programs = CourseCodeProgram.objects.values_list('program_code', flat=True)
+        return Response(programs)
 
 
 class OptimizeView(CreateAPIView):

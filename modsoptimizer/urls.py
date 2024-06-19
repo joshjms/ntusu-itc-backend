@@ -17,5 +17,6 @@ urlpatterns = [
     path('course_code/<str:course_code>/', views.CourseCodeDetailView.as_view()),
     path('course_index/<str:course_index>/', views.CourseIndexDetailView.as_view()),
     path('course_programs/', views.CourseProgramListView.as_view()),
+    path('course_code_programs/', views.CourseCodeProgramListView.as_view()),
     path('optimize/', views.OptimizeView.as_view()),
 ]

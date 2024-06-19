@@ -1,4 +1,4 @@
-from modsoptimizer.models import CourseCode
+from modsoptimizer.models import CourseCode, CourseCodeProgram
 import re
 
 
@@ -26,3 +26,9 @@ def perform_course_additional():
         course.level = level
 
         course.save()
+        
+    # populate course code program
+    CourseCodeProgram.objects.all().delete()
+    program_codes = CourseCode.objects.values_list('program_code', flat=True).distinct()
+    for program_code in program_codes:
+        CourseCodeProgram.objects.create(program_code=program_code)

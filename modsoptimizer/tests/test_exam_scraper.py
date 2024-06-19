@@ -14,7 +14,7 @@ class TestExamScraper(APITestCase):
     '''
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        FILE_PATH = os.path.join('modsoptimizer', 'utils', 'scraping_files', 'exam_schedule.html')
+        FILE_PATH = os.path.join('modsoptimizer', 'utils', 'scraping_files', 'exam_schedule_test.html')
         self.soup = get_soup_from_html_file(FILE_PATH)
 
     def get_exam_schedule_str(self, date_str, time_str, *args):

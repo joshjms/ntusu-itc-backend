@@ -35,6 +35,34 @@ class CourseCode(models.Model):
     # information that is common across all indexes of this course
     common_information = models.TextField(null=True, blank=True, validators=[validate_information])
     
+    description = models.TextField(null=True, blank=True)
+    prerequisite = models.CharField(max_length=300, null=True, blank=True)
+    mutually_exclusive = models.CharField(max_length=300, null=True, blank=True)
+    not_available = models.CharField(max_length=300, null=True, blank=True)
+    not_available_all = models.CharField(max_length=300, null=True, blank=True)
+    offered_as_ue = models.BooleanField(default=True)
+    offered_as_bde = models.BooleanField(default=True)
+    grade_type = models.CharField(max_length=300, null=True, blank=True)
+    not_offered_as_core_to = models.CharField(max_length=300, null=True, blank=True)
+    not_offered_as_pe_to = models.CharField(max_length=300, null=True, blank=True)
+    not_offered_as_bde_ue_to = models.CharField(max_length=300, null=True, blank=True)
+    department_maintaining = models.CharField(max_length=50, null=True, blank=True)
+    program_list = models.CharField(max_length=1000, null=True, blank=True)
+    
+    # level of the course, determined by the first non-letter character in the course code
+    # currently only store level 1 to 5, the rest will be stored as 10
+    # if the number after the letters are less than 4 digits, it will be stored as 10
+    # example: lv1: MH1101, SC1003; lv3: MH3700, E3102L
+    # level 10: AAA28R, AAI28C, AGE18A, ES9003
+    level = models.CharField(max_length=2, null=True, blank=True)
+    # program of the course (characters up to and excluding the first non-letter character)
+    # example: MH3701 -> program_code = 'MH'
+    # program_code = 'E'
+    # AAA28R -> program_code = 'AAA'
+    program_code = models.CharField(max_length=3, null=True, blank=True)
+    # these 'level' and 'program_code' are programatically populated
+    # from 'scrape_course_additional' api endpoint
+    
     def serialize_info(self, info):
         single_infos = info.split('^')
         return {
@@ -45,6 +73,20 @@ class CourseCode(models.Model):
             'venue': single_infos[4],
             'remark': single_infos[5],
         }
+    
+    '''
+    Per June 2024, all course codes in db have been asserted to have length of 6.
+    Level is determined by the third character.
+    For example, 'MH1100' is a level 1 course, 'MH3700' is a level 3 course.
+    Currently, we only classify level 1 to 5 course,
+    the rest will be integer 10 which are classified as 'others'.
+    '''
+    @property
+    def get_level(self):
+        digit = self.code[2]
+        if digit.isdigit() and int(digit) in range(1, 6):
+            return int(digit)
+        return 10
 
     @property
     def get_common_information(self):
@@ -105,3 +147,36 @@ class CourseIndex(models.Model):
 
     def __str__(self):
         return f'<Index {self.index} for course {self.course.code}>'
+
+
+'''
+To store Bachelors program such as:
+Accountancy Year 1
+Accountancy Year 2
+Minor in Computing and Data Analysis
+Minor in Mathematics
+etc
+'''
+class CourseProgram(models.Model):
+    name = models.CharField(max_length=300, unique=True)
+    value = models.CharField(max_length=300, unique=True)
+    datetime_added = models.DateTimeField(auto_now_add=True)
+    courses = models.ManyToManyField(CourseCode, related_name='programs')
+    year = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], null=True, blank=True)
+    
+    def __str__(self):
+        return f'<CourseProgram ID #{self.id}: {self.name}>'
+    
+    class Meta:
+        verbose_name_plural = 'Course Programs'
+
+
+'''
+Store unique program_code from CourseCode so it does not have to be
+requeried everytime such as MH, SC, etc...
+'''
+class CourseCodeProgram(models.Model):
+    program_code = models.CharField(max_length=3, unique=True)
+    
+    def __str__(self):
+        return f'<CourseCodeProgram ID #{self.id}: {self.program_code}>'

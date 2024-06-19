@@ -1,19 +1,24 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
+from rest_framework.generics import CreateAPIView, GenericAPIView, ListAPIView, RetrieveAPIView
 from rest_framework.response import Response
-from modsoptimizer.models import CourseCode, CourseIndex
+from modsoptimizer.models import CourseCode, CourseIndex, CourseProgram, CourseCodeProgram
 from modsoptimizer.serializers import (
     CourseCodePartialSerializer,
     CourseCodeSerializer,
     CourseIndexSerializer,
+    CourseProgramSerializer,
     OptimizerInputSerialzer,
 )
 from modsoptimizer.utils.algo import optimize_index
+from modsoptimizer.utils.course_additional_scraper import perform_course_additional
 from modsoptimizer.utils.course_scraper import perform_course_scraping
+from modsoptimizer.utils.decorators import custom_swagger_index_schema, swagger_course_code_list_schema
+from modsoptimizer.utils.description_scraper import perform_description_scraping
 from modsoptimizer.utils.exam_scraper import perform_exam_schedule_scraping
 from modsoptimizer.utils.info_scraper import perform_info_update
-from modsoptimizer.utils.mixin import CourseCodeQueryParamsMixin
+from modsoptimizer.utils.mixin import CourseCodeQueryParamsMixin, CourseProgramQueryParamsMixin
+from modsoptimizer.utils.program_scraper import perform_program_scraping
 from portal.permissions import IsSuperUser
 
 
@@ -38,9 +43,40 @@ def get_info_data(_):
     return Response('Info Update Completed')
 
 
+@custom_swagger_index_schema
+@api_view(['GET'])
+@permission_classes([IsSuperUser])
+def get_description_data(request):
+    start_index = request.query_params.get('start_index', 0)
+    end_index = request.query_params.get('end_index', CourseCode.objects.count())
+    perform_description_scraping(int(start_index), int(end_index))
+    return Response('Description Scraping Completed')
+
+
+@custom_swagger_index_schema
+@api_view(['GET'])
+@permission_classes([IsSuperUser])
+def get_program_data(request):
+    start_index = request.query_params.get('start_index', 0)
+    end_index = request.query_params.get('end_index')
+    perform_program_scraping(int(start_index), int(end_index) if end_index else None)
+    return Response('Program Scraping Completed')
+
+
+@api_view(['GET'])
+@permission_classes([IsSuperUser])
+def get_course_additional_data(_):
+    perform_course_additional()
+    return Response('Course Additional Data Population Completed')
+
+
 class CourseCodeListView(CourseCodeQueryParamsMixin, ListAPIView):
     serializer_class = CourseCodePartialSerializer
     queryset = CourseCode.objects.all()
+    
+    @swagger_course_code_list_schema
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
 
 
 class CourseCodeDetailView(RetrieveAPIView):
@@ -57,6 +93,17 @@ class CourseIndexDetailView(RetrieveAPIView):
 
     def get_object(self):
         return get_object_or_404(CourseIndex, index=self.kwargs['course_index'])
+
+
+class CourseProgramListView(CourseProgramQueryParamsMixin, ListAPIView):
+    serializer_class = CourseProgramSerializer
+    queryset = CourseProgram.objects.all()
+    
+
+class CourseCodeProgramListView(GenericAPIView):
+    def get(self, request):
+        programs = CourseCodeProgram.objects.values_list('program_code', flat=True)
+        return Response(programs)
 
 
 class OptimizeView(CreateAPIView):

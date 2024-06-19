@@ -11,6 +11,7 @@ urlpatterns = [
     path('scrape_info/', views.get_info_data),
     path('scrape_description/', views.get_description_data),
     path('scrape_program/', views.get_program_data),
+    path('scrape_course_additional/', views.get_course_additional_data),
 
     path('course_code/', views.CourseCodeListView.as_view()),
     path('course_code/<str:course_code>/', views.CourseCodeDetailView.as_view()),

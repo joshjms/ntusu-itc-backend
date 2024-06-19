@@ -11,6 +11,7 @@ from modsoptimizer.serializers import (
     OptimizerInputSerialzer,
 )
 from modsoptimizer.utils.algo import optimize_index
+from modsoptimizer.utils.course_additional_scraper import perform_course_additional
 from modsoptimizer.utils.course_scraper import perform_course_scraping
 from modsoptimizer.utils.decorators import custom_swagger_index_schema, swagger_course_code_list_schema
 from modsoptimizer.utils.description_scraper import perform_description_scraping
@@ -40,6 +41,13 @@ def get_exam_data(_):
 def get_info_data(_):
     perform_info_update()
     return Response('Info Update Completed')
+
+
+@api_view(['GET'])
+@permission_classes([IsSuperUser])
+def get_course_additional_data(_):
+    perform_course_additional()
+    return Response('Course Additional Data Population Completed')
 
 
 @custom_swagger_index_schema

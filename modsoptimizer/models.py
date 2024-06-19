@@ -49,6 +49,20 @@ class CourseCode(models.Model):
     department_maintaining = models.CharField(max_length=50, null=True, blank=True)
     program_list = models.CharField(max_length=1000, null=True, blank=True)
     
+    # level of the course, determined by the first non-letter character in the course code
+    # currently only store level 1 to 5, the rest will be stored as 10
+    # if the number after the letters are less than 4 digits, it will be stored as 10
+    # example: lv1: MH1101, SC1003; lv3: MH3700, E3102L
+    # level 10: AAA28R, AAI28C, AGE18A, ES9003
+    level = models.CharField(max_length=2, null=True, blank=True)
+    # program of the course (characters up to and excluding the first non-letter character)
+    # example: MH3701 -> program_code = 'MH'
+    # program_code = 'E'
+    # AAA28R -> program_code = 'AAA'
+    program_code = models.CharField(max_length=3, null=True, blank=True)
+    # these 'level' and 'program_code' are programatically populated
+    # from 'scrape_course_additional' api endpoint
+    
     def serialize_info(self, info):
         single_infos = info.split('^')
         return {
@@ -59,6 +73,20 @@ class CourseCode(models.Model):
             'venue': single_infos[4],
             'remark': single_infos[5],
         }
+    
+    '''
+    Per June 2024, all course codes in db have been asserted to have length of 6.
+    Level is determined by the third character.
+    For example, 'MH1100' is a level 1 course, 'MH3700' is a level 3 course.
+    Currently, we only classify level 1 to 5 course,
+    the rest will be integer 10 which are classified as 'others'.
+    '''
+    @property
+    def get_level(self):
+        digit = self.code[2]
+        if digit.isdigit() and int(digit) in range(1, 6):
+            return int(digit)
+        return 10
 
     @property
     def get_common_information(self):

@@ -34,9 +34,11 @@ def swagger_course_code_list_schema(func):
             openapi.Parameter('not_offered_as_bde_ue_to__icontains', openapi.IN_QUERY, type=openapi.TYPE_STRING, default=None),
             openapi.Parameter('department_maintaining__icontains', openapi.IN_QUERY, type=openapi.TYPE_STRING, default=None),
             openapi.Parameter('program_list__icontains', openapi.IN_QUERY, type=openapi.TYPE_STRING, default=None),
+            openapi.Parameter('program_code', openapi.IN_QUERY, type=openapi.TYPE_STRING, default=None),
             
             openapi.Parameter('search__icontains_2', openapi.IN_QUERY, type=openapi.TYPE_STRING, default=None),
             openapi.Parameter('program__icontains', openapi.IN_QUERY, type=openapi.TYPE_STRING, default=None),
             openapi.Parameter('year', openapi.IN_QUERY, type=openapi.TYPE_STRING, default=None),
+            openapi.Parameter('level__in', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, default=None),
         ]
     )(func)

@@ -43,13 +43,6 @@ def get_info_data(_):
     return Response('Info Update Completed')
 
 
-@api_view(['GET'])
-@permission_classes([IsSuperUser])
-def get_course_additional_data(_):
-    perform_course_additional()
-    return Response('Course Additional Data Population Completed')
-
-
 @custom_swagger_index_schema
 @api_view(['GET'])
 @permission_classes([IsSuperUser])
@@ -68,6 +61,13 @@ def get_program_data(request):
     end_index = request.query_params.get('end_index')
     perform_program_scraping(int(start_index), int(end_index) if end_index else None)
     return Response('Program Scraping Completed')
+
+
+@api_view(['GET'])
+@permission_classes([IsSuperUser])
+def get_course_additional_data(_):
+    perform_course_additional()
+    return Response('Course Additional Data Population Completed')
 
 
 class CourseCodeListView(CourseCodeQueryParamsMixin, ListAPIView):

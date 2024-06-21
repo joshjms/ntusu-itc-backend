@@ -79,6 +79,15 @@ class CustomLevelMultipleFilter(BaseFilterBackend):
         return queryset.filter(level__in=levels)
 
 
+class ProgramCodeMultipleFilter(BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        program_qp = request.query_params.get('program_code', None)
+        if not program_qp:
+            return queryset
+        programs = program_qp.split(';')
+        return queryset.filter(program_code__in=programs)
+
+
 class CourseCodeQueryParamsMixin:
     filter_backends = [
         DjangoFilterBackend,
@@ -88,6 +97,7 @@ class CourseCodeQueryParamsMixin:
         CustomProgramSearch,
         CustomYearSearch,
         CustomLevelMultipleFilter,
+        ProgramCodeMultipleFilter,
     ]
     filterset_fields = {
         'code': ['icontains'],
@@ -105,7 +115,6 @@ class CourseCodeQueryParamsMixin:
         'not_offered_as_bde_ue_to': ['icontains'],
         'department_maintaining': ['icontains'],
         'program_list': ['icontains'],
-        'program_code': ['exact'],
     }
     ordering_fields = ['code', 'name', 'academic_units',]
     pagination_class = PaginationConfig

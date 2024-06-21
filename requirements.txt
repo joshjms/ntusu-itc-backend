@@ -1,7 +1,7 @@
 # Django
 asgiref==3.5.2
 Django==4.1.13
-sqlparse==0.4.4
+sqlparse==0.5.0
 tzdata==2022.5
 pytz==2022.5
 
@@ -40,7 +40,7 @@ charset-normalizer==2.1.1
 coreapi==2.3.3
 coreschema==0.0.4
 drf-yasg==1.21.4
-idna==3.4
+idna==3.7
 inflection==0.5.1
 itypes==1.2.0
 Jinja2==3.1.4
@@ -61,7 +61,7 @@ soupsieve==2.3.2post1
 lxml==4.9.2
 
 # WSGI (Gunicorn)
-gunicorn==20.1.0
+gunicorn==22.0.0
 
 # Static file serving (WhiteNoise)
 whitenoise==6.3.0
@@ -76,4 +76,4 @@ openpyxl==3.1.2
 python-dotenv==1.0.0
 
 # Pillow
-pillow==10.2.0
+pillow==10.3.0

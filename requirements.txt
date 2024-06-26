@@ -6,7 +6,7 @@ tzdata==2022.5
 pytz==2022.5
 
 # Django REST Framework; dependent to Django
-djangorestframework==3.14.0
+djangorestframework==3.15.2
 
 # Django Cors Headers; dependent to Django
 django-cors-headers==3.13.0

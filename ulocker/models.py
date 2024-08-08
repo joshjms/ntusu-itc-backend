@@ -50,6 +50,7 @@ class Booking(models.Model):
     start_month = models.CharField(max_length=7, validators=[validate_date_format])
     duration = models.IntegerField()
     comment = models.CharField(max_length=300, null=True, blank=True)
+    
 
     def __str__(self):
         return f"<{self.applicant_name} -> {self.locker} ({self.start_month} - {self.duration} month(s))>"

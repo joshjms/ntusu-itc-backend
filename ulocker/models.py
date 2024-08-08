@@ -51,6 +51,8 @@ class Booking(models.Model):
     duration = models.IntegerField()
     comment = models.CharField(max_length=300, null=True, blank=True)
     payment_status = models.CharField(max_length=50, default='unpaid')
+    command = models.CharField(max_length=50, default='')
+    end_month = models.CharField(max_length=7, default='')
 
     def __str__(self):
         return f"<{self.applicant_name} -> {self.locker} ({self.start_month} - {self.duration} month(s))>"

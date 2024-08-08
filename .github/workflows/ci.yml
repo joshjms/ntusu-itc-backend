@@ -26,6 +26,13 @@ jobs:
         pip install -r requirements.txt
         python manage.py makemigrations
         python manage.py migrate
+      env:
+        PROD: 1
+        DB_HOST: ${{ secrets.DB_HOST }}
+        DB_NAME: ${{ secrets.DB_NAME }}
+        DB_USER: ${{ secrets.DB_USER }}
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+
     - name: Run Tests
       run: |
         python manage.py test

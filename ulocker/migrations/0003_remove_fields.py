@@ -6,16 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("ulocker", "0003_remove_booking_payment_status_booking_command_and_more"),
+        ("ulocker", "0002_locker_passcode"),
     ]
 
     operations = [
-        migrations.AlterModelOptions(
-            name="ulockeradmin",
-            options={
-                "verbose_name": "ULocker Admin",
-                "verbose_name_plural": "ULocker Admins",
-            },
+        migrations.RemoveField(
+            model_name="booking",
+            name="payment_status",
         ),
         migrations.RemoveField(
             model_name="booking",
@@ -24,10 +21,5 @@ class Migration(migrations.Migration):
         migrations.RemoveField(
             model_name="booking",
             name="end_month",
-        ),
-        migrations.AddField(
-            model_name="booking",
-            name="comment",
-            field=models.CharField(blank=True, max_length=300, null=True),
         ),
     ]

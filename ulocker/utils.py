@@ -136,7 +136,7 @@ Please confirm the booking above by clicking on this link.
             else config.semesterly_price if obj.duration == 4 \
             else config.yearly_price if obj.duration == 12 \
             else 'N/A'
-        frontend_link = 'Please proceed to make payment at the Student Activities Centre (SAC) counter from Monday to Friday, 11:30 am to 8:30 pm. Note that payment is by cash as we are still processing the QR code. After payment is made, you will receive an email confirmation including the passcode within 24 hours.'
+        frontend_link = 'TODO'
         recipients = [obj.user.email]
         email_subject = 'ULocker - Payment Required'
         rental_duration = ULockerEmailService.get_rental_period(obj.start_month, obj.duration)
@@ -156,7 +156,8 @@ Organization Name: {obj.organization_name}<br>
 Position: {obj.position}<br>
 <br>
 The price for the booking is <b>{price}</b>.<br>
-Please proceed and make payment on the following link: {frontend_link}<br>
+Please proceed to make payment at the Student Activities Centre (SAC) counter from Monday to Friday, 11:30 am to 8:30 pm. Note that payment is by cash as we are still processing the QR code. <br>
+After payment is made, you will receive an email confirmation including the passcode within 24 hours.'<br>
 <br><br>
 {DO_NOT_REPLY_MESSAGE}
         '''

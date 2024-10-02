@@ -35,7 +35,7 @@ six==1.16.0
 urllib3==1.26.19
 
 # DRF-YASG (Swagger UI Docs); dependent to DRF
-certifi==2023.7.22
+certifi==2024.7.4
 charset-normalizer==2.1.1
 coreapi==2.3.3
 coreschema==0.0.4

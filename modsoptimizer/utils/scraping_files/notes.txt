@@ -1,6 +1,0 @@
-Please write here the latest date of the website used for scraping.
-Just to make sure that the data is up to date.
-Also, it helps to track bugs if occured in later versions of the website.
-
-Exam schedule: 15/01/2024; AY2023/2024 Semester 2
-Course schedule: 10/12/2023; AY2023/2024 Semester 2 (*15/01/2024 -> update in production)

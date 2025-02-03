@@ -68,7 +68,6 @@ INSTALLED_APPS = [
     'event',
     'starswar',
     'indexswapper',
-    'modsoptimizer',
     'ulocker'
 ]
 

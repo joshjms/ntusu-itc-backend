@@ -1,6 +1,6 @@
 # Django
 asgiref==3.5.2
-Django==4.1.13
+Django==4.2.16
 sqlparse==0.5.0
 tzdata==2022.5
 pytz==2022.5

@@ -52,6 +52,10 @@ class Item(models.Model):
     def __str__(self):
         return f"<(ID: {self.id}) {self.title}>"
 
+    class Meta:
+        verbose_name = 'Item'
+        verbose_name_plural = 'Items'
+
 
 class ItemLoanRequest(models.Model):
     approval_status = models.CharField(max_length=10, choices=STATUSES, default="Processing")
@@ -64,3 +68,7 @@ class ItemLoanRequest(models.Model):
 
     def __str__(self):
         return f"<(ID: {self.id}) Loan request for Item, {self.item.title}, made by {self.user.user.username}, {self.approval_status}>"
+
+    class Meta:
+        verbose_name = 'Item Loan Request'
+        verbose_name_plural = 'Item Loan Requests'

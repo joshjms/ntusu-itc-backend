@@ -5,6 +5,8 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from django.http import JsonResponse
+
 from django.utils import timezone
 
 from .models import (
@@ -32,13 +34,25 @@ class ItemDetailView(generics.RetrieveAPIView):
     queryset = Item.objects.all()
     lookup_url_kwarg = 'item_id'
     
-# view all loan requests
+# view all loan requests // this one for admin only
 class ItemLoanRequestListView(generics.ListAPIView):
     serializer_class = ItemLoanRequestSerializer
     queryset = ItemLoanRequest.objects.all()
     
+# view the user loan requests
+class UserLoanRequestListView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ItemLoanRequestSerializer
+    
+    def get_queryset(self):
+        user_id = self.request.user.id
+        # checking the request user and the token user
+        if self.kwargs['username'] != self.request.user.username:
+            return Response({"detail": "You are not authorized to view this user's loan requests"}, status=status.HTTP_401_UNAUTHORIZED)
+        return ItemLoanRequest.objects.filter(user=user_id)
+    
 # send loan request
-class LoanRequestCreateView(APIView):
+class LoanRequestCreateView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
     
     def post(self, request, *args, **kwargs):
@@ -63,7 +77,7 @@ class LoanRequestCreateView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # return item
-class LoanRequestReturnView(APIView):
+class LoanRequestReturnView(generics.UpdateAPIView):
     permission_classes = [IsAuthenticated]
     
     def put(self, request, pk, *args, **kwargs):

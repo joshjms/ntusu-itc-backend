@@ -17,9 +17,9 @@ class ItemSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'description', 'category', 'attachment', 'quantity', 'user']
 
 class ItemLoanRequestSerializer(serializers.ModelSerializer):
-    item = serializers.PrimaryKeyRelatedField(queryset=Item.objects.all()
-                                              )
+    item = serializers.PrimaryKeyRelatedField(queryset=Item.objects.all())
     class Meta:
         model = ItemLoanRequest
         fields = ['id', 'approval_status', 'start_date', 'end_date', 'return_date', 'quantity', 'item', 'user']
+        read_only_fields = ['id', 'user']
 

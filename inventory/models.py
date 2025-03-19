@@ -7,6 +7,7 @@ STATUSES = (
     ("accepted", "Accepted"),
     ("rejected", "Rejected"),
     ("processing", "Processing"),
+    ("returned", "Returned"),
 )
 
 

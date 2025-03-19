@@ -16,5 +16,5 @@ urlpatterns = [
     path('loan-requests/', ItemLoanRequestListView.as_view(), name='loan-requests'),
     path('loan-requests/<str:username>/', UserLoanRequestListView.as_view(), name='user-loan-requests'),
     path('items/loan/', LoanRequestCreateView.as_view(), name='loan-request-create'),
-    path('items/loan/return/<int:pk>', LoanRequestReturnView.as_view(), name='loan-request-return'),
+    path('loan-requests/return/<int:pk>', LoanRequestReturnView.as_view(), name='loan-request-return'),
 ]

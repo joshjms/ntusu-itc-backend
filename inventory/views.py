@@ -87,6 +87,9 @@ class LoanRequestReturnView(generics.UpdateAPIView):
         except ItemLoanRequest.DoesNotExist:
             return Response({"detail": "Loan request not found"}, status=status.HTTP_404_NOT_FOUND)
         
+        if loan_request.approval_status != 'accepted':
+            return Response({"detail": "Loan request has not been accepted"}, status=status.HTTP_400_BAD_REQUEST)
+        
         loan_request.return_date = timezone.now()
         loan_request.approval_status = 'returned'
         loan_request.save()
@@ -99,4 +102,5 @@ class LoanRequestReturnView(generics.UpdateAPIView):
         except Item.DoesNotExist:
             return Response({"detail": "Item not found"}, status=status.HTTP_404_NOT_FOUND)
         
-        return Response({"detail": "Item returned successfully"}, status=status.HTTP_200_OK)
+        item_serializer = ItemSerializer(item)
+        return Response({"detail": "Item returned successfully", "item": item_serializer.data}, status=status.HTTP_200_OK)

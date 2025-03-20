@@ -7,6 +7,7 @@ STATUSES = (
     ("accepted", "Accepted"),
     ("rejected", "Rejected"),
     ("processing", "Processing"),
+    ("returned", "Returned"),
 )
 
 
@@ -58,7 +59,7 @@ class Item(models.Model):
 
 
 class ItemLoanRequest(models.Model):
-    approval_status = models.CharField(max_length=10, choices=STATUSES, default="Processing")
+    approval_status = models.CharField(max_length=10, choices=STATUSES, default="processing")
     start_date = models.DateField()
     end_date = models.DateField()
     return_date = models.DateField(blank=True, null=True)

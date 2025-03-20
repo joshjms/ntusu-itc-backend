@@ -83,4 +83,3 @@ class ItemLoanRequestAdmin(admin.ModelAdmin):
     list_display = ['id', 'approval_status', 'start_date', 'end_date', 'return_date', 'quantity', 'item', 'user']
     list_filter = ['approval_status', 'start_date', 'end_date', 'return_date']
     search_fields = ['item__title']
-

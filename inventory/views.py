@@ -1,13 +1,12 @@
-from django.shortcuts import render
 from rest_framework import status
-from rest_framework import generics, viewsets
+from rest_framework import generics, viewsets, permissions
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from django.http import JsonResponse
-
 from django.utils import timezone
+from django.shortcuts import render
 
 from .models import (
     InventoryUser, 
@@ -29,10 +28,13 @@ class ItemListView(generics.ListAPIView):
     serializer_class = ItemSerializer
     
 # view item with id
-class ItemDetailView(generics.RetrieveAPIView):
-    serializer_class = ItemSerializer
+class ItemDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Item.objects.all()
-    lookup_url_kwarg = 'item_id'
+    serializer_class = ItemSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_update(self, serializer):
+        serializer.save(user=self.request.user.inventorylender)
     
 # view all loan requests // this one for admin only
 class ItemLoanRequestListView(generics.ListAPIView):

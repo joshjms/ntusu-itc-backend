@@ -20,6 +20,5 @@ class ItemLoanRequestSerializer(serializers.ModelSerializer):
     item = serializers.PrimaryKeyRelatedField(queryset=Item.objects.all())
     class Meta:
         model = ItemLoanRequest
-        fields = ['id', 'approval_status', 'start_date', 'end_date', 'return_date', 'quantity', 'item', 'user']
+        fields = '__all__' # Include all fields in the API
         read_only_fields = ['id', 'user']
-

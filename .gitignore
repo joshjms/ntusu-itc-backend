@@ -151,3 +151,5 @@ GitHub.sublime-settings
 
 # Zip files
 *.zip
+
+/static

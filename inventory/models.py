@@ -13,7 +13,7 @@ STATUSES = (
 
 def get_item_path(instance, filename):
     unique_identifier = get_random_string(12)
-    return f'inventory/item_files/{unique_identifier}_{filename}'
+    return f'static/{unique_identifier}_{filename}'
 
 
 class InventoryUser(models.Model):

@@ -24,6 +24,7 @@ from .serializers import (
 
 # view items
 class ItemListView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
     
@@ -38,6 +39,7 @@ class ItemDetailView(generics.RetrieveUpdateDestroyAPIView):
     
 # view all loan requests // this one for admin only
 class ItemLoanRequestListView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
     serializer_class = ItemLoanRequestSerializer
     queryset = ItemLoanRequest.objects.all()
     

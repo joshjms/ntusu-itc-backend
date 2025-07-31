@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.db.models import Count, Q, F
-from inventory.models import InventoryUser, InventoryLender, Item, ItemLoanRequest
+from inventory.models import InventoryUser, InventoryLender, InventoryItem, InventoryBooking
 
 
 class AvailabilityFilter(admin.SimpleListFilter):
@@ -48,7 +48,7 @@ class InventoryLenderAdmin(admin.ModelAdmin):
         return obj.user.email
 
 
-@admin.register(Item)
+@admin.register(InventoryItem)
 class ItemAdmin(admin.ModelAdmin):
     list_display = ['id', 'title', 'category', 'quantity', 'lender', 'loan_request_count', 'is_available']
     list_filter = ['category', AvailabilityFilter]
@@ -78,7 +78,7 @@ class ItemAdmin(admin.ModelAdmin):
         return obj.on_loan < obj.quantity
 
 
-@admin.register(ItemLoanRequest)
+@admin.register(InventoryBooking)
 class ItemLoanRequestAdmin(admin.ModelAdmin):
     list_display = ['id', 'approval_status', 'start_date', 'end_date', 'return_date', 'quantity', 'item', 'user']
     list_filter = ['approval_status', 'start_date', 'end_date', 'return_date']

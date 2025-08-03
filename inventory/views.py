@@ -3,10 +3,12 @@ from rest_framework import generics, viewsets, permissions
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.exceptions import PermissionDenied
 
 from django.http import JsonResponse
 from django.utils import timezone
 from django.shortcuts import render
+from rest_framework.permissions import IsAdminUser
 
 from .models import (
     InventoryUser, 
@@ -39,7 +41,7 @@ class ItemDetailView(generics.RetrieveUpdateDestroyAPIView):
     
 # view all loan requests // this one for admin only
 class ItemLoanRequestListView(generics.ListAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdminUser]
     serializer_class = ItemLoanRequestSerializer
     queryset = ItemLoanRequest.objects.all()
     
@@ -51,9 +53,11 @@ class UserLoanRequestListView(generics.ListAPIView):
     def get_queryset(self):
         user_id = self.request.user.id
         # checking the request user and the token user
-        if self.kwargs['username'] != self.request.user.username:
-            return Response({"detail": "You are not authorized to view this user's loan requests"}, status=status.HTTP_401_UNAUTHORIZED)
-        return ItemLoanRequest.objects.filter(user=user_id)
+        # or admin user
+        if self.kwargs['username'] != self.request.user.username and self.request.user.is_superuser == False:
+            raise PermissionDenied("You are not allowed to view this user's loan requests")
+        inventory_user = InventoryUser.objects.get(user__username=self.kwargs['username'])
+        return ItemLoanRequest.objects.filter(user=inventory_user)
     
 # send loan request
 class LoanRequestCreateView(generics.CreateAPIView):
@@ -61,7 +65,7 @@ class LoanRequestCreateView(generics.CreateAPIView):
     
     def post(self, request, *args, **kwargs):
         item_id = request.data.get('item')
-        quantity = request.data.get('quantity')
+        quantity = int(request.data.get('quantity'))
         user_id = request.user.id
         
         try:
@@ -80,14 +84,13 @@ class LoanRequestCreateView(generics.CreateAPIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# return item
+# return item // only admin can modify this
 class LoanRequestReturnView(generics.UpdateAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdminUser]
     
     def put(self, request, pk, *args, **kwargs):
         try:
-            request_user = InventoryUser.objects.get(pk=request.user.id)
-            loan_request = ItemLoanRequest.objects.get(pk=pk, user=request_user)
+            loan_request = ItemLoanRequest.objects.get(pk=pk)
         except ItemLoanRequest.DoesNotExist:
             return Response({"detail": "Loan request not found"}, status=status.HTTP_404_NOT_FOUND)
         

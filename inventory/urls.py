@@ -1,20 +1,20 @@
 from django.urls import path
 
 from .views import (
-    ItemListView,
-    ItemDetailView,
-    ItemLoanRequestListView,
-    LoanRequestCreateView,
-    LoanRequestReturnView,
-    UserLoanRequestListView,
+    InventoryItemListView,
+    InventoryItemDetailView,
+    InventoryBookingListView,
+    InventoryBookingCreateView,
+    InventoryBookingReturnView,
+    UserInventoryBookingListView,
 )
 
 app_name = 'inventory'
 urlpatterns = [
-    path('items/', ItemListView.as_view(), name='item-list'),
-    path('items/<int:pk>/', ItemDetailView.as_view(), name='item-detail'),
-    path('loan-requests/', ItemLoanRequestListView.as_view(), name='loan-requests'),
-    path('loan-requests/<str:username>/', UserLoanRequestListView.as_view(), name='user-loan-requests'),
-    path('items/loan/', LoanRequestCreateView.as_view(), name='loan-request-create'),
-    path('loan-requests/return/<int:pk>', LoanRequestReturnView.as_view(), name='loan-request-return'),
+    path('items/', InventoryItemListView.as_view(), name='item-list'),
+    path('items/<int:pk>/', InventoryItemDetailView.as_view(), name='item-detail'),
+    path('bookings/', InventoryBookingListView.as_view(), name='loan-requests'),
+    path('bookings/<str:username>/', UserInventoryBookingListView.as_view(), name='user-loan-requests'),
+    path('items/loan/', InventoryBookingCreateView.as_view(), name='loan-request-create'),
+    path('bookings/return/<int:pk>', InventoryBookingReturnView.as_view(), name='loan-request-return'),
 ]

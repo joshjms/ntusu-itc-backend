@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from inventory.models import InventoryUser, InventoryLender, Item, ItemLoanRequest
+from inventory.models import InventoryUser, InventoryLender, InventoryItem, InventoryBooking
 
 class InventoryUserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -11,14 +11,14 @@ class InventoryLenderSerializer(serializers.ModelSerializer):
         model = InventoryLender
         fields = ['user.id', 'user.username', 'user.email', 'organisation_name']
 
-class ItemSerializer(serializers.ModelSerializer):
+class InventoryItemSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Item
+        model = InventoryItem
         fields = ['id', 'title', 'description', 'category', 'attachment', 'quantity', 'user']
 
-class ItemLoanRequestSerializer(serializers.ModelSerializer):
-    item = serializers.PrimaryKeyRelatedField(queryset=Item.objects.all())
+class InventoryBookingSerializer(serializers.ModelSerializer):
+    item = serializers.PrimaryKeyRelatedField(queryset=InventoryItem.objects.all())
     class Meta:
-        model = ItemLoanRequest
+        model = InventoryBooking
         fields = '__all__' # Include all fields in the API
         read_only_fields = ['id', 'user']
